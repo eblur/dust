@@ -18,6 +18,8 @@ from scipy.interpolate import interp1d
 #         : rp(E) where E is in [keV]
 #  ip     : same as above, ip(E) where E is in [keV]
 
+CMROOT = '/Users/lia/Academic/halo_lib/'
+
 class CmDrude(object):
     """ OBJECT cmindex.CmDrude
     ---------------------------------------
@@ -67,7 +69,7 @@ class CmGraphite(object):
         self.size   = size
         self.orient = orient
         
-        D03vals = c.restore( '/Users/lia/Academic/hg_lib/halo_lib/CM_D03.pysav' )      # look up file
+        D03vals = c.restore( CMROOT + 'CM_D03.pysav' )      # look up file
         
         if size == 'big':            
             if orient == 'perp':
@@ -108,7 +110,7 @@ class CmSilicate(object):
     def __init__( self ):
         self.cmtype = 'Silicate'
 
-        D03vals = c.restore( '/Users/lia/Academic/hg_lib/halo_lib/CM_D03.pysav' )      # look up file
+        D03vals = c.restore( CMROOT + 'CM_D03.pysav' )      # look up file
         
         lamvals = D03vals['Sil_lam']
         revals  = D03vals['Sil_re']
