@@ -196,7 +196,7 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
 
 	return interp1d( halodict.alpha/arcsec2pix, result )
 
-def simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
+def simulate_screen( specfile, a0=0.1, a1=None, p=3.5, NH=NH, d2g=0.009, xg=0.5, \
 	alpha=ALPHA, aeff=aeff.get_area('zero',cycle=7), exposure=EXPOSURE ):
 	'''
 	Simulate a surface brightness profile from spectrum file
@@ -223,12 +223,12 @@ def simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
 		dust_dist = GH.dust.Dustdist( p=p, rad=GH.dust.adist(a0,a1) )
 	
 	halo_dict = get_halodict( source_flux, rad=dust_dist, scatm=SCATM, alpha=alpha )
-	analytic_screen( halo_dict, xg=xg, d2g=d2g )
+	analytic_screen( halo_dict, xg=xg, NH=NH, d2g=d2g )
 	result = simulate_surbri( halo_dict, source_flux, aeff, exposure=exposure )
 
 	return result
 
-def simulate_uniform( specfile, a0=0.1, a1=None, p=None, d2g=0.009, \
+def simulate_uniform( specfile, a0=0.1, a1=None, p=None, NH=NH, d2g=0.009, \
 	alpha=ALPHA, aeff=aeff.get_area('zero',cycle=7), exposure=EXPOSURE ):
 	'''
 	Simulate a surface brightness profile from spectrum file
@@ -254,7 +254,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=None, d2g=0.009, \
 		dust_dist = GH.dust.Dustdist( p=p, rad=GH.dust.adist(a0,a1) )
 	
 	halo_dict = get_halodict( source_flux, rad=dust_dist, scatm=SCATM, alpha=alpha )
-	analytic_uniform( halo_dict, d2g=d2g )
+	analytic_uniform( halo_dict, NH=NH, d2g=d2g )
 	result = simulate_surbri( halo_dict, source_flux, aeff, exposure=exposure )
 	
 	return result

@@ -10,18 +10,33 @@ from scipy.integrate import trapz
 import galhalo as GH
 import dust
 
+## UPDATED May 27, 2013  : Rewrote GammaInc function to be more robust
 ## UPDATED April 4, 2013 : To treat halos in same way as DiscreteISM 
 ## 							and UniformISM functions in galhalo.py
 ## CREATED April 3, 2013
 
 #--------------------------------------------
 # http://www.johndcook.com/gamma_python.html
+#
+# See ~/Academic/notebooks/test_functions.ipynb for testing
+# and
+# http://mathworld.wolfram.com/IncompleteGammaFunction.html for general info
 
 from scipy.special import gammaincc
 from scipy.special import gamma
+from scipy.special import expi
 
-def GammaInc( a, x ):
-	return gammaincc( a, x ) * gamma( a )
+def GammaInc( a, z ):
+    if z.any() < 0:
+        print 'ERROR: z must be >= 0'
+        return
+    if a == 0:
+        return -expi(-z)
+
+    elif a < 0:
+        return ( GammaInc(a+1,z) - np.power(z,a) * np.exp(-z) ) / a
+    else:
+        return gammaincc(a,z) * gamma(a)
 
 def set_htype( halo, xg=None, NH=1.0e20, d2g=0.009 ):
 	'''
@@ -72,8 +87,6 @@ def G_s( halo ):
 	a0 = halo.dist.a[0]
 	a1 = halo.dist.a[-1]
 	p  = halo.rad.p
-	if p > 7:
-		print 'WARNING: Scipy.special.gammaincc requires a > 0, this calculation will fail.'
 	charsig0 = 1.04 * 60.0 / halo.E0
 	pfrac    = (7.0-p)/2.0
 	const    = halo.alpha**2/(2.0*charsig0**2*halo.htype.xg**2)
@@ -117,8 +130,6 @@ def G_u( halo ):
 	a0 = halo.rad.a[0]
 	a1 = halo.rad.a[-1]
 	p  = halo.rad.p
-	if p > 7:
-		print 'WARNING: Scipy.special.gammaincc requires a > 0, this calculation will fail.'
 	power = 6.0 - halo.rad.p
 	pfrac = (7.0-p) / 2.0
 	charsig = 1.04 * 60.0 / halo.E0
