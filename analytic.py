@@ -27,16 +27,17 @@ from scipy.special import gamma
 from scipy.special import expi
 
 def GammaInc( a, z ):
-    if z.any() < 0:
-        print 'ERROR: z must be >= 0'
-        return
-    if a == 0:
-        return -expi(-z)
+	if z.any() < 0:
+		print 'ERROR: z must be >= 0'
+		return
+	if a == 0:
+		return -expi(-z)
 
-    elif a < 0:
-        return ( GammaInc(a+1,z) - np.power(z,a) * np.exp(-z) ) / a
-    else:
-        return gammaincc(a,z) * gamma(a)
+	elif a < 0:
+		return ( GammaInc(a+1,z) - np.power(z,a) * np.exp(-z) ) / a
+	else:
+		return gammaincc(a,z) * gamma(a)
+
 
 def set_htype( halo, xg=None, NH=1.0e20, d2g=0.009 ):
 	'''
