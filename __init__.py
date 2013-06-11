@@ -1,15 +1,15 @@
 #! /usr/bin/env python
 
-import WD01
-import constants
-import galhalo
-import model_halo
-import cmindex
-import analytic
-import cosmology
-import halo
-import scatmodels
-import cmindex
-import dust
-import halodict
-import sigma_scat
+from WD01 import *
+from constants import *
+from galhalo import *
+from model_halo import *
+from cmindex import *
+from analytic import *
+from cosmology import *
+from halo import *
+from scatmodels import *
+from cmindex import *
+from dust import *
+from halodict import *
+from sigma_scat import *
