@@ -1,19 +1,17 @@
 #! /Library/Frameworks/EPD64.framework/Versions/Current/bin/python
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 import galhalo as GH
 import halodict as HD
 import analytic as AH
+import constants as c
 
 from scipy.interpolate import interp1d
 
-import sys
-sys.argv
-
 ## UPDATED June 11, 2013 : I want to make halo_lib 
 ## independent of asciidata, radprofile, and aeff
+## CAVEAT : Path to effective area data file needs to be specified
 
 ## UPDATED April 4, 2013 : To include analytic solutions for galactic ISM
 ## (RG Gans + Drude solution only)
@@ -43,7 +41,7 @@ grains = GH.dust.Dustdist( p=P, rad=avals )
 SCATM  = GH.ss.Scatmodel()
 ALPHA  = np.power( 10.0, np.arange(-1.0,3.01,0.1) )
 
-AEFF   = HD.aeff( 'zeroth_aeff_cycle7.dat' )
+AEFF   = HD.aeff( '/Users/lia/Academic/halo_lib/zeroth_aeff_cycle7.dat' )
 
 #---------------------------------------------------------------------
 ## Set up halo dictionary

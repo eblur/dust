@@ -1,7 +1,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from galhalo import *
 
 from scipy.special import erf
 from scipy.integrate import trapz
@@ -9,6 +8,8 @@ from scipy.integrate import trapz
 ## REQUIRES Halo objects to work
 import galhalo as GH
 import dust
+
+## UPDATED June 11, 2013 : Make the halos calculation faster for halodicts?
 
 ## UPDATED May 27, 2013  : Rewrote GammaInc function to be more robust
 ## UPDATED April 4, 2013 : To treat halos in same way as DiscreteISM 
