@@ -2,19 +2,18 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import asciidata as AD
 
 import galhalo as GH
 import halodict as HD
 import analytic as AH
 
-import radprofile as rp
-import aeff
-
 from scipy.interpolate import interp1d
 
 import sys
 sys.argv
+
+## UPDATED June 11, 2013 : I want to make halo_lib 
+## independent of asciidata, radprofile, and aeff
 
 ## UPDATED April 4, 2013 : To include analytic solutions for galactic ISM
 ## (RG Gans + Drude solution only)
@@ -44,6 +43,8 @@ grains = GH.dust.Dustdist( p=P, rad=avals )
 SCATM  = GH.ss.Scatmodel()
 ALPHA  = np.power( 10.0, np.arange(-1.0,3.01,0.1) )
 
+AEFF   = HD.aeff( 'zeroth_aeff_cycle7.dat' )
+
 #---------------------------------------------------------------------
 ## Set up halo dictionary
 
@@ -52,13 +53,9 @@ def get_spec( specfile ):
 	Returns halodict.Spectrum object containing the 
 	source flux [photons/cm^2/s] as a function of energy [keV]
 	"""
-	try:
-		specdata = AD.open( specfile )
-	except:
-		print 'ERROR: Specfile not found'
-		return	
-	energy  = specdata[0].tonumpy()
-	srcflux = specdata[1].tonumpy()
+	data = c.read_table( specfile, 2 )
+	energy  = np.array( data[0] )
+	srcflux = np.array( data[1] )
 	return HD.Spectrum( energy, srcflux )
 
 def get_halodict( spectrum, rad=grains, scatm=SCATM, alpha=ALPHA ):
@@ -182,7 +179,7 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
     ----------------------------------------------------
     halodict : halodict.HaloDict object
     spectrum : halodict.Spectrum object
-    aeff     : interp1d object : x = energy [keV], y = effective area [cm^2] from aeff.py
+    aeff     : interp1d object : x = energy [keV], y = effective area [cm^2]
     exposure : float : Exposure time [sec]
 	'''
 	flux_dict = dict( zip( spectrum.bin, spectrum.flux ) )
@@ -197,13 +194,13 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
 	return interp1d( halodict.alpha/arcsec2pix, result )
 
 def simulate_screen( specfile, a0=0.1, a1=None, p=3.5, NH=NH, d2g=0.009, xg=0.5, \
-	alpha=ALPHA, aeff=aeff.get_area('zero',cycle=7), exposure=EXPOSURE ):
+	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE ):
 	'''
 	Simulate a surface brightness profile from spectrum file
 	for a screen of dust at xg, using 3-5 free parameters
     ----------------------------------------------------
     FUNCTION simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
-    	alpha=ALPHA, aeff=aeff.get_area('zero',cycle=7), exposure=EXPOSURE )
+    	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE )
     RETURNS : scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
     ----------------------------------------------------
     specfile : string : Name of spectrum file
@@ -213,7 +210,7 @@ def simulate_screen( specfile, a0=0.1, a1=None, p=3.5, NH=NH, d2g=0.009, xg=0.5,
     d2g      : float : Dust-to-gas mass ratio
     xg       : float [0-1] : Position of screen where 0 = point source, 1 = observer
     alpha    : np.array [arcsec] : Angles for halo intensity values
-    aeff     : intper1d object : x = energy [keV], y = effective area [cm^2] from aeff.py
+    aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
     exposure : float [sec] : Observation exposure time
 	'''
 	source_flux = get_spec( specfile )
@@ -229,13 +226,13 @@ def simulate_screen( specfile, a0=0.1, a1=None, p=3.5, NH=NH, d2g=0.009, xg=0.5,
 	return result
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=None, NH=NH, d2g=0.009, \
-	alpha=ALPHA, aeff=aeff.get_area('zero',cycle=7), exposure=EXPOSURE ):
+	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE ):
 	'''
 	Simulate a surface brightness profile from spectrum file
 	for a uniform distribution of dust, using 2-4 free parameters
     ----------------------------------------------------
     FUNCTION simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
-    	alpha=ALPHA, aeff=aeff.get_area('zero',cycle=7), exposure=EXPOSURE )
+    	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE )
     RETURNS : scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
     ----------------------------------------------------
     specfile : string : Name of spectrum file
@@ -244,7 +241,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=None, NH=NH, d2g=0.009, \
     p        : float : Power law index for grain size distribution
     d2g      : float : Dust-to-gas mass ratio
     alpha    : np.array [arcsec] : Angles for halo intensity values
-    aeff     : intper1d object : x = energy [keV], y = effective area [cm^2] from aeff.py
+    aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
     exposure : float [sec] : Observation exposure time
 	'''
 	source_flux = get_spec( specfile )

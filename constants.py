@@ -59,7 +59,7 @@ def arcm2rad():
     return 2.0*np.pi / 360. / 60.        # rad/arcmin
 
 
-#------- Save and restor functions, similar to IDL -----
+#------- Save and restore functions, similar to IDL -------#
 # http://idl2python.blogspot.com/2010/10/save-and-restore-2.html
 # Updated April 20, 2012 to store objects
 # http://wiki.python.org/moin/UsingPickle
@@ -88,45 +88,42 @@ def restore(file):
     f.close
     return result
 
-#---- Reports the status of a for loops --------
+#------- Read ascii tables --------#
+# June 11, 2013
+# needed for computers that don't have access to asciidata (hotfoot)
 
-def loop_status( i, istop, f=0.0, time=False, init=False ):
-    now     = ''
-    if time:
-        from time import gmtime, strftime
-        now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+def read_table( filename, ncols, ignore='#' ):
+	"""
+	Read data saved in an ascii table
+	Assumes data is separated by white space
+	Assumes all the data are floats
+	Ignores lines that start with the ignore character / sequence
+	---------------
+	Usage : read_table( filename, ncols, ignore='#' )
+	Returns : A dictionary with the column index as keys and the column data as lists
+	"""
 
-    if init:
-        print '0% done ' + now
-        return 0.0
-    
-    percent = np.float64(i) / np.float64(istop)
-    
-    if percent >= 0.9 and f < 0.8:
-        print '90% done ' + now
-        return percent
-    elif percent >= 0.8 and f < 0.7:
-        print '80% done ' + now
-        return percent
-    elif percent >= 0.7 and f < 0.6:
-        print '70% done ' + now
-        return percent
-    elif percent >= 0.6 and f < 0.5:
-        print '60% done ' + now
-        return percent
-    elif percent >= 0.5 and f < 0.4:
-        print '50% done ' + now
-        return percent
-    elif percent >= 0.4 and f < 0.3:
-        print '40% done ' + now
-        return percent
-    elif percent >= 0.3 and f < 0.2:
-        print '30% done ' + now
-        return percent
-    elif percent >= 0.2 and f < 0.1:
-        print '20% done ' + now
-        return percent
-    elif percent >= 0.1 and f == 0.0:
-        print '10% done ' + now
-        return percent
+	# Initialize result dictionary
+	result = {}
+	for i in range(ncols):
+		result[i] = []
+	
+	try : f = open( filename, 'r' )
+	except:
+		print 'ERROR: file not found'
+		return
+	
+	end_of_file = False
+	while not end_of_file:
+		try:
+			temp = f.readline()
+			if temp[0] == ignore : pass  # Ignore the ignore character
+			else:
+				temp = temp.split()
+				for i in range(ncols) : result[i].append( np.float(temp[i]) )
+		except:
+			end_of_file = True
+	
+	f.close()
+	return result
 

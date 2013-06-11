@@ -5,10 +5,11 @@ import galhalo as gh
 
 import numpy as np
 import constants as c
-import asciidata as AD
 import matplotlib.pyplot as plt
 
 from scipy.interpolate import interp1d
+
+## UPDATED June 11, 2013 : Make this file independent of asciidata
 
 ## July 17, 2012 : A library of objects and functions for simulating a
 ## full halo given an object's spectrum.
@@ -181,8 +182,10 @@ def sum_spectra( spec1, spec2, emin, emax, dE, restore=False ):
     return Spectrum( sum_bin, sum_flux )
 
 def aeff( filename ):
-    data = AD.open( filename )
-    return interp1d( data[0].tonumpy(), data[1].tonumpy() )   # keV vs cm^2
+	data = c.read_table( filename, 2 )
+	energy = np.array( data[0] )
+	aeff   = np.array( data[1] )
+	return interp1d( energy, aeff )   # keV vs cm^2
 
 def bin_halo( alpha, hbright, binedges ):
     total  = []
