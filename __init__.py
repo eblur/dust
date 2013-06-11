@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from WD01 import *
+#from WD01 import *
 from constants import *
 from galhalo import *
 from model_halo import *

@@ -91,8 +91,4 @@ def make_dust_spectrum( amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5 ):
     """
     return Dustspectrum( rad=Dustdist( rad=adist(amin=amin, amax=amax, na=na), p=p, rho=rho ), md=md )
 
-#--------------------
-# Can only be called at end here because WD01 requires dust objects
-
-import WD01
 
