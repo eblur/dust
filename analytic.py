@@ -96,6 +96,27 @@ def G_s( halo ):
 	gamma0   = GammaInc( pfrac, const * a0**2 )
 	return -0.5 * np.power( const, -pfrac ) * ( gamma1 - gamma0 )
 
+def G_s_dict( halodict ):
+
+	energy = halodict.energy
+	ref    = halodict[ energy[0] ]
+
+	a0 = ref.dist.a[0]
+	a1 = ref.dist.a[-1]
+	p  = ref.rad.p
+	
+	NE = len(energy)
+	NA = len(ref.alpha)
+	superA = np.tile( ref.alpha, (NE,1) ) # NE x NA
+	superE = np.tile( energy.reshape(NE,1), NA )
+	
+	charsig0 = 1.04 * 60.0 / superE
+	pfrac    = (7.0-p)/2.0
+	const    = superA**2 / ( 2.0 * charsig0**2 * ref.htype.xg**2 )
+	gamma1   = GammaInc( pfrac, const * a1**2 ) # note 'a' is always a single value
+	gamma0   = GammaInc( pfrac, const * a0**2 )
+	return -0.5 * np.power( const, -pfrac ) * ( gamma1 - gamma0 )
+
 def screen_eq( halo ):
 	'''
 	Analytic function for a screen of dust particles 
@@ -120,6 +141,35 @@ def screen_eq( halo ):
 		result = const / halo.htype.xg**2 * G_s(halo) / G_p(halo)
 
 	halo.intensity = result
+	return result
+
+def screen_eq_dict( halodict, xg=0.5, **kwargs):
+
+	energy = halodict.energy # NE x 1
+	ref    = halodict[ energy[0] ] # A reference halo
+	# Assume all other halos have same properties except for energy
+	set_htype( ref, xg=xg, **kwargs )
+	hfrac  = ref.taux * energy[0]**2 / energy**2 # NE x 1
+	
+	NE     = len(halodict.energy)
+	NA     = len(ref.alpha)
+
+	superA = np.tile( ref.alpha, (NE,1) ) # NE x NA
+	superE = np.tile( energy.reshape(NE,1), NA ) # NE x NA
+	supertau = np.tile( hfrac.reshape(NE,1), NA )
+	
+	if type(ref.rad) == dust.Grain:
+		charsig = 1.04 * 60. / ref.rad.a / superE # NE x NA [arcsec]
+		gterm   = np.exp( -superA**2 / (2 * charsig**2 * ref.htype.xg**2) ) # NE x NA
+		result  = supertau * gterm / ( ref.htype.xg**2 * 2.0*np.pi*charsig**2 ) # NE x NA
+	
+	if type(ref.rad) == dust.Dustdist:
+		charsig0 = 1.04 * 60.0 / superE # NE x NA
+		const    = supertau / ( 2.0*np.pi*charsig0**2 ) # NE x NA
+		result   = const / ref.htype.xg**2 * G_s_dict(halodict) / G_p(ref)
+		## Have to fix G_s to take whatever energy
+	
+	halodict.intensity = result
 	return result
 
 #--------------------------------------------

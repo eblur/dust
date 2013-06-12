@@ -184,11 +184,16 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
 	arcsec2pix = 0.5  #arcsec/pix
 	result = 0.0
 
-	for ee in halodict.energy:
-		corr_counts = flux_dict[ee] * np.exp( halodict[ee].taux ) * aeff(ee) * EXPOSURE
-		halo_counts = corr_counts * halodict[ee].intensity * arcsec2pix**2 # pixels^-2
-		result = result + halo_counts
+	corr_counts = spectrum.flux * np.exp( halodict.taux ) * aeff(spectrum.bin) * EXPOSURE
 
+#	for ee in halodict.energy:
+	for i in range( len(halodict.alpha) ):
+		#corr_counts = flux_dict[ee] * np.exp( halodict[ee].taux ) * aeff(ee) * EXPOSURE
+		#halo_counts = corr_counts * halodict[ee].intensity * arcsec2pix**2 # pixels^-2
+		halo_counts = corr_counts * halodict.intensity[:,i] * arcsec2pix**2 # pixels^-2
+		#result = result + halo_counts
+	
+	result = np.sum( halodict.intensity, 0 )
 	return interp1d( halodict.alpha/arcsec2pix, result )
 
 def simulate_screen( specfile, a0=0.1, a1=None, p=3.5, NH=NH, d2g=0.009, xg=0.5, \

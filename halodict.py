@@ -77,6 +77,17 @@ class HaloDict( object ):
         self.alpha  = alpha
         self.energy = energy
         self.dict   = dict( zip(energy,halo_list) )
+        self.rad    = rad
+        self.scatm  = scatm
+        self.intensity = np.zeros( shape=( len(energy), len(alpha) ) )
+
+	@property
+	def superE( self ):
+		return np.tile( alpha, (NE,1) ) # NE x NA
+	
+	@property
+	def superA( self ):
+		return np.tile( energy.reshape(NE,1), NA ) # NE x NA
 
     def __getitem__( self, key ):
         return self.dict[key]
@@ -106,10 +117,11 @@ class HaloDict( object ):
 
     @property
     def taux( self ):
-        result = []
-        for ee in self.energy:
-            result.append( self.dict[ee].taux[0] )
-        return np.array( result )
+    	return self[ self.energy[0] ].taux * self.energy[0]**2 / self.energy**2
+#        result = []
+#        for ee in self.energy:
+#            result.append( self.dict[ee].taux[0] )
+#        return np.array( result )
 
     @property
     def len( self ):
