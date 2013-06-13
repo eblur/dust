@@ -37,12 +37,12 @@ class Halo(object):
                   alpha = ss.angles(), 
                   rad   = dust.Grain(), 
                   scatm = ss.Scatmodel() ):
-        self.htype = None
-        self.E0    = E0
-        self.alpha = alpha
-        self.rad   = rad    # Two options: dust.Grain or dust.Dustdist
-        self.dist  = None   # dust.Dustspectrum will be stored here when halo is calculated
-        self.scatm = scatm
+        self.htype  = None
+        self.energy = E0
+        self.alpha  = alpha
+        self.rad    = rad    # Two options: dust.Grain or dust.Dustdist
+        self.dist   = None   # dust.Dustspectrum will be stored here when halo is calculated
+        self.scatm  = scatm
         self.intensity = np.zeros( np.size(alpha) )
         self.taux  = None
 
@@ -81,7 +81,7 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
     cosm : cosmo.Cosmology
     nz   : int : number of z-values to use in integration
     """
-    E0    = halo.E0
+    E0    = halo.energy
     alpha = halo.alpha
     scatm = halo.scatm
     
@@ -144,7 +144,7 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
     #----- Finally, set the halo intensity --------
 
     halo.intensity  = intensity * np.power( c.arcs2rad(), 2 )  # arcsec^-2
-    halo.taux       = cosmo.CosmTauX( zs, E=halo.E0, dist=halo.rad, scatm=halo.scatm, cosm=halo.htype.cosm )
+    halo.taux       = cosmo.CosmTauX( zs, E=halo.energy, dist=halo.rad, scatm=halo.scatm, cosm=halo.htype.cosm )
     
 #----------------- Infinite Screen Case --------------------------
 
@@ -162,7 +162,7 @@ def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
     if zg >= zs:
         print '%% STOP: zg must be < zs'
 
-    E0    = halo.E0
+    E0    = halo.energy
     alpha = halo.alpha
     scatm = halo.scatm
 
@@ -200,7 +200,7 @@ def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
         intensity = np.zeros( np.size(zpvals) )
 
     halo.intensity = intensity * np.power( c.arcs2rad(), 2 )  # arcsec^-2
-    halo.taux      = cosmo.CosmTauScreen( zg, E=halo.E0, dist=halo.dist, scatm=halo.scatm )
+    halo.taux      = cosmo.CosmTauScreen( zg, E=halo.energy, dist=halo.dist, scatm=halo.scatm )
 
 
 

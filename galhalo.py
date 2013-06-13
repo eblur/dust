@@ -169,14 +169,14 @@ def UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
     nx   : int : number of values to use in integration
     usepathdiff : boolean : True = use extinction due to path difference e^(-tau*path_diff)
     """
-    E0    = halo.E0
+    E0    = halo.energy
     alpha = halo.alpha
     scatm = halo.scatm
     md    = NH * c.mp() * d2g
 
     halo.htype = GalHalo( NH=NH, d2g=d2g, ismtype='Uniform' )
     halo.dist  = dust.Dustspectrum( rad=halo.rad, md=md )
-    halo.taux  = ss.Kappascat( E=halo.E0, scatm=halo.scatm, dist=halo.dist ).kappa * md
+    halo.taux  = ss.Kappascat( E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * md
 
     dx    = 1.0 / nx
     xvals = np.arange( 0.0, 1.0, dx ) + dx
@@ -244,7 +244,7 @@ def DiscreteISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
     NH   : float : column density [cm^-2]
     d2g  : float : dust-to-gass mass ratio
     """
-    E0    = halo.E0
+    E0    = halo.energy
     alpha = halo.alpha
     scatm = halo.scatm
     md    = NH * c.mp() * d2g
@@ -273,6 +273,6 @@ def DiscreteISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
         intensity = np.zeros( np.size(xvals) )
 
     halo.intensity = intensity * np.power( c.arcs2rad(), 2 )  # arcsec^-2
-    halo.taux      = ss.Kappascat( E=halo.E0, scatm=halo.scatm, dist=halo.dist ).kappa * md
+    halo.taux      = ss.Kappascat( E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * md
 
 

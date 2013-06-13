@@ -64,7 +64,7 @@ def set_htype( halo, xg=None, NH=1.0e20, d2g=0.009 ):
 
 	md         = NH * GH.c.mp() * d2g
 	halo.dist  = dust.Dustspectrum( rad=halo.rad, md=md )
-	halo.taux  = GH.ss.Kappascat( E=halo.E0, scatm=halo.scatm, dist=halo.dist ).kappa * halo.dist.md
+	halo.taux  = GH.ss.Kappascat( E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * halo.dist.md
 	return
 
 #--------------------------------------------
@@ -89,7 +89,7 @@ def G_s( halo ):
 	a0 = halo.dist.a[0]
 	a1 = halo.dist.a[-1]
 	p  = halo.rad.p
-	charsig0 = 1.04 * 60.0 / halo.E0
+	charsig0 = 1.04 * 60.0 / halo.energy
 	pfrac    = (7.0-p)/2.0
 	const    = halo.alpha**2/(2.0*charsig0**2*halo.htype.xg**2)
 	gamma1   = GammaInc( pfrac, const * a1**2 )
@@ -131,12 +131,12 @@ def screen_eq( halo ):
 	hfrac = halo.taux
 
 	if type(halo.rad) == dust.Grain:
-		charsig = 1.04 * 60. / halo.rad.a  / halo.E0  #arcsec
+		charsig = 1.04 * 60. / halo.rad.a  / halo.energy  #arcsec
 		gterm  = np.exp( -halo.alpha**2 / (2 * charsig**2 * halo.htype.xg**2) )
 		result = hfrac * gterm / ( halo.htype.xg**2 * 2.0*np.pi*charsig**2 )
 
 	if type(halo.rad) == dust.Dustdist:
-		charsig0 = 1.04 * 60.0 / halo.E0
+		charsig0 = 1.04 * 60.0 / halo.energy
 		const = hfrac / ( 2.0*np.pi*charsig0**2 )
 		result = const / halo.htype.xg**2 * G_s(halo) / G_p(halo)
 
@@ -184,7 +184,7 @@ def G_u( halo ):
 	p  = halo.rad.p
 	power = 6.0 - halo.rad.p
 	pfrac = (7.0-p) / 2.0
-	charsig = 1.04 * 60.0 / halo.E0
+	charsig = 1.04 * 60.0 / halo.energy
 	const   = halo.alpha / charsig / np.sqrt(2.0)
 	A1 = np.power(a1,power) * ( 1 - erf(const*a1) )
 	A0 = np.power(a0,power) * ( 1 - erf(const*a0) )
@@ -206,12 +206,12 @@ def uniform_eq( halo ):
 	hfrac = halo.taux
 
 	if type(halo.rad) == dust.Grain:
-		charsig = 1.04 * 60. / halo.rad.a  / halo.E0  #arcsec
+		charsig = 1.04 * 60. / halo.rad.a  / halo.energy  #arcsec
 		eterm  = 1 - erf( halo.alpha / charsig / np.sqrt(2.) )
 		result = hfrac * eterm * np.sqrt(np.pi/2.0) / (2.0*np.pi*charsig*halo.alpha)
 
 	if type(halo.rad) == dust.Dustdist:
-		charsig = 1.04 * 60.0 / halo.E0
+		charsig = 1.04 * 60.0 / halo.energy
 		const = hfrac / ( halo.alpha * charsig * np.sqrt(8.0*np.pi) )
 		result = const * G_u(halo) / G_p(halo)
 
