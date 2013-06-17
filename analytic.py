@@ -104,7 +104,7 @@ def G_s( halo ):
     gamma0   = GammaInc( pfrac, const * a0**2 )
     return -0.5 * np.power( const, -pfrac ) * ( gamma1 - gamma0 )
 
-def screen_eq( halo, xg=0.5, **kwargs ):
+def screen_eq( halo, xg=0.5, verbose=False, **kwargs ):
     '''
     Analytic function for a screen of dust particles 
         from parameters set in halo (taux, a0, a1, p, xg)
@@ -120,24 +120,24 @@ def screen_eq( halo, xg=0.5, **kwargs ):
     hfrac, energy, alpha = np.array([]), np.array([]), np.array([])
     
     if type(halo) == Halo:
-        print 'Using a Halo object'
+        if verbose: print 'Using a Halo object'
         hfrac = halo.taux
         energy, alpha = halo.energy, halo.alpha
     
     if type(halo) == HaloDict:
-        print 'Using a halo dictionary'
+        if verbose: print 'Using a halo dictionary'
         NE, NA = len(halo.energy), len(halo.alpha)
         hfrac  = np.tile( halo.taux.reshape(NE,1), NA ) # NE x NA
         energy, alpha = halo.superE, halo.superA # NE x NA
     
     if type(halo.rad) == dust.Grain:
-        print 'Using a dust grain'
+        if verbose: print 'Using a dust grain'
         charsig = 1.04 * 60. / halo.rad.a  / energy  #arcsec
         gterm  = np.exp( -alpha**2 / (2 * charsig**2 * xg**2) )
         result = hfrac * gterm / ( xg**2 * 2.0*np.pi*charsig**2 )
     
     if type(halo.rad) == dust.Dustdist:
-        print 'Using a distribution of grain sizes'
+        if verbose: print 'Using a distribution of grain sizes'
         charsig0 = 1.04 * 60.0 / energy
         const = hfrac / ( 2.0*np.pi*charsig0**2 )
         result = const / xg**2 * G_s(halo) / G_p(halo)
@@ -173,7 +173,7 @@ def G_u( halo ):
     B0 = np.power(const,-power) * GammaInc( pfrac, const**2 * a0**2 ) / np.sqrt(np.pi)
     return ( (A1-B1) - (A0-B0) ) / power
 
-def uniform_eq( halo, **kwargs ):
+def uniform_eq( halo, verbose=False, **kwargs ):
     '''
     Analytic function for a uniform distribution of dust particles 
         from parameters set in halo (taux, a0, a1, p)
@@ -188,24 +188,24 @@ def uniform_eq( halo, **kwargs ):
     set_htype( halo, xg=None, **kwargs )
     
     if type(halo) == Halo:
-        print 'Using a Halo object'
+        if verbose: print 'Using a Halo object'
         hfrac = halo.taux
         energy, alpha = halo.energy, halo.alpha
     
     if type(halo) == HaloDict:
-        print 'Using a halo dictionary'
+        if verbose: print 'Using a halo dictionary'
         NE, NA = len(halo.energy), len(halo.alpha)
         hfrac = np.tile( halo.taux.reshape(NE,1), NA ) # NE x NA
         energy, alpha = halo.superE, halo.superA # NE x NA
     
     if type(halo.rad) == dust.Grain:
-        print 'Using a dust grain'
+        if verbose: print 'Using a dust grain'
         charsig = 1.04 * 60. / halo.rad.a  / energy  #arcsec
         eterm  = 1 - erf( alpha / charsig / np.sqrt(2.) )
         result = hfrac * eterm * np.sqrt(np.pi/2.0) / (2.0*np.pi*charsig*alpha)
     
     if type(halo.rad) == dust.Dustdist:
-        print 'Using a distribution of grain sizes'
+        if verbose: print 'Using a distribution of grain sizes'
         charsig = 1.04 * 60.0 / energy
         const = hfrac / ( alpha * charsig * np.sqrt(8.0*np.pi) )
         result = const * G_u(halo) / G_p(halo)

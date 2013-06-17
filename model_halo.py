@@ -130,7 +130,7 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
     result = 0.0
     
     corr_counts = spectrum * np.exp( halodict.taux ) \
-        * aeff(halodict.energy) * EXPOSURE
+        * aeff(halodict.energy) * exposure
     
     NE, NA = halodict.len, halodict.hsize
     halo_counts = np.tile( corr_counts.reshape(NE,1), NA ) * halodict.intensity
