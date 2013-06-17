@@ -166,10 +166,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
         dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+0.01,0.05) )
     
     halo_dict = HD.HaloDict( energy, rad=dust_dist, scatm=SCATM, alpha=alpha )
-    print halo_dict.rad.a
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
-    print halo_dict.taux
-    print halo_dict.dist.md
     result = simulate_surbri( halo_dict, flux, aeff, exposure=exposure )
     
     return result
@@ -201,10 +198,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
         dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+0.01,0.05) )
     
     halo_dict = HD.HaloDict( energy, rad=dust_dist, scatm=SCATM, alpha=alpha )
-    print halo_dict.rad
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
-    print halo_dict.taux
-    print halo_dict.dist.md
     result = simulate_surbri( halo_dict, flux, aeff, exposure=exposure )
     
     return result
