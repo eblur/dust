@@ -17,63 +17,14 @@ from scipy.interpolate import interp1d
 
 #---------------------------------------------------------------
 
-"""
-class Spectrum( object ):
-    def __init__( self, bin, flux ):
-        self.bin  = bin     # np.array
-        self.flux = flux    # np.array
-
-    @property
-    def dbin( self ):
-        result = self.bin[1:] - self.bin[0:-1]
-        result = np.append( result, result[-1] )
-        return result    # np.array
-
-    @property
-    def dict( self ):
-        return dict( zip(self.bin,self.flux) )
-
-    def rebin( self, emin, emax, dE ):
-        try:
-            self.bin  = self.origbin
-            self.flux = self.origflux
-        except:
-            self.origbin  = self.bin
-            self.origflux = self.flux
-
-        energy  = np.arange( emin, emax, dE )          # Defines the bin boundaries
-        new_bin = energy[0:-1] + 0.5 * ( energy[1:] - energy[0:-1] )
-        
-        count    = 0
-        new_flux = []
-        for ee in energy[0:-1]:
-            iee = np.where( np.logical_and( self.bin>=ee, self.bin<ee+dE ) )[0]
-            if len(iee) == 0:
-                new_flux.append( 0 )
-            else:
-                new_flux.append( np.sum( self.flux[iee] ) )
-
-        self.bin  = new_bin
-        self.flux = np.array( new_flux )
-        return
-
-    def restore( self ):
-        try:
-            self.bin  = self.origbin
-            self.flux = self.origflux
-        except:
-            pass
-        return
-"""
-
 class HaloDict( object ):
     """
     A dictionary of halos where each property can be looked up with energy as a key.
     """
-
-    def __init__( self, energy, alpha=np.arange(1.0,200.0,1.0), \
-    	rad=dust.Grain(), scatm=ss.Scatmodel() ):
-
+    
+    def __init__( self, energy, alpha=np.power(10.0, np.arange(0.0,3.01,0.05)), \
+        rad=dust.Grain(), scatm=ss.Scatmodel() ):
+    
         self.alpha  = alpha
         self.energy = energy
         self.index  = dict( zip(energy,range(len(energy))) )
@@ -81,16 +32,16 @@ class HaloDict( object ):
         self.scatm  = scatm
         self.intensity = np.zeros( shape=( len(energy), len(alpha) ) )
         
-		# The following variables get defined when htype is set
-		# See analytic.set_htype
+        # The following variables get defined when htype is set
+        # See analytic.set_htype
         self.htype  = None
         self.dist   = None
         self.taux   = None
-
-	def __getitem__( self, key ):
-		i = self.index[key]
-		return self.intensity[i,:]
-
+    
+    def __getitem__( self, key ):
+        i = self.index[key]
+        return self.intensity[i,:]
+    
     ## http://stackoverflow.com/questions/19151/build-a-basic-python-iterator
     def __iter__( self ):
         self.count = 0
@@ -100,31 +51,30 @@ class HaloDict( object ):
             raise StopIteration
         else:
             self.count += 1
-            #return self[ self.energy[self.count-1] ]
             return self.intensity[count,:]
-
+    
     def __getslice__( self, i, j ):
-    	slice  = np.where( np.logical_and( self.energy>=i, self.energy<j ) )[0]
-    	return self.intensity[slice,:]
-	
+        slice  = np.where( np.logical_and( self.energy>=i, self.energy<j ) )[0]
+        return self.intensity[slice,:]
+    
     @property
     def len( self ):
         return len( self.energy )
-
+    
     @property
     def hsize( self ):
         return len( self.alpha )
-
+    
     @property
     def superE( self ):
         NE, NA = len(self.energy), len(self.alpha)
         return np.tile( self.energy.reshape(NE,1), NA ) # NE x NA
-
+    
     @property
     def superA( self ):
         NE, NA = len(self.energy), len(self.alpha)
         return np.tile( self.alpha, (NE,1) ) # NE x NA
-
+    
     def total_halo( self, fluxes ):
         """
         Sums the halos from different energy bins to create a total halo profile.
@@ -140,7 +90,7 @@ class HaloDict( object ):
         self.total = result
         return
 
-	# I want to rewrite this, but ignore for now
+        # I want to rewrite this, but ignore for now
     def ecf( self, theta, nth=100 ):
         """
         Returns the enclosed fraction for the halo surface brightness
@@ -157,11 +107,11 @@ class HaloDict( object ):
             interpH = interp1d( self.alpha, self.total )
         except:
             print 'Error: total_halo calculation has not been performed.'
-
+        
         dth     = ( theta-min(self.alpha) ) / (nth-1)
         tharray = np.arange( min(self.alpha), theta + dth, dth )
         total   = c.intz( self.alpha, 2.0*np.pi*self.alpha * self.total )
-
+        
         try:
             print c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total
             return c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total
@@ -169,17 +119,16 @@ class HaloDict( object ):
             print 'Error: ECF calculation failed. Theta is likely out of bounds.'
             return
 
-
 #---------------------------------------------------------------
 # Supporting functions
 
 def get_spectrum( filename ):
-	data = c.read_table( filename, 2 )
-	energy, flux = np.array( data[0] ), np.array( data[1] )
-	return energy, flux
+    data = c.read_table( filename, 2 )
+    energy, flux = np.array( data[0] ), np.array( data[1] )
+    return energy, flux
 
 def aeff( filename ):
-	data = c.read_table( filename, 2 )
-	energy = np.array( data[0] )
-	aeff   = np.array( data[1] )
-	return interp1d( energy, aeff )   # keV vs cm^2
+    data = c.read_table( filename, 2 )
+    energy = np.array( data[0] )
+    aeff   = np.array( data[1] )
+    return interp1d( energy, aeff )   # keV vs cm^2
