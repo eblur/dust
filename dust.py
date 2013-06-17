@@ -44,7 +44,7 @@ class Dustdist(object):  # power (p), rho, radius (a)
     dnda ( md : mass density [g cm^-2 or g cm^-3] )
          returns : number density [cm^-3 um^-1]
     """
-    def __init__(self, p=4.0, rho=3.0, rad=adist() ):
+    def __init__(self, p=3.5, rho=3.0, rad=adist() ):
         self.p   = p
         self.rho = rho
         self.a   = rad
