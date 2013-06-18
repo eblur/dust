@@ -164,7 +164,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
         dust_dist = GH.dust.Grain( rad=a0 )
     else:
         dth = (a1-a0)/10.0
-        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+0.01,dth) )
+        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth) )
     
     halo_dict = HD.HaloDict( energy, rad=dust_dist, scatm=SCATM, alpha=alpha )
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
@@ -197,7 +197,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
         dust_dist = GH.dust.Grain( rad=a0 )
     else:
         dth = (a1-a0)/10.0
-        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+0.01,dth) )
+        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth) )
     
     halo_dict = HD.HaloDict( energy, rad=dust_dist, scatm=SCATM, alpha=alpha )
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
