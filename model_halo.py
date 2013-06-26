@@ -8,6 +8,8 @@ import analytic as AH
 import constants as c
 
 from scipy.interpolate import interp1d
+from scipy import logical_and
+## Bizzare -- I had to import logical_and for some reason
 
 ## UPDATED June 11, 2013 : I want to make halo_lib 
 ## independent of asciidata, radprofile, and aeff
@@ -140,7 +142,7 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
 
 def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, xg=0.5, \
-    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE ):
+    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, elim=None ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a screen of dust at xg, using 3-5 free parameters
@@ -166,15 +168,21 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
         dth = (a1-a0)/10.0
         dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth) )
     
-    halo_dict = HD.HaloDict( energy, rad=dust_dist, scatm=SCATM, alpha=alpha )
+    ii = range( len(energy) )
+    if elim != None:
+        print 'Limiting energy to values between', \
+            elim[0], 'and', elim[1], 'keV'
+        ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
+    
+    halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=SCATM, alpha=alpha )
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
-    result = simulate_surbri( halo_dict, flux, aeff, exposure=exposure )
+    result = simulate_surbri( halo_dict, flux[ii], aeff, exposure=exposure )
     
     return result
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, \
-    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE ):
+    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, elim=None ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a uniform distribution of dust, using 2-4 free parameters
@@ -199,9 +207,15 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
         dth = (a1-a0)/10.0
         dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth) )
     
-    halo_dict = HD.HaloDict( energy, rad=dust_dist, scatm=SCATM, alpha=alpha )
+    ii = range( len(energy) )
+    if elim != None:
+        print 'Limiting energy to values between', \
+            elim[0], 'and', elim[1], 'keV'
+        ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
+    
+    halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=SCATM, alpha=alpha )
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
-    result = simulate_surbri( halo_dict, flux, aeff, exposure=exposure )
+    result = simulate_surbri( halo_dict, flux[ii], aeff, exposure=exposure )
     
     return result
 
