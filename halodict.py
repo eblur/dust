@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 from scipy.interpolate import interp1d
 
+## UPDATED July 10, 2013 : Rewrote ecf method in HaloDict object
 ## UPDATED June 11, 2013 : Make this file independent of asciidata
 
 ## July 17, 2012 : A library of objects and functions for simulating a
@@ -90,11 +91,12 @@ class HaloDict( object ):
         self.total = result
         return
 
-        # I want to rewrite this, but ignore for now
+        # Rewrite -- July 10, 2013
     def ecf( self, theta, nth=100 ):
         """
         Returns the enclosed fraction for the halo surface brightness
-        profile, via integral(theta,2pi*theta*halo)/total_halo_counts
+        profile, as a function of energy via 
+        integral(theta,2pi*theta*halo)/total_halo_counts
         -------------------------------------------------------------------------
         theta : float : Value for which to compute enclosed fraction (arcseconds)
         nth   : int (100) : Number of angles to use in calculation
@@ -103,21 +105,37 @@ class HaloDict( object ):
         Interpolation method must be checked.
         -------------------------------------------------------------------------
         """
-        try:
-            interpH = interp1d( self.alpha, self.total )
-        except:
-            print 'Error: total_halo calculation has not been performed.'
+#        try:
+#            interpH = interp1d( self.alpha, self.total )
+#        except:
+#            print 'Error: total_halo calculation has not been performed.'
+
+        NE, NA = len(self.energy), len(self.alpha)
+        result = np.zeros( NE ) # NE x NA
+        total  = self.taux
         
         dth     = ( theta-min(self.alpha) ) / (nth-1)
         tharray = np.arange( min(self.alpha), theta + dth, dth )
-        total   = c.intz( self.alpha, 2.0*np.pi*self.alpha * self.total )
+#        total   = c.intz( self.alpha, 2.0*np.pi*self.alpha * self.total )
         
+        if self.taux == None:
+            print 'ERROR: No taux is specified. Need to run halo calculation'
+            return result
+        
+        for i in range(NE):
+            interpH = interp1d( self.alpha, self.intensity[i,:] )
+            result[i] = c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total[i]
+        
+        return result
+
+        """
         try:
             print c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total
             return c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total
         except:
             print 'Error: ECF calculation failed. Theta is likely out of bounds.'
             return
+        """
 
 #---------------------------------------------------------------
 # Supporting functions
