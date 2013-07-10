@@ -105,18 +105,12 @@ class HaloDict( object ):
         Interpolation method must be checked.
         -------------------------------------------------------------------------
         """
-#        try:
-#            interpH = interp1d( self.alpha, self.total )
-#        except:
-#            print 'Error: total_halo calculation has not been performed.'
-
         NE, NA = len(self.energy), len(self.alpha)
         result = np.zeros( NE ) # NE x NA
         total  = self.taux
         
         dth     = ( theta-min(self.alpha) ) / (nth-1)
         tharray = np.arange( min(self.alpha), theta + dth, dth )
-#        total   = c.intz( self.alpha, 2.0*np.pi*self.alpha * self.total )
         
         if self.taux == None:
             print 'ERROR: No taux is specified. Need to run halo calculation'
@@ -127,15 +121,6 @@ class HaloDict( object ):
             result[i] = c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total[i]
         
         return result
-
-        """
-        try:
-            print c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total
-            return c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total
-        except:
-            print 'Error: ECF calculation failed. Theta is likely out of bounds.'
-            return
-        """
 
 #---------------------------------------------------------------
 # Supporting functions
