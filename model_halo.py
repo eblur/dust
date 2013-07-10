@@ -141,21 +141,25 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
     return interp1d( halodict.alpha/arcsec2pix, result )
 
 def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
-    NH=1.0e22, d2g=0.009, xg=0.5, \
+    NH=1.0e22, d2g=0.009, xg=0.5, dict=False, \
     alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, elim=None ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a screen of dust at xg, using 3-5 free parameters
     ----------------------------------------------------
     FUNCTION simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
-    	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE )
-    RETURNS : scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
+    	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, dict=False )
+    RETURNS : if dict == False : 
+        scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
+              if dict == True :
+        HaloDict object with full benefits of information
     ----------------------------------------------------
     specfile : string : Name of spectrum file
     a0       : float [um] : Minimum (or single) grain size to use
     a1       : float [um] : Maximum grain size for distribution (if None, single used)
     p        : float : Power law index for grain size distribution
     d2g      : float : Dust-to-gas mass ratio
+    dict     : boolean (False) : if True, returns halodict instead of interp object
     xg       : float [0-1] : Position of screen where 0 = point source, 1 = observer
     alpha    : np.array [arcsec] : Angles for halo intensity values
     aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
@@ -178,24 +182,29 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
     result = simulate_surbri( halo_dict, flux[ii], aeff, exposure=exposure )
     
-    return result
+    if dict : return halo_dict
+    else : return result
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
-    NH=1.0e22, d2g=0.009, \
+    NH=1.0e22, d2g=0.009, dict=False, \
     alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, elim=None ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a uniform distribution of dust, using 2-4 free parameters
     ----------------------------------------------------
     FUNCTION simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
-    	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE )
-    RETURNS : scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
+    	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, dict=False )
+    RETURNS : if dict == False : 
+        scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
+              if dict == True :
+        HaloDict object with full benefits of information
     ----------------------------------------------------
     specfile : string : Name of spectrum file
     a0       : float [um] : Minimum (or single) grain size to use
     a1       : float [um] : Maximum grain size for distribution (if None, single used)
     p        : float : Power law index for grain size distribution
     d2g      : float : Dust-to-gas mass ratio
+    dict     : boolean (False) : if True, returns halodict instead of interp object
     alpha    : np.array [arcsec] : Angles for halo intensity values
     aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
     exposure : float [sec] : Observation exposure time
@@ -217,5 +226,6 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
     result = simulate_surbri( halo_dict, flux[ii], aeff, exposure=exposure )
     
-    return result
+    if dict : return halo_dict
+    else : return result
 
