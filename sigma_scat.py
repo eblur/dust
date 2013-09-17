@@ -56,7 +56,7 @@ def makeScatmodel( model_name, material_name ):
     RETURNS Scatmodel object
     ----------------------------------------------------
     model_name : string : 'RG' or 'Mie'
-    material_name : string : 'Drude', 'Silicate' or 'Graphite'
+    material_name : string : 'Drude', 'Silicate', 'Graphite', 'SmallGraphite'
     """
 
     if model_name == 'RG':
@@ -73,6 +73,8 @@ def makeScatmodel( model_name, material_name ):
         cm = cmi.CmSilicate()
     elif material_name == 'Graphite':
         cm = cmi.CmGraphite()
+    elif material_name == 'SmallGraphite': # Small Graphite ~ 0.01 um
+        cm = cmi.CmGraphite( size='small' )
     else:
         print 'Error: CM name not recognized'
         return
