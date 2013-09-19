@@ -142,7 +142,7 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
 
 def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, xg=0.5, dict=False, \
-    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, elim=None ):
+    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a screen of dust at xg, using 3-5 free parameters
@@ -178,7 +178,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
             elim[0], 'and', elim[1], 'keV'
         ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
     
-    halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=SCATM, alpha=alpha )
+    halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
     result = simulate_surbri( halo_dict, flux[ii], aeff, exposure=exposure )
     
@@ -187,7 +187,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, dict=False, \
-    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, elim=None ):
+    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a uniform distribution of dust, using 2-4 free parameters
@@ -222,7 +222,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
             elim[0], 'and', elim[1], 'keV'
         ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
     
-    halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=SCATM, alpha=alpha )
+    halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
     result = simulate_surbri( halo_dict, flux[ii], aeff, exposure=exposure )
     
