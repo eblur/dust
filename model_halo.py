@@ -141,7 +141,7 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
     return interp1d( halodict.alpha/arcsec2pix, result )
 
 def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
-    NH=1.0e22, d2g=0.009, xg=0.5, dict=False, \
+    NH=1.0e22, d2g=0.009, xg=0.5, rho=3.0, dict=False, \
     alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None ):
     '''
     Simulate a surface brightness profile from spectrum file
@@ -155,22 +155,25 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
         HaloDict object with full benefits of information
     ----------------------------------------------------
     specfile : string : Name of spectrum file
-    a0       : float [um] : Minimum (or single) grain size to use
+    a0       : float [um] : Minimum (or single) grain size to use (0.05)
     a1       : float [um] : Maximum grain size for distribution (if None, single used)
     p        : float : Power law index for grain size distribution
-    d2g      : float : Dust-to-gas mass ratio
+    NH       : float [cm^-2] : Hyrdogen column (1.0e22)
+    d2g      : float : Dust-to-gas mass ratio (0.009)
+    rho      : float [g cm^-3] : mass density of a dust grain (3)
     dict     : boolean (False) : if True, returns halodict instead of interp object
     xg       : float [0-1] : Position of screen where 0 = point source, 1 = observer
     alpha    : np.array [arcsec] : Angles for halo intensity values
     aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
     exposure : float [sec] : Observation exposure time
+    scatm    : ss.Scatmodel()
     '''
     energy, flux = HD.get_spectrum( specfile )
     if a1 == None:
-        dust_dist = GH.dust.Grain( rad=a0 )
+        dust_dist = GH.dust.Grain( rad=a0, rho=rho )
     else:
         dth = (a1-a0)/10.0
-        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth) )
+        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth), rho=rho )
     
     ii = range( len(energy) )
     if elim != None:
@@ -186,7 +189,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     else : return result
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
-    NH=1.0e22, d2g=0.009, dict=False, \
+    NH=1.0e22, d2g=0.009, rho=3.0, dict=False, \
     alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None ):
     '''
     Simulate a surface brightness profile from spectrum file
@@ -203,18 +206,21 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     a0       : float [um] : Minimum (or single) grain size to use
     a1       : float [um] : Maximum grain size for distribution (if None, single used)
     p        : float : Power law index for grain size distribution
-    d2g      : float : Dust-to-gas mass ratio
+    NH       : float [cm^-2] : Hyrdogen column (1.0e22)
+    d2g      : float : Dust-to-gas mass ratio (0.009)
+    rho      : float [g cm^-3] : mass density of a dust grain (3)
     dict     : boolean (False) : if True, returns halodict instead of interp object
     alpha    : np.array [arcsec] : Angles for halo intensity values
     aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
     exposure : float [sec] : Observation exposure time
+    scatm    : ss.Scatmodel()
     '''
     energy, flux = HD.get_spectrum( specfile )
     if a1 == None:
-        dust_dist = GH.dust.Grain( rad=a0 )
+        dust_dist = GH.dust.Grain( rad=a0, rho=rho )
     else:
         dth = (a1-a0)/10.0
-        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth) )
+        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth), rho=rho )
     
     ii = range( len(energy) )
     if elim != None:
