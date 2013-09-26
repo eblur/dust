@@ -112,7 +112,6 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
         cnt  = 0.0
         na   = np.size(alpha)
         for al in alpha:
-            f = c.loop_status( cnt, na, f=f, time=True )
             cnt += 1
             thscat = al / X  # np.size(thscat) = nz
             dsig   = ss.Diffscat( theta=thscat, a=halo.dist.a, E=Evals, scatm=scatm ).dsig
