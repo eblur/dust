@@ -9,7 +9,7 @@ CODE_PATH = '/Users/lia/Academic/halo_lib/'
 ION_FILE  = CODE_PATH + 'PAHion_30'
 NEU_FILE  = CODE_PATH + 'PAHneu_30'
 
-def parse_PAH( option, ignore='#', flag='>' ):
+def parse_PAH( option, ignore='#', flag='>', verbose=False ):
     
     if option == 'ion': filename = ION_FILE
     if option == 'neu': filename = NEU_FILE
@@ -33,7 +33,7 @@ def parse_PAH( option, ignore='#', flag='>' ):
             # Characters flagged with '>' earn a dictionary entry with grain size
             elif line[0] == flag : 
                 gsize = np.float( line.split()[1] )
-                print 'Reading data for grain size:', gsize
+                if verbose : print 'Reading data for grain size:', gsize
                 result[ gsize ] = {}
                 # Initialize dictionaries with lists
                 for i in range( len(COLS) ) : result[gsize][COLS[i]] = []
@@ -44,12 +44,12 @@ def parse_PAH( option, ignore='#', flag='>' ):
                 for i in range( len(COLS) ) :
                     result[ gsize ][ COLS[i] ].append( np.float( row_vals[i] ) )
         except:
-            print line
+            if verbose : print line
             end_of_file = True
     
     f.close()
     
     return result
 
-test_ion = parse_PAH('ion')
-test_neu = parse_PAH('neu')
+#test_ion = parse_PAH('ion')
+#test_neu = parse_PAH('neu')
