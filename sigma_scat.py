@@ -55,7 +55,7 @@ def makeScatmodel( model_name, material_name ):
     FUNCTION makeScatmodel( model_name, material_name )
     RETURNS Scatmodel object
     ----------------------------------------------------
-    model_name : string : 'RG' or 'Mie'
+    model_name    : string : 'RG' or 'Mie'
     material_name : string : 'Drude', 'Silicate', 'Graphite', 'SmallGraphite'
     """
 

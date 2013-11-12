@@ -43,7 +43,14 @@ from scipy.interpolate import interp1d
 #    Qsca( E, a=1.0, cm=cmi.CmDrude() )
 #    Qext( E, a=1.0, cm=cmi.CmDrude() )
 #    Diff( theta, E=1.0, a=1.0, cm=cmi.CmDrude() )
-
+#
+# PAH( type )
+#   stype = 'PAH' + type
+#   type  = type
+#   get_Q( E, qtype, a )
+#   Qsca( E, a=0.01 )
+#   Qabs( E, a=0.01 )
+#   Qext( E, a=0.01 )
 
 class RGscat(object):
     """
