@@ -4,6 +4,10 @@ import numpy as np
 import constants as c
 import cmindex as cmi
 
+## Needed for PSH model
+from parse_PAH import *
+from scipy.interpolate import interp1d
+
 #------------- Scattering Models --------------------------
 # Each model must contain Qsca and Diff functions
 #
@@ -11,6 +15,12 @@ import cmindex as cmi
 #        cm : cmtype object from cmindex.py
 #        a  : scalar [grain size, micron] ) :
 # returns scalar or np.array [scattering efficiency, unitless]
+#
+# Snother option :
+# Qext ( E  : scalar or np.array [keV]
+#        cm : cmtype object cmindex.py
+#        a  : scalar [grain szie, micron] ) :
+# returns scalr or np.array [scattering efficiency, unitless]
 #
 # Diff ( cm : cmtype object from cmindex.py
 #        theta : scalar or np.array [angle, arcsec]
@@ -33,6 +43,7 @@ import cmindex as cmi
 #    Qsca( E, a=1.0, cm=cmi.CmDrude() )
 #    Qext( E, a=1.0, cm=cmi.CmDrude() )
 #    Diff( theta, E=1.0, a=1.0, cm=cmi.CmDrude() )
+
 
 class RGscat(object):
     """
@@ -381,4 +392,53 @@ class Mie(object):
         dQ  = self.getQs( a=a, E=E, cm=cm, getQ='diff', theta=theta )
                            
         return dQ * cgeo
+
+class PAH( object ):
+    """
+    OBJECT PAH( type )
+    type  : string : 'ion' or 'neu'
+    stype : string : 'PAH' + type
+    ---------------------------------------------
+    FUNCTIONS
+    Qsca( E, a=0.01 [um], cm=None ) : scattering efficiency [unitless]
+    Qabs( E, a=0.01 [um], cm=None ) : absorption efficiency [unitless]
+    Qext( E, a=0.01 [um], cm=None ) : extincton efficiency [unitless]
+    """
+    
+    def __init__( self, type ):
+        self.type  = type
+        self.stype = 'PAH' + type
+    
+    def get_Q( self, E, qtype, a ):
+        try :
+            data = parse_PAH( self.type )
+        except :
+            print 'ERROR: Cannot find PAH type', self.type
+            return
+        
+        try :
+            qvals = np.array( data[a][qtype] )
+            wavel = np.array( data[a]['w(micron)'] )
+        except :
+            print 'ERROR: Cannot get grain size', a, 'for', self.stype
+            return
+        
+        # Wavelengths were listed in reverse order
+        q_interp = interp1d( wavel[::-1], qvals[::-1] )
+        
+        E_um = ( c.kev2lam() / E ) * 1.e4   # cm to um
+        return q_interp( E_um )
+    
+    def Qabs( self, E, a=0.01 ):
+        return self.get_Q( E, 'Q_abs', a )
+    
+    def Qext( self, E, a=0.01 ):
+        return self.get_Q( E, 'Q_ext', a )
+    
+    def Qsca( self, E, a=0.01 ):
+        return self.get_Q( E, 'Q_sca', a )
+
+
+
+
 
