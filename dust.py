@@ -91,4 +91,22 @@ def make_dust_spectrum( amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5 ):
     """
     return Dustspectrum( rad=Dustdist( rad=adist(amin=amin, amax=amax, na=na), p=p, rho=rho ), md=md )
 
+#-----------------------------------------------------------------
+
+def MRN( amin=0.005, amax=0.3, p=3.5, na=100, spectrum=True, **kwargs ):
+    """ FUNCTION MRN( amin=0.005, amax=0.3, p=3.5, na=100, spectrum=True, **kwargs )
+    ----------------------------------------
+    INPUTS
+    amin : [micron]
+    amax : [micron]
+    p    : scalar for dust power law dn/da \propto a^-p
+    na   : int
+    spectrum : boolean
+    ----------------------------------------
+    RETURNS
+    if spectrum == True: dust.Dustspectrum (object)
+    if spectrum == False: dust.Dustdist (object)
+    """
+    if spectrum : return make_dust_spectrum( amin=amin, amax=amax, p=p, **kwargs )
+    else : return Dustdist( rad=adist(amin=amin, amax=amax, na=na), p=p, **kwargs )
 
