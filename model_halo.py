@@ -118,7 +118,7 @@ EXPOSURE = 50000.  # default 50ks exposure
 def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
     '''
     Take a halo dictionary with a simulated halo, 
-    and simulate a surface brightness profile with it.
+    and simulate a Chandra surface brightness profile with it.
     ----------------------------------------------------
     FUNCTION simulate_surbri( halodict, spectrum, aeff, exposure=50000.0 )
     RETURNS : scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
@@ -128,7 +128,7 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
     aeff     : interp1d object : x = energy [keV], y = effective area [cm^2]
     exposure : float : Exposure time [sec]
     '''
-    arcsec2pix = 0.5  #arcsec/pix
+    arcsec2pix = 0.5  #arcsec/pix (Chandra)
     result = 0.0
     
     corr_counts = spectrum * np.exp( halodict.taux ) \
@@ -136,13 +136,14 @@ def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
     
     NE, NA = halodict.len, halodict.hsize
     halo_counts = np.tile( corr_counts.reshape(NE,1), NA ) * halodict.intensity
+    # counts/arcsec^2
     
     result = np.sum( halo_counts, 0 )
-    return interp1d( halodict.alpha/arcsec2pix, result )
+    return interp1d( halodict.alpha/arcsec2pix, result * arcsec2pix**2 )
 
 def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, xg=0.5, rho=3.0, dict=False, \
-    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None ):
+    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None, na=50 ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a screen of dust at xg, using 3-5 free parameters
@@ -172,7 +173,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     if a1 == None:
         dust_dist = GH.dust.Grain( rad=a0, rho=rho )
     else:
-        dth = (a1-a0)/10.0
+        dth = (a1-a0)/na
         dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth), rho=rho )
     
     ii = range( len(energy) )
@@ -190,7 +191,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, rho=3.0, dict=False, \
-    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None ):
+    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None, na=50 ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a uniform distribution of dust, using 2-4 free parameters
@@ -219,7 +220,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     if a1 == None:
         dust_dist = GH.dust.Grain( rad=a0, rho=rho )
     else:
-        dth = (a1-a0)/10.0
+        dth = (a1-a0)/na
         dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth), rho=rho )
     
     ii = range( len(energy) )
