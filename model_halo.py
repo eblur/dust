@@ -61,6 +61,7 @@ def screen( halodict, xg=0.5, NH=NH, d2g=0.009, verbose=False ):
     verbose  : boolean : If true, print halo energy at each calculation step
     """
     print 'Numerically integrating halo model for a dust screen at x =', xg
+    AH.set_htype( halodict, xg=xg, NH=NH, d2g=d2g )
     for i in range( halodict.len ):
         if verbose: print 'Calculating halo energy :', halodict.energy[i], ' keV'
         halo_temp = GH.Halo( halodict.energy[i], alpha=halodict.alpha, \
@@ -83,6 +84,7 @@ def uniform( halodict, NH=NH, d2g=0.009, verbose=False ):
     verbose  : boolean : If true, print halo energy at each calculation step
     """
     print 'Numerically integrating halo model for uniform ISM'
+    AH.set_htype( halodict, NH=NH, d2g=d2g )
     for i in range( halodict.len ):
         if verbose: print 'Calculating halo energy:', halodict.energy[i], ' keV'
         halo_temp = GH.Halo( halodict.energy[i], alpha=halodict.alpha, \
