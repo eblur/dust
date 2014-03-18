@@ -105,6 +105,8 @@ def uniscreen( params, **kwargs ):
     SS     = screen_halo( SPECFILE, xg=x_s, NH=nhs, amax=a_s, p=p_s, **kwargs )
     return sum_interp( UU, SS )
 
+'''
+# Not really necessary
 def red_chisq_uniform( params, xdata, ydata, sigma, elim=None ):
     #print params
     logNH, amax, p = params
@@ -112,10 +114,15 @@ def red_chisq_uniform( params, xdata, ydata, sigma, elim=None ):
     UU      = uniform_halo( SPECFILE, NH=NH, amax=amax, p=p, elim=elim )
     chi     = ( ydata - UU(xdata) ) / sigma
     return np.sum(chi**2) / ( len(xdata) - len(params) )
+'''
 
 def red_chisq( xdata, ydata, sigma, model, nparams ):
     chi = ( ydata - model(xdata) ) / sigma
     return np.sum(chi**2) / ( len(xdata) - nparams )
+
+def chisq( xdata, ydata, sigma, model, nparams ):
+    chi = ( ydata - model(xdata) ) / sigma
+    return np.sum(chi**2)
 
 ##-------- Some basic plotting stuff -------##
 
