@@ -120,7 +120,7 @@ def red_chisq( xdata, ydata, sigma, model, nparams ):
     chi = ( ydata - model(xdata) ) / sigma
     return np.sum(chi**2) / ( len(xdata) - nparams )
 
-def chisq( xdata, ydata, sigma, model, nparams ):
+def chisq( xdata, ydata, sigma, model ):
     chi = ( ydata - model(xdata) ) / sigma
     return np.sum(chi**2)
 
