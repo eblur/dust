@@ -2,10 +2,7 @@
 import numpy as np
 import asciidata as AD
 import matplotlib.pyplot as plt
-#import errors as err
-
-## Sept 12, 2014 : Rewrite to remove reliance on "errors" module
-##		WARNING Error propagation is UNTESTED at this point
+import errors as err
 
 ## April 1, 2013 : Added copy function to Profile object
 ## March 29, 2013 : Updated minus, plus, divide, multiply with error propagating routine (errors.py)
@@ -57,30 +54,28 @@ class Profile(object):
         oldsb     = self.surbri
         oldsb_err = self.surbri_err
         self.surbri = oldsb - value
-        self.surbri_err = np.sqrt(oldsb_err**2 + value_err**2)
+        self.surbri_err = err.prop_add(oldsb_err, value_err)
         return
     
     def plus( self, value, value_err=0 ):
         oldsb     = self.surbri
         oldsb_err = self.surbri_err
         self.surbri = oldsb + value
-        self.surbri_err = np.sqrt(oldsb_err**2 + value_err**2)
+        self.surbri_err = err.prop_add(oldsb_err, value_err)
         return
     
     def divide( self, value, value_err=0 ):
         oldsb     = self.surbri
         oldsb_err = self.surbri_err
         self.surbri = oldsb / value
-        self.surbri_err = np.sqrt(oldsb_err**2 - oldsb * value_err**2) / value
-        #self.surbri_err = err.prop_div( oldsb, value, oldsb_err, value_err )
+        self.surbri_err = err.prop_div( oldsb, value, oldsb_err, value_err )
         return
     
     def multiply( self, value, value_err=0 ):
         oldsb     = self.surbri
         oldsb_err = self.surbri_err
         self.surbri = oldsb * value
-        self.surbri_err = np.sqrt( oldsb**2 * value_err**2 + value**2 * oldsb_err**2)
-        #self.surbri_err = err.prop_mult( oldsb, value, oldsb_err, value_err )
+        self.surbri_err = err.prop_mult( oldsb, value, oldsb_err, value_err )
         return
 
 #----------------------------------------------
