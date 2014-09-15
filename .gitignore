@@ -7,6 +7,10 @@
 *.*~
 *#
 
+# ipynb support files #
+######################
+.ipynb_checkpoints*
+
 # Mercurial relics #
 ###############
 .hg*

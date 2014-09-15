@@ -1,8 +1,11 @@
 
 import numpy as np
-import asciidata as AD
 import matplotlib.pyplot as plt
+
 import errors as err
+from astropy.io import ascii
+
+## Sept 15, 2014 : Use astropy modules to read ascii data, replacing asciidata module
 
 ## April 1, 2013 : Added copy function to Profile object
 ## March 29, 2013 : Updated minus, plus, divide, multiply with error propagating routine (errors.py)
@@ -91,11 +94,11 @@ def copy_profile( profile ):
 
 def get_profile( filename ):
     result = Profile()
-    data   = AD.open( filename + '.txt' )
-    result.rleft  = data[0].tonumpy()
-    result.rright = data[1].tonumpy()
-    result.surbri = data[2].tonumpy() # counts pix^-2
-    result.surbri_err = data[3].tonumpy()
+    data = ascii.read( filename + '.txt' )
+    result.rleft = data['col1'].data
+    result.rright = data['col2'].data
+    result.surbri = data['col3'].data # counts or flux, pix^-2
+    result.surbri_err = data['col4'].data
     return result
 
 # March 29, 2013 : logmin value contains the minimum extent of the lower errorbar;
