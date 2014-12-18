@@ -1,4 +1,5 @@
 
+## December 11, 2014 : Took out reliance on AEFF, which I initially took from PIMMS
 ## June 26, 2013 : Support code for emcee analysis
 
 import numpy as np
@@ -15,11 +16,8 @@ from scipy.interpolate import interp1d
 
 ##-------- Supporting constants, Cyg X-3 obsid 6601 -------##
 
-SPECFILE = 'sherpa_flux_chart.dat'
-EXPOSURE = 49563.941342781 # dmkeypar $evt2_raw EXPOSURE echo+
 ALPHA    = np.arange( 1.0, 200.0, 1.0 ) # 0.5 arcsec resolution
 AMIN     = 0.005
-AEFF     = MH.HD.aeff( '/Users/lia/Academic/halo_lib/zeroth_aeff_cycle7.dat' )
 
 ##-------- Supporting structure, from emcee_fit -------##
 
@@ -73,15 +71,15 @@ def eat_pickle( filename ):
     return data
 
 ## Simulate the halos
-def uniform_halo( filename=SPECFILE, amin=AMIN, amax=0.3, p=3.5, \
-    aeff=AEFF, exposure=EXPOSURE, **kwargs ):
-    return MH.simulate_uniform( filename, a0=amin, a1=amax, p=p, \
-        aeff=aeff, exposure=exposure, **kwargs )
+def uniform_halo( filename, params, **kwargs ):
+    logNH, amax, p = params
+    return MH.simulate_uniform( filename, \
+        NH=np.power(10.0,logNH), a0=AMIN, a1=amax, p=p, **kwargs )
 
-def screen_halo( filename=SPECFILE, xg=0.5, amin=AMIN, amax=0.3, p=3.5, \
-    aeff=AEFF, exposure=EXPOSURE, **kwargs):
-    return MH.simulate_screen( filename, xg=xg, a0=amin, a1=amax, \
-        p=p, exposure=exposure, **kwargs )
+def screen_halo( filename, params, **kwargs ):
+    xg, logNH, amax, p = params
+    return MH.simulate_screen( filename, \
+        xg=xg, NH=np.power(10.0,logNH), a0=AMIN, a1=amax, p=p, **kwargs)
 
 def sum_interp( sb1, sb2 ):
     ## Takes interp objects and sums them to create another interp object
@@ -92,29 +90,21 @@ def sum_interp( sb1, sb2 ):
     else:
         return interp1d( sb1.x, sb1.y + sb2.y )
 
-def multiscreen_halo( x1, x2, nh1, nh2, amin=AMIN, amax=0.3, p=3.5, **kwargs ):
-    s1 = screen_halo( xg=x1, amin=amin, amax=amax, p=p, NH=nh1, **kwargs )
-    s2 = screen_halo( xg=x2, amin=amin, amax=amax, p=p, NH=nh2, **kwargs )
+def multiscreen_halo( specfile, params, amin=AMIN, **kwargs ):
+    x1, x2, logNH1, logNH2, amax, p = params
+    s1 = MH.simulate_screen( specfile, xg=x1, NH=np.power(10.0,logNH1), \
+        a0=AMIN, a1=amax, p=p, **kwargs )
+    s2 = MH.simulate_screen( specfile, xg=x2, NH=np.power(10.0,logNH2), \
+        a0=AMIN, a1=amax, p=p, **kwargs )
     return sum_interp( s1, s2 )
 
-def uniscreen( params, **kwargs ):
+def uniscreen( specfile, params, **kwargs ):
     logNHu, logNHs, a_u, a_s, p_u, p_s, x_s = params
     nhu    = np.power( 10.0, logNHu )
-    UU     = uniform_halo( SPECFILE, NH=nhu, amax=a_u, p=p_u, **kwargs )
+    UU     = MH.simulate_uniform( specfile, NH=nhu, a0=AMIN, a1=a_u, p=p_u, **kwargs )
     nhs    = np.power( 10.0, logNHs )
-    SS     = screen_halo( SPECFILE, xg=x_s, NH=nhs, amax=a_s, p=p_s, **kwargs )
+    SS     = MH.simulate_screen( specfile, xg=x_s, NH=nhs, a0=AMIN, a1=a_s, p=p_s, **kwargs )
     return sum_interp( UU, SS )
-
-'''
-# Not really necessary
-def red_chisq_uniform( params, xdata, ydata, sigma, elim=None ):
-    #print params
-    logNH, amax, p = params
-    NH      = np.power( 10.0, logNH )
-    UU      = uniform_halo( SPECFILE, NH=NH, amax=amax, p=p, elim=elim )
-    chi     = ( ydata - UU(xdata) ) / sigma
-    return np.sum(chi**2) / ( len(xdata) - len(params) )
-'''
 
 def red_chisq( xdata, ydata, sigma, model, nparams ):
     chi = ( ydata - model(xdata) ) / sigma
