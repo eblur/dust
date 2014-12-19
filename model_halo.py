@@ -139,7 +139,7 @@ def simulate_intensity( halodict, spectrum ):
     return interp1d( halodict.alpha, result ) # arcsec, flux/arcsec^2
 
 def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
-    NH=1.0e22, d2g=0.009, xg=0.5, rho=3.0, dict=False, \
+    NH=1.0e22, d2g=0.009, xg=0.5, rho=3.0, return_dict=False, \
     alpha=ALPHA, scatm=SCATM, elim=None, na=50 ):
     '''
     Simulate a surface brightness profile from spectrum file
@@ -183,11 +183,11 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
     result = simulate_intensity( halo_dict, flux[ii] )
     
-    if dict : return halo_dict
+    if return_dict : return halo_dict
     else : return result
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
-    NH=1.0e22, d2g=0.009, rho=3.0, dict=False, \
+    NH=1.0e22, d2g=0.009, rho=3.0, return_dict=False, \
     alpha=ALPHA, scatm=SCATM, elim=None, na=50 ):
     '''
     Simulate a surface brightness profile from spectrum file
@@ -232,6 +232,6 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
     result = simulate_intensity( halo_dict, flux[ii] )
     
-    if dict : return halo_dict
+    if return_dict : return halo_dict
     else : return result
 
