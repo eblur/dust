@@ -11,6 +11,9 @@ from scipy.interpolate import interp1d
 from scipy import logical_and
 ## Bizzare -- I had to import logical_and for some reason
 
+## December 11, 2014 : Remove dependence on AEFF, which came from PIMMS
+##    Instead of simulating counts/pix^2, using raw flux/arcsec^2
+
 ## UPDATED June 11, 2013 : I want to make halo_lib 
 ## independent of asciidata, radprofile, and aeff
 ## CAVEAT : Path to effective area data file needs to be specified
@@ -42,8 +45,6 @@ grains = GH.dust.Dustdist( p=P, rad=avals )
 
 SCATM  = GH.ss.Scatmodel()
 ALPHA  = np.power( 10.0, np.arange(0.0,3.01,0.1) )
-
-AEFF   = HD.aeff( '/Users/lia/Academic/halo_lib/zeroth_aeff_cycle7.dat' )
 
 #---------------------------------------------------------------------
 
@@ -113,45 +114,39 @@ def totalhalo( halodict, spectrum ):
     return corrflux
 
 #---------------------------------------------------------------------
-## April 8, 2013 : Write a simple function wrap this all up?
 
-EXPOSURE = 50000.  # default 50ks exposure
-
-def simulate_surbri( halodict, spectrum, aeff, exposure=EXPOSURE ):
+def simulate_intensity( halodict, spectrum ):
     '''
     Take a halo dictionary with a simulated halo, 
     and simulate a Chandra surface brightness profile with it.
     ----------------------------------------------------
-    FUNCTION simulate_surbri( halodict, spectrum, aeff, exposure=50000.0 )
-    RETURNS : scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
+    FUNCTION simulate_intensity( halodict, spectrum )
+    RETURNS : scipy.interpolate.interp1d object : x = arcsec, y = flux/arcsec^2
     ----------------------------------------------------
     halodict : halodict.HaloDict object
     spectrum : flux for each energy value in halodict
-    aeff     : interp1d object : x = energy [keV], y = effective area [cm^2]
-    exposure : float : Exposure time [sec]
     '''
     arcsec2pix = 0.5  #arcsec/pix (Chandra)
     result = 0.0
     
-    corr_counts = spectrum * np.exp( halodict.taux ) \
-        * aeff(halodict.energy) * exposure
+    corr_flux = spectrum * np.exp( halodict.taux )
     
     NE, NA = halodict.len, halodict.hsize
-    halo_counts = np.tile( corr_counts.reshape(NE,1), NA ) * halodict.intensity
-    # counts/arcsec^2
+    halo_flux = np.tile( corr_flux.reshape(NE,1), NA ) * halodict.intensity
+    # flux/arcsec^2
     
-    result = np.sum( halo_counts, 0 )
-    return interp1d( halodict.alpha/arcsec2pix, result * arcsec2pix**2 )
+    result = np.sum( halo_flux, 0 )
+    return interp1d( halodict.alpha, result ) # arcsec, flux/arcsec^2
 
 def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, xg=0.5, rho=3.0, dict=False, \
-    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None, na=50 ):
+    alpha=ALPHA, scatm=SCATM, elim=None, na=50 ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a screen of dust at xg, using 3-5 free parameters
     ----------------------------------------------------
     FUNCTION simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
-    	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, dict=False )
+    	alpha=ALPHA, dict=False, scatm=SCATM, elim=None, na=50 )
     RETURNS : if dict == False : 
         scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
               if dict == True :
@@ -167,9 +162,9 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     dict     : boolean (False) : if True, returns halodict instead of interp object
     xg       : float [0-1] : Position of screen where 0 = point source, 1 = observer
     alpha    : np.array [arcsec] : Angles for halo intensity values
-    aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
-    exposure : float [sec] : Observation exposure time
     scatm    : ss.Scatmodel()
+    elim     : tuple containing energy limits [keV]
+    na       : number of bins to use for grain size distribution
     '''
     energy, flux = HD.get_spectrum( specfile )
     if a1 == None:
@@ -180,26 +175,26 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     
     ii = range( len(energy) )
     if elim != None:
-        print 'Limiting energy to values between', \
-            elim[0], 'and', elim[1], 'keV'
+        #print 'Limiting energy to values between', \
+        #    elim[0], 'and', elim[1], 'keV'
         ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
     
     halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
-    result = simulate_surbri( halo_dict, flux[ii], aeff, exposure=exposure )
+    result = simulate_intensity( halo_dict, flux[ii] )
     
     if dict : return halo_dict
     else : return result
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, rho=3.0, dict=False, \
-    alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, scatm=SCATM, elim=None, na=50 ):
+    alpha=ALPHA, scatm=SCATM, elim=None, na=50 ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a uniform distribution of dust, using 2-4 free parameters
     ----------------------------------------------------
     FUNCTION simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
-    	alpha=ALPHA, aeff=AEFF, exposure=EXPOSURE, dict=False )
+    	alpha=ALPHA, dict=False, scatm=SCATM, elim=None, na=50 )
     RETURNS : if dict == False : 
         scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
               if dict == True :
@@ -217,6 +212,8 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
     exposure : float [sec] : Observation exposure time
     scatm    : ss.Scatmodel()
+    elim     : tuple containing energy limits [keV]
+    na       : number of bins to use for grain size distribution
     '''
     energy, flux = HD.get_spectrum( specfile )
     if a1 == None:
@@ -227,13 +224,13 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     
     ii = range( len(energy) )
     if elim != None:
-        print 'Limiting energy to values between', \
-            elim[0], 'and', elim[1], 'keV'
+        #print 'Limiting energy to values between', \
+        #    elim[0], 'and', elim[1], 'keV'
         ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
     
     halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
-    result = simulate_surbri( halo_dict, flux[ii], aeff, exposure=exposure )
+    result = simulate_intensity( halo_dict, flux[ii] )
     
     if dict : return halo_dict
     else : return result
