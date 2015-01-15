@@ -71,15 +71,15 @@ def eat_pickle( filename ):
     return data
 
 ## Simulate the halos
-def uniform_halo( filename, params, **kwargs ):
+def uniform_halo( filename, params, alpha=ALPHA, **kwargs ):
     logNH, amax, p = params
     return MH.simulate_uniform( filename, \
-        NH=np.power(10.0,logNH), a0=AMIN, a1=amax, p=p, **kwargs )
+        NH=np.power(10.0,logNH), a0=AMIN, a1=amax, p=p, alpha=alpha, **kwargs )
 
-def screen_halo( filename, params, **kwargs ):
+def screen_halo( filename, params, alpha=ALPHA, **kwargs ):
     xg, logNH, amax, p = params
     return MH.simulate_screen( filename, \
-        xg=xg, NH=np.power(10.0,logNH), a0=AMIN, a1=amax, p=p, **kwargs)
+        xg=xg, NH=np.power(10.0,logNH), a0=AMIN, a1=amax, p=p, alpha=alpha, **kwargs)
 
 def sum_interp( sb1, sb2 ):
     ## Takes interp objects and sums them to create another interp object
