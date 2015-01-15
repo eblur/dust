@@ -90,20 +90,22 @@ def sum_interp( sb1, sb2 ):
     else:
         return interp1d( sb1.x, sb1.y + sb2.y )
 
-def multiscreen_halo( specfile, params, amin=AMIN, **kwargs ):
+def multiscreen_halo( specfile, params, amin=AMIN, alpha=ALPHA, **kwargs ):
     x1, x2, logNH1, logNH2, amax, p = params
     s1 = MH.simulate_screen( specfile, xg=x1, NH=np.power(10.0,logNH1), \
-        a0=AMIN, a1=amax, p=p, **kwargs )
+        a0=AMIN, a1=amax, p=p, alpha=alpha, **kwargs )
     s2 = MH.simulate_screen( specfile, xg=x2, NH=np.power(10.0,logNH2), \
-        a0=AMIN, a1=amax, p=p, **kwargs )
+        a0=AMIN, a1=amax, p=p, alpha=alpha, **kwargs )
     return sum_interp( s1, s2 )
 
-def uniscreen( specfile, params, **kwargs ):
+def uniscreen( specfile, params, alpha=ALPHA, **kwargs ):
     logNHu, logNHs, a_u, a_s, p_u, p_s, x_s = params
     nhu    = np.power( 10.0, logNHu )
-    UU     = MH.simulate_uniform( specfile, NH=nhu, a0=AMIN, a1=a_u, p=p_u, **kwargs )
+    UU     = MH.simulate_uniform( specfile, NH=nhu, \
+        a0=AMIN, a1=a_u, p=p_u, alpha=alpha, **kwargs )
     nhs    = np.power( 10.0, logNHs )
-    SS     = MH.simulate_screen( specfile, xg=x_s, NH=nhs, a0=AMIN, a1=a_s, p=p_s, **kwargs )
+    SS     = MH.simulate_screen( specfile, xg=x_s, NH=nhs, \
+        a0=AMIN, a1=a_s, p=p_s, alpha=alpha, **kwargs )
     return sum_interp( UU, SS )
 
 def red_chisq( xdata, ydata, sigma, model, nparams ):
