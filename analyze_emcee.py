@@ -29,18 +29,22 @@ def string_to_walker( string ):
         walker = np.append( walker, np.float(param) )
     return np.array( [walker] )
 
-def read_pos( filename ):
+def read_pos( filename, acor=1 ):
     f = open( filename )
 
     first_line = f.readline()
     result     = string_to_walker( first_line )
 
     end_of_file = False
+    counter     = 1
     while not( end_of_file ):
         try:
             next_line = f.readline()
-            walker    = string_to_walker( next_line )
-            result = np.concatenate( (result,walker) )
+            if (counter % acor) == 0:
+                walker    = string_to_walker( next_line )
+                result = np.concatenate( (result,walker) )
+            else: pass
+            counter += 1
         except:
             end_of_file = True
 
