@@ -140,7 +140,7 @@ def simulate_intensity( halodict, spectrum ):
 
 def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, xg=0.5, rho=3.0, return_dict=False, \
-    alpha=ALPHA, scatm=SCATM, elim=None, na=50 ):
+    alpha=ALPHA, scatm=SCATM, elim=None, na=50, v=False ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a screen of dust at xg, using 3-5 free parameters
@@ -175,8 +175,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     
     ii = range( len(energy) )
     if elim != None:
-        #print 'Limiting energy to values between', \
-        #    elim[0], 'and', elim[1], 'keV'
+        if v: print 'Limiting energy to values between', elim[0], 'and', elim[1], 'keV'
         ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
     
     halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
@@ -188,7 +187,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
 
 def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, rho=3.0, return_dict=False, \
-    alpha=ALPHA, scatm=SCATM, elim=None, na=50 ):
+    alpha=ALPHA, scatm=SCATM, elim=None, na=50, v=False ):
     '''
     Simulate a surface brightness profile from spectrum file
     for a uniform distribution of dust, using 2-4 free parameters
@@ -224,8 +223,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     
     ii = range( len(energy) )
     if elim != None:
-        #print 'Limiting energy to values between', \
-        #    elim[0], 'and', elim[1], 'keV'
+        if v: print 'Limiting energy to values between', elim[0], 'and', elim[1], 'keV'
         ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
     
     halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
