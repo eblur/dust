@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 
 from scipy.interpolate import interp1d
 
+from astropy.io import fits
+
 ## UPDATED July 10, 2013 : Rewrote ecf method in HaloDict object
 ## UPDATED June 11, 2013 : Make this file independent of asciidata
 
@@ -137,3 +139,62 @@ def aeff( filename ):
     energy = np.array( data[0] )
     aeff   = np.array( data[1] )
     return interp1d( energy, aeff )   # keV vs cm^2
+
+## 2015.01.29 - Add a function that will save and load halo dicts into/from fits files
+
+def fitsify_halodict( hd, outfile, clobber=False ):
+    # Set up the header
+    prihdr = fits.Header()
+    prihdr['COMMENT'] = "This is a fits file containing halo dictionary information"
+    prihdr['SCATM']   = hd.scatm.stype
+    prihdr['HTYPE']   = hd.htype.ismtype
+    prihdr['DUSTMASS'] = hd.dist.md
+    prihdr['DUSTDENS'] = hd.rad.rho
+    prihdr['DUSTPOWR'] = hd.rad.p
+    prihdu = fits.PrimaryHDU(header=prihdr)
+    
+    # Create a block that contains the energy and taux info
+    tbhdu = fits.BinTableHDU.from_columns( \
+        [fits.Column(name='energy', format='1E', array=hd.energy), \
+         fits.Column(name='taux', format='1E', array=hd.taux)] )
+    
+    dust_hdu = fits.BinTableHDU.from_columns( \
+        [fits.Column(name='rad', format='1E', array=hd.rad.a)] )
+            
+    thdulist = fits.HDUList([prihdu, tbhdu, dust_hdu])
+    
+    for EE in hd.energy:
+        tbhdu = fits.BinTableHDU.from_columns( \
+            [fits.Column(name='alpha', format='1E', array=hd.alpha), \
+             fits.Column(name='intensity', format='1E', array=hd[EE])] )
+        thdulist.append(tbhdu)
+    
+    thdulist.writeto(outfile, clobber=clobber)
+    return
+
+def read_halodict_fits( infile ):
+    hdulist = fits.open(infile)
+    header  = hdulist[0].header
+    
+    energy  = hdulist[1].data['energy']
+    taux    = hdulist[1].data['taux']
+    rad     = hdulist[2].data['rad']
+    md      = header['DUSTMASS']
+    rho     = header['DUSTDENS']
+    powr    = header['DUSTPOWR']
+    alpha   = hdulist[3].data['alpha']
+    
+    dd      = dust.Dustdist( rad=rad, p=powr, rho=rho )
+    result  = HaloDict( energy, alpha=alpha, rad=dd )
+    result.taux = taux
+    result.dist = dust.Dustspectrum( rad=dd, md=md )
+    
+    for i in np.arange(len(energy))+3:
+        result.intensity[i-3,:] = hdulist[i].data['intensity']
+    
+    return result
+    
+    
+
+
+
