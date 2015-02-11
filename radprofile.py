@@ -1,11 +1,10 @@
 
 import numpy as np
-import matplotlib.pyplot as plt
-
-import errors as err
+from astropy.io import fits
 from astropy.io import ascii
+import errors as err
 
-## Sept 15, 2014 : Use astropy modules to read ascii data, replacing asciidata module
+## November 30, 2014 : Removed dependence on matplotlib and asciidata
 
 ## April 1, 2013 : Added copy function to Profile object
 ## March 29, 2013 : Updated minus, plus, divide, multiply with error propagating routine (errors.py)
@@ -57,14 +56,16 @@ class Profile(object):
         oldsb     = self.surbri
         oldsb_err = self.surbri_err
         self.surbri = oldsb - value
-        self.surbri_err = err.prop_add(oldsb_err, value_err)
+        self.surbri_err = err.prop_add( oldsb_err, value_err )
+        #self.surbri_err = np.sqrt( oldsb_err**2 + value_err**2 )
         return
     
     def plus( self, value, value_err=0 ):
         oldsb     = self.surbri
         oldsb_err = self.surbri_err
         self.surbri = oldsb + value
-        self.surbri_err = err.prop_add(oldsb_err, value_err)
+        self.surbri_err = err.prop_add( oldsb_err, value_err )
+        #self.surbri_err = np.sqrt( oldsb_err**2 + value_err**2 )
         return
     
     def divide( self, value, value_err=0 ):
@@ -72,6 +73,7 @@ class Profile(object):
         oldsb_err = self.surbri_err
         self.surbri = oldsb / value
         self.surbri_err = err.prop_div( oldsb, value, oldsb_err, value_err )
+        #self.surbri_err = oldsb_err*2 / value
         return
     
     def multiply( self, value, value_err=0 ):
@@ -79,6 +81,23 @@ class Profile(object):
         oldsb_err = self.surbri_err
         self.surbri = oldsb * value
         self.surbri_err = err.prop_mult( oldsb, value, oldsb_err, value_err )
+        #self.surbri_err = oldsb_err*2 * value
+        return
+    
+    def write( self, filename, indices='all', sci_note=False ):
+        if indices == 'all':
+            indices = range(len(self.rmid))
+        
+        FORMAT = "%f \t%f \t%f \t%f\n"
+        if sci_note:
+            FORMAT = "%e \t%e \t%e \t%e\n" 
+        
+        f = open(filename, 'w')
+        f.write( "# Bin_left\tBin_right\tSurbri\tSurbri_err\n" )
+        for i in indices:
+            f.write( FORMAT % \
+            (self.rleft[i], self.rright[i], self.surbri[i], self.surbri_err[i]) )
+        f.close()
         return
 
 #----------------------------------------------
@@ -92,29 +111,32 @@ def copy_profile( profile ):
 	result.surbri_err = np.array( profile.surbri_err )
 	return result
 
-def get_profile( filename ):
+def get_profile_fits( filename, flux=False ):
     result = Profile()
-    data = ascii.read( filename + '.txt' )
-    result.rleft = data['col1'].data
-    result.rright = data['col2'].data
-    result.surbri = data['col3'].data # counts or flux, pix^-2
-    result.surbri_err = data['col4'].data
+    if flux:
+        sb_key    = 'SUR_FLUX'     # phot/cm^2/s/pix^2
+        sberr_key = 'SUR_FLUX_ERR'
+    else:
+        sb_key    = 'SUR_BRI'      # count/pix^2
+        sberr_key = 'SUR_BRI_ERR'
+    hdu_list = fits.open( filename )
+    data     = hdu_list[1].data
+    result.rleft = data['R'][:,0]
+    result.rright = data['R'][:,1]
+    result.surbri = data[sb_key]
+    result.surbri_err = data[sberr_key]
     return result
 
-# March 29, 2013 : logmin value contains the minimum extent of the lower errorbar;
-# This is helpful for loglog plotting, when the error bar is larger than the value
-#
-def plot_profile( profile, logmin=None, *args, **kwargs ):
-	errhi = profile.surbri_err
-	errlo = profile.surbri_err
-	if logmin != None:
-		print 'Utilizing logmin error bars'
-		ineg  = np.where( profile.surbri - profile.surbri_err <= 0.0 )[0]
-		errlo[ineg] = profile.surbri[ineg] - logmin
-	plt.errorbar( profile.rmid, profile.surbri, \
-                  xerr=(profile.rright-profile.rleft)*0.5, \
-                  yerr=[errlo,errhi], *args, **kwargs )
-	return
+def get_profile( filename ):
+    result = Profile()
+    data   = ascii.read( filename )
+    keys   = data.keys()
+    result.rleft  = data[keys[0]]
+    result.rright = data[keys[1]]
+    result.surbri = data[keys[2]]
+    result.surbri_err = data[keys[3]]
+    return result
+
 
 def add_profile( profile1, profile2=Profile(), weight1=1.0, weight2=1.0 ):
     result = Profile()
@@ -161,12 +183,6 @@ def residual_profile( profile, model ):
 try:
     datafile    = sys.argv[1]
     profile     = get_profile( datafile )
-    plot_profile( profile )
-    plt.loglog()
-    plt.xlabel( 'Pixels' )
-    plt.ylabel( 'Surface Brightness [counts/pixel$^2$]' )
-    plt.title( sys.argv[1] )
-    plt.savefig( sys.argv[1] + '.pdf', format='pdf' )
 except:
     pass
 
