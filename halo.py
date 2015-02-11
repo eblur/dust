@@ -51,11 +51,7 @@ class Halo(object):
         Returns the enclosed fraction for the halo surface brightness
         profile, via integral(theta,2pi*theta*halo)/tau.
         theta : float : Value for which to compute enclosed fraction (arcseconds)
-        nth   : int (100) : Number of angles to use in calculation
-        -------------------------------------------------------------------------
-        WARNING -- This functions is not particularly robust.
-        Interpolation method must be checked.
-        -------------------------------------------------------------------------
+        nth   : int (500) : Number of angles to use in calculation
         """
         if self.htype == None:
             print 'Error: Halo has not yet beein calculated.'
