@@ -46,7 +46,7 @@ class Halo(object):
         self.intensity = np.zeros( np.size(alpha) )
         self.taux  = None
 
-    def ecf( self, theta, nth=100 ):
+    def ecf( self, theta, nth=500 ):
         """
         Returns the enclosed fraction for the halo surface brightness
         profile, via integral(theta,2pi*theta*halo)/tau.
