@@ -57,8 +57,7 @@ class Halo(object):
             print 'Error: Halo has not yet beein calculated.'
             return
         interpH = interp1d( self.alpha, self.intensity )
-        dth     = ( theta-min(self.alpha) ) / (nth-1)
-        tharray = np.arange( min(self.alpha), theta + dth, dth )
+        tharray = np.linspace( min(self.alpha), theta, nth )
         try:
             return c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / self.taux
         except:

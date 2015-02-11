@@ -95,26 +95,20 @@ class HaloDict( object ):
         self.total = result
         return
 
-        # Rewrite -- July 10, 2013
-    def ecf( self, theta, nth=100 ):
+        # Update -- Feb 10, 2015 to match halo.ecf
+    def ecf( self, theta, nth=500 ):
         """
         Returns the enclosed fraction for the halo surface brightness
         profile, as a function of energy via 
         integral(theta,2pi*theta*halo)/total_halo_counts
         -------------------------------------------------------------------------
         theta : float : Value for which to compute enclosed fraction (arcseconds)
-        nth   : int (100) : Number of angles to use in calculation
-        -------------------------------------------------------------------------
-        WARNING -- This functions is not particularly robust.
-        Interpolation method must be checked.
-        -------------------------------------------------------------------------
+        nth   : int (500) : Number of angles to use in calculation
         """
         NE, NA = len(self.energy), len(self.alpha)
         result = np.zeros( NE ) # NE x NA
-        total  = self.taux
-        
-        dth     = ( theta-min(self.alpha) ) / (nth-1)
-        tharray = np.arange( min(self.alpha), theta + dth, dth )
+        taux   = self.taux
+        tharray = np.linspace( min(self.alpha), theta, nth )
         
         if self.taux == None:
             print 'ERROR: No taux is specified. Need to run halo calculation'
@@ -122,7 +116,7 @@ class HaloDict( object ):
         
         for i in range(NE):
             interpH = interp1d( self.alpha, self.intensity[i,:] )
-            result[i] = c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / total[i]
+            result[i] = c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / taux[i]
         
         return result
 
