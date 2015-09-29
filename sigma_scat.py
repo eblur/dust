@@ -7,6 +7,9 @@ import cmindex as cmi
 import scatmodels as sms
 from scipy.interpolate import interp1d
 
+# from multiprocessing import Pool
+#from pathos.multiprocessing import Pool
+
 #----------------------------------------------------------
 # evals( emin=1.0, emax=2.0, de=0.1 ) : np.array [keV]
 # angles( thmin=5.0, thmax=100.0, dth=5.0 ) : np.array [arcsec]
@@ -181,54 +184,71 @@ class Kappascat(object):
     Opacity to scattering [g^-1 cm^2]
     OBJECT Kappascat( E=1.0 [keV], scatm=Scatmodel(), dist=dust.Dustspectrum() )
     ---------------------------------
+    E     : scalar or np.array : keV, photon energy
     scatm : Scatmodel
-    E     : scalar or np.array : keV
     dist  : dust.Dustspectrum
     kappa : scalar or np.array : cm^2 g^-1, typically
+    
+    ---------------------------------
+    To call this class:
+    ---------------------------------
+    kappa = Kappascat()
+    kappa(E) computes integral of scattering cross-section over grain size distribution    
     """
     def __init__( self, E=1.0, scatm=Scatmodel(), dist=dust.Dustspectrum() ):
-        self.scatm  = scatm
         self.E      = E
+        self.kappa  = None
+        self.scatm  = scatm
         self.dist   = dist
 
-        cm   = scatm.cmodel
-        scat = scatm.smodel
+        if self.scatm.cmodel.cmtype == 'Graphite':
+            self.qsca_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
+            self.qsca_pa = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
+        else:
+            self.qsca    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
 
-        cgeo = np.pi * np.power( dist.a * c.micron2cm(), 2 )
+    def __call__(self, with_mp=False):
+        cm   = self.scatm.cmodel
+        scat = self.scatm.smodel
 
-        qsca    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-        qsca_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-        qsca_pa = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-                                
+        cgeo = np.pi * np.power( self.dist.a * c.micron2cm(), 2 )
+
         # Test for graphite case
         if cm.cmtype == 'Graphite':
-
-            if np.size(dist.a) > 1:
-                for i in range( np.size(dist.a) ):
-                    qsca_pe[:,i] = scat.Qsca( E, a=dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-                    qsca_pa[:,i] = scat.Qsca( E, a=dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='para') )
+            if np.size(self.dist.a) > 1:
+                for i in range( np.size(self.dist.a) ):
+                    self.qsca_pe[:,i] = scat.Qsca( self.E, a=self.dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+                    self.qsca_pa[:,i] = scat.Qsca( self.E, a=self.dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='para') )
             else:
-                qsca_pe = scat.Qsca( E, a=dist.a, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-                qsca_pa = scat.Qsca( E, a=dist.a, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+                self.qsca_pe = scat.Qsca( self.E, a=self.dist.a, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+                self.qsca_pa = scat.Qsca( self.E, a=self.dist.a, cm=cmi.CmGraphite(size=cm.size, orient='para') )
             
-            qsca    = ( qsca_pa + 2.0 * qsca_pe ) / 3.0
+            self.qsca = ( self.qsca_pa + 2.0 * self.qsca_pe ) / 3.0
 
         else:
-            if np.size(dist.a) > 1:
-                for i in range( np.size(dist.a) ):
-                    qsca[:,i] = scat.Qsca( E, a=dist.a[i], cm=cm )
+            if np.size(self.dist.a) > 1:
+                if with_mp:
+                    pool = Pool(processes=2)
+                    self.qsca = np.array(pool.map(self._one_scatter,self.dist.a)).T
+                else:
+                    for i in range( np.size(self.dist.a) ):
+                        self.qsca[:,i] = self._one_scatter(self.dist.a[i])
             else:
-                qsca = scat.Qsca( E, a=dist.a, cm=cm )
+                self.qsca = scat.Qsca( self.E, a=self.dist.a, cm=cm )
 
-        if np.size(dist.a) == 1:
-            kappa = dist.nd * qsca * cgeo / dist.md
+        if np.size(self.dist.a) == 1:
+            kappa = self.dist.nd * self.qsca * cgeo / self.dist.md
         else:
             kappa = np.array([])
-            for j in range( np.size(E) ):
+            for j in range( np.size(self.E) ):
                 kappa = np.append( kappa, \
-                                   c.intz( dist.a, dist.nd * qsca[j,:] * cgeo ) / dist.md )
+                                   c.intz( self.dist.a, self.dist.nd * self.qsca[j,:] * cgeo ) / self.dist.md )
 
         self.kappa = kappa
+
+    def _one_scatter(self, a):
+        """Do one scattering calculation."""
+        return self.scatm.smodel.Qsca( self.E, a=a, cm=self.scatm.cmodel )
 
 
 class Kappaext(object):
@@ -251,42 +271,43 @@ class Kappaext(object):
             self.kappa = None
             return
 
-        cm   = scatm.cmodel
-        scat = scatm.smodel
+    def __call__(self):
+        cm   = self.scatm.cmodel
+        scat = self.scatm.smodel
 
-        cgeo = np.pi * np.power( dist.a * c.micron2cm(), 2 )
+        cgeo = np.pi * np.power( self.dist.a * c.micron2cm(), 2 )
 
-        qext    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-        qext_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-        qext_pa = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
+        qext    = np.zeros( shape=( np.size(self.E),np.size(self.dist.a) )  )
+        qext_pe = np.zeros( shape=( np.size(self.E),np.size(self.dist.a) )  )
+        qext_pa = np.zeros( shape=( np.size(self.E),np.size(self.dist.a) )  )
                                 
         # Test for graphite case
         if cm.cmtype == 'Graphite':
 
             if np.size(dist.a) > 1:
                 for i in range( np.size(dist.a) ):
-                    qext_pe[:,i] = scat.Qext( E, a=dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-                    qext_pa[:,i] = scat.Qext( E, a=dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='para') )
+                    qext_pe[:,i] = scat.Qext( self.E, a=self.dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+                    qext_pa[:,i] = scat.Qext( self.E, a=self.dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='para') )
             else:
-                qext_pe = scat.Qext( E, a=dist.a, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-                qext_pa = scat.Qext( E, a=dist.a, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+                qext_pe = scat.Qext( self.E, a=self.dist.a, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+                qext_pa = scat.Qext( self.E, a=self.dist.a, cm=cmi.CmGraphite(size=cm.size, orient='para') )
             
             qext    = ( qext_pa + 2.0 * qext_pe ) / 3.0
 
         else:
-            if np.size(dist.a) > 1:
-                for i in range( np.size(dist.a) ):
-                    qext[:,i] = scat.Qext( E, a=dist.a[i], cm=cm )
+            if np.size(self.dist.a) > 1:
+                for i in range( np.size(self.dist.a) ):
+                    qext[:,i] = scat.Qext( self.E, a=self.dist.a[i], cm=cm )
             else:
-                qext = scat.Qext( E, a=dist.a, cm=cm )
+                qext = scat.Qext( self.E, a=self.dist.a, cm=cm )
 
-        if np.size(dist.a) == 1:
-            kappa = dist.nd * qext * cgeo / dist.md
+        if np.size(self.dist.a) == 1:
+            kappa = self.dist.nd * qext * cgeo / self.dist.md
         else:
             kappa = np.array([])
-            for j in range( np.size(E) ):
+            for j in range( np.size(self.E) ):
                 kappa = np.append( kappa, \
-                                   c.intz( dist.a, dist.nd * qext[j,:] * cgeo ) / dist.md )
+                                   c.intz( self.dist.a, self.dist.nd * qext[j,:] * cgeo ) / self.dist.md )
 
         self.kappa = kappa
 
