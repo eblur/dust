@@ -1,4 +1,5 @@
 
+import os
 import numpy as np
 import constants as c
 from scipy.interpolate import interp1d
@@ -18,7 +19,15 @@ from scipy.interpolate import interp1d
 #         : rp(E) where E is in [keV]
 #  ip     : same as above, ip(E) where E is in [keV]
 
-CMROOT = '/Users/lia/Academic/halo_lib/'
+def find_cmfile( name ):
+    path_list = os.getenv("PYTHONPATH").split(':')
+    for path in path_list:
+        for root, dirs, files in os.walk(path+"/"):
+            if name in files:
+                return os.path.join(root, name)
+        else:
+            return ""
+
 
 class CmDrude(object):
     """ OBJECT cmindex.CmDrude
@@ -69,7 +78,8 @@ class CmGraphite(object):
         self.size   = size
         self.orient = orient
         
-        D03vals = c.restore( CMROOT + 'CM_D03.pysav' )      # look up file
+        D03file = find_cmfile('CM_D03.pysav') # look up file
+        D03vals = c.restore(D03file) # read in index values
         
         if size == 'big':            
             if orient == 'perp':
@@ -110,7 +120,8 @@ class CmSilicate(object):
     def __init__( self ):
         self.cmtype = 'Silicate'
 
-        D03vals = c.restore( CMROOT + 'CM_D03.pysav' )      # look up file
+        D03file = find_cmfile('CM_D03.pysav')
+        D03vals = c.restore(D03file)      # look up file
         
         lamvals = D03vals['Sil_lam']
         revals  = D03vals['Sil_re']
