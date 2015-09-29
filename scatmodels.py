@@ -4,7 +4,7 @@ import numpy as np
 import constants as c
 import cmindex as cmi
 
-## Needed for PSH model
+## Needed for PAH model
 from parse_PAH import *
 from scipy.interpolate import interp1d
 
@@ -120,6 +120,7 @@ class Mie(object):
 
     stype = 'Mie'
 
+    @profile
     def getQs( self, a=1.0, E=1.0, cm=cmi.CmDrude(), getQ='sca', theta=None ):  # Takes single a and E argument
 
         if np.size(a) > 1:
