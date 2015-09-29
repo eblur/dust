@@ -2,12 +2,20 @@
 ## Created by Lia Corrales to parse PAH optical constant tables (PAHion_30, PAHneu_30)
 ## November 11, 2013 : lia@astro.columbia.edu
 
+import os
 import numpy as np
 
-CODE_PATH = '/Users/lia/Academic/halo_lib/'
+def find_cmfile( name ):
+    path_list = os.getenv("PYTHONPATH").split(':')
+    for path in path_list:
+        for root, dirs, files in os.walk(path+"/"):
+            if name in files:
+                return os.path.join(root, name)
+        else:
+            return ""
 
-ION_FILE  = CODE_PATH + 'PAHion_30'
-NEU_FILE  = CODE_PATH + 'PAHneu_30'
+ION_FILE  = find_cmfile('PAHion_30')
+NEU_FILE  = find_cmfile('PAHneu_30')
 
 def parse_PAH( option, ignore='#', flag='>', verbose=False ):
     
