@@ -410,6 +410,7 @@ class PAH( object ):
     Qsca( E, a=0.01 [um], cm=None ) : scattering efficiency [unitless]
     Qabs( E, a=0.01 [um], cm=None ) : absorption efficiency [unitless]
     Qext( E, a=0.01 [um], cm=None ) : extincton efficiency [unitless]
+    
     """
     
     def __init__( self, type ):
@@ -446,6 +447,8 @@ class PAH( object ):
         return self.get_Q( E, 'Q_sca', a )
 
 
-
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
 
