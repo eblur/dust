@@ -6,6 +6,7 @@ import dust
 import cmindex as cmi
 import scatmodels as sms
 from scipy.interpolate import interp1d
+from scipy.integrate import trapz
 
 # from multiprocessing import Pool
 #from pathos.multiprocessing import Pool
@@ -206,6 +207,15 @@ class Kappascat(object):
         scat = self.scatm.smodel
 
         cgeo = np.pi * np.power( self.dist.a * c.micron2cm(), 2 )
+        
+        if cm.cmtype == 'Graphite':
+            qsca_pe = scat.Qsca( self.E, a=self.dist.a, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+            qsca_pa = scat.Qsca( self.E, a=self.dist.a, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+            qsca    = ( qsca_pa + 2.0 * qsca_pe ) / 3.0
+        else:
+            qsca = scat.Qsca( self.E, self.dist.a, cm=cm )
+                
+        '''
         qsca = np.zeros( shape=( np.size(self.E),np.size(self.dist.a) )  )
 
         # Test for graphite case
@@ -225,14 +235,20 @@ class Kappascat(object):
         else:
             if np.size(self.dist.a) > 1:
                 if with_mp:
-                    pool = Pool(processes=2)
+                    pool = Pool(processes=with_mp)
                     qsca = np.array(pool.map(self._one_scatter,self.dist.a)).T
                 else:
                     for i in range( np.size(self.dist.a) ):
                         qsca[:,i] = self._one_scatter(self.dist.a[i])
             else:
                 qsca = scat.Qsca( self.E, a=self.dist.a, cm=cm )
+        '''
 
+        integrand  = self.dist.nd[None,:] * qsca * cgeo[None,:] / self.dist.md
+        kappa      = trapz( integrand, self.dist.a, axis=1 )
+        self.kappa = kappa
+
+        '''
         if np.size(self.dist.a) == 1:
             kappa = self.dist.nd * qsca * cgeo / self.dist.md
         else:
@@ -241,11 +257,11 @@ class Kappascat(object):
                 kappa = np.append( kappa, \
                                    c.intz( self.dist.a, self.dist.nd * qsca[j,:] * cgeo ) / self.dist.md )
 
-        self.kappa = kappa
+        self.kappa = kappa'''
 
-    def _one_scatter(self, a):
+'''    def _one_scatter(self, a):
         """Do one scattering calculation."""
-        return self.scatm.smodel.Qsca( self.E, a=a, cm=self.scatm.cmodel )
+        return self.scatm.smodel.Qsca( self.E, a=a, cm=self.scatm.cmodel )'''
 
 
 class Kappaext(object):

@@ -381,23 +381,22 @@ class Mie(object):
         else:
             return 0.0
 
-
-                if with_mp:
-                    pool = Pool(processes=2)
-                    qsca = np.array(pool.map(self._one_scatter,self.dist.a)).T
-
     def _one_sca( self, params ):
         x, cmrp, cmip = params
         return self.getQs( x=x, cm=[cmrp,cmip] )
 
-    def Qsca( self, E, a=1.0, cm=cmi.CmDrude(), with_mp=True ):
-        x = ( 2.0 * np.pi * a*c.micron2cm() ) / ( c.kev2lam()/E )
-        params = np.vstack( (x, cm.rp(E), cm.ip(E)) )
-        if with_mp:
-            pool = Pool(processes=4)
-            qsca = np.array(pool.map(self._one_sca,params))
-        else:
-            qsca = self.getQs( x=x, cm=[cm.rp(E),cm.ip(E)] )
+    def Qsca( self, E, a=1.0, cm=cmi.CmDrude(), with_mp=False ):
+        # Dan F-M taught me about broadcasting
+        x = ( 2.0 * np.pi * a[None,:]*c.micron2cm() ) / ( c.kev2lam()/E[:,None] )
+        qsca = np.zeros( (len(E),len(a)) )
+        for i in range(len(E)):
+            '''if with_mp:
+                params = np.vstack( (x[:,i], cm.rp(E), cm.ip(E)) )
+                pool = Pool(processes=with_mp)
+                qsca[:,i] = np.array(pool.map(self._one_sca,params))
+            else:
+                qsca[:,i] = self.getQs( x=x[:,i], cm=[cm.rp(E),cm.ip(E)] )'''
+            qsca[:,i] = self.getQs( x=x[:,i], cm=[cm.rp(E),cm.ip(E)] )
         return qsca
 
     def Qext( self, E, a=1.0, cm=cmi.CmDrude() ):
