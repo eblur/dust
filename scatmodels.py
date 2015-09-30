@@ -103,7 +103,8 @@ class RGscat(object):
         return dsig * thdep
 
 
-default_x = 2.0 * np.pi * 1.e4 / 12.4  #2 pi 1 um (angs) / 1 keV (angs) ~ 5000
+default_x  = 2.0 * np.pi * 1.e4 / 12.4  #2 pi 1 um (angs) / 1 keV (angs) ~ 5000
+default_cm = [cmi.CmDrude().rp(1.0),cmi.CmDrude().ip(1.0)]
 
 ## Copied from ~/code/mie/bhmie_mod.pro
 ## ''Subroutine BHMIE is the Bohren-Huffman Mie scattering subroutine
@@ -119,7 +120,9 @@ class Mie(object):
     stype : string : 'Mie'
     ---------------------------------
     FUNCTIONS
-    getQs( x=default_x, cm=cmi.CmDrude(), getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] ) : Efficiency factors [unitless or ster^-1]
+    getQs( x=default_x [2 pi a / lambda], cm=default_cm, [rp,ip],
+           getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] ) 
+           : Returns efficiency factors [unitless or ster^-1]
     Qsca( E [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Scattering efficiency [unitless]
     Qext( E [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Extinction efficiency [unitless]
     Diff( theta [arcsec], E=1.0 [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Differential cross-section [cm^2 ster^-1]
@@ -128,7 +131,7 @@ class Mie(object):
     stype = 'Mie'
 
     #@profile
-    def getQs( self, x=default_x, cm=[cmi.CmDrude().rp(1.0),cmi.CmDrude().ip(1.0)], getQ='sca', theta=None ):
+    def getQs( self, x=default_x, cm=default_cm, getQ='sca', theta=None ):
 
         indl90 = np.array([])  # Empty arrays indicate that there are no theta values set
         indg90 = np.array([])  # Do not have to check if theta != None throughout calculation
