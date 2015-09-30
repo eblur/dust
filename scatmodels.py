@@ -126,6 +126,23 @@ class Mie(object):
     Qsca( E [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Scattering efficiency [unitless]
     Qext( E [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Extinction efficiency [unitless]
     Diff( theta [arcsec], E=1.0 [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Differential cross-section [cm^2 ster^-1]
+    
+        
+    >>> E = np.linspace(1.0,10.0,10)
+    >>> a = np.linspace(0.005,0.3,25)
+    >>> myMie = Mie()
+    
+    >>> gra_sca = myMie.Qsca( E=E, a=a, cm=cmi.CmGraphite() )
+    >>> assert gra_sca.shape == (len(E),len(a))
+    
+    >>> sil_sca =  myMie.Qsca( E=E, a=a, cm=cmi.CmSilicate() )
+    >>> assert sil_sca.shape == (len(E),len(a))
+
+    >>> gra_ext = myMie.Qext( E=E, a=a, cm=cmi.CmGraphite() )
+    >>> assert gra_ext.shape == (len(E),len(a))
+    
+    >>> sil_ext =  myMie.Qext( E=E, a=a, cm=cmi.CmSilicate() )
+    >>> assert sil_ext.shape == (len(E),len(a))
     """
 
     stype = 'Mie'
