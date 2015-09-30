@@ -206,6 +206,7 @@ class Kappascat(object):
         cm   = self.scatm.cmodel
         scat = self.scatm.smodel
 
+        # geometric cross-section
         cgeo = np.pi * np.power( self.dist.a * c.micron2cm(), 2 )
         
         if cm.cmtype == 'Graphite':
@@ -294,8 +295,17 @@ class Kappaext(object):
         cm   = self.scatm.cmodel
         scat = self.scatm.smodel
 
+        # geometric cross section
         cgeo = np.pi * np.power( self.dist.a * c.micron2cm(), 2 )
-        qext    = np.zeros( shape=( np.size(self.E),np.size(self.dist.a) )  )
+        
+        if cm.cmtype == 'Graphite':
+            qext_pe = scat.Qext( self.E, a=self.dist.a, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+            qext_pa = scat.Qext( self.E, a=self.dist.a, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+            qext    = ( qext_pa + 2.0 * qext_pe ) / 3.0
+        else:
+            qext = scat.Qext( self.E, self.dist.a, cm=cm )
+
+        '''qext    = np.zeros( shape=( np.size(self.E),np.size(self.dist.a) )  )
                                 
         # Test for graphite case
         if cm.cmtype == 'Graphite':
@@ -318,16 +328,19 @@ class Kappaext(object):
                 for i in range( np.size(self.dist.a) ):
                     qext[:,i] = scat.Qext( self.E, a=self.dist.a[i], cm=cm )
             else:
-                qext = scat.Qext( self.E, a=self.dist.a, cm=cm )
+                qext = scat.Qext( self.E, a=self.dist.a, cm=cm )'''
 
-        if np.size(self.dist.a) == 1:
+
+        '''if np.size(self.dist.a) == 1:
             kappa = self.dist.nd * qext * cgeo / self.dist.md
         else:
             kappa = np.array([])
             for j in range( np.size(self.E) ):
                 kappa = np.append( kappa, \
-                                   c.intz( self.dist.a, self.dist.nd * qext[j,:] * cgeo ) / self.dist.md )
+                                   c.intz( self.dist.a, self.dist.nd * qext[j,:] * cgeo ) / self.dist.md )'''
 
+        integrand  = self.dist.nd[None,:] * qext * cgeo[None,:] / self.dist.md
+        kappa      = trapz( integrand, self.dist.a, axis=1 )
         self.kappa = kappa
 
 
