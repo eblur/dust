@@ -101,18 +101,23 @@ class RGscat(object):
         return dsig * thdep
 
 
+default_x = 2.0 * np.pi * 1.e4 / 12.4  #2 pi 1 um (angs) / 1 keV (angs) ~ 5000
+
 ## Copied from ~/code/mie/bhmie_mod.pro
 ## ''Subroutine BHMIE is the Bohren-Huffman Mie scattering subroutine
 ##    to calculate scattering and absorption by a homogenous isotropic
 ##    sphere.''
 #
+## 2015.09.29 -- Changing it so Mie takes x= 2pi*wavel/a as input.  
+##    Ignore energy and grain size considerations for now
+##
 class Mie(object):
     """
     OBJECT Mie()
     stype : string : 'Mie'
     ---------------------------------
     FUNCTIONS
-    getQs( a=1.0 [um], E=1.0 [keV], cm=cmi.CmDrude(), getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] ) : Efficiency factors [unitless or ster^-1]
+    getQs( x=default_x, cm=cmi.CmDrude(), getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] ) : Efficiency factors [unitless or ster^-1]
     Qsca( E [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Scattering efficiency [unitless]
     Qext( E [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Extinction efficiency [unitless]
     Diff( theta [arcsec], E=1.0 [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Differential cross-section [cm^2 ster^-1]
@@ -120,12 +125,8 @@ class Mie(object):
 
     stype = 'Mie'
 
-    @profile
-    def getQs( self, a=1.0, E=1.0, cm=cmi.CmDrude(), getQ='sca', theta=None ):  # Takes single a and E argument
-
-        if np.size(a) > 1:
-            print 'Error: Can only specify one value for a'
-            return
+    #@profile
+    def getQs( self, x=default_x, cm=[cmi.CmDrude().rp(1.0),cmi.CmDrude().ip(1.0)], getQ='sca', theta=None ):
 
         indl90 = np.array([])  # Empty arrays indicate that there are no theta values set
         indg90 = np.array([])  # Do not have to check if theta != None throughout calculation
@@ -159,9 +160,8 @@ class Mie(object):
             pi1   = np.zeros( nang, dtype='complex' ) + 1.0
             tau   = np.zeros( nang, dtype='complex' )
 
-        refrel = cm.rp(E) + 1j*cm.ip(E)
+        refrel = cm[0] + 1j*cm[1]
 
-        x      = ( 2.0 * np.pi * a*c.micron2cm() ) / ( c.kev2lam()/E  )
         y      = x * refrel
         ymod   = np.abs(y)
         nx     = np.size( x )
@@ -381,10 +381,12 @@ class Mie(object):
 
 
     def Qsca( self, E, a=1.0, cm=cmi.CmDrude() ):
-        return self.getQs( a=a, E=E, cm=cm )
+        x = ( 2.0 * np.pi * a*c.micron2cm() ) / ( c.kev2lam()/E  )
+        return self.getQs( x=x, cm=[cm.rp(E),cm.ip(E)] )
 
     def Qext( self, E, a=1.0, cm=cmi.CmDrude() ):
-        return self.getQs( a=a, E=E, cm=cm, getQ='ext' )
+        x = ( 2.0 * np.pi * a*c.micron2cm() ) / ( c.kev2lam()/E  )
+        return self.getQs( x=x, cm=[cm.rp(E),cm.ip(E)], getQ='ext' )
 
     def Diff( self, theta, E=1.0, a=1.0, cm=cmi.CmDrude() ):
         
@@ -397,7 +399,8 @@ class Mie(object):
             print 'Error: E and theta must have same size if np.size(E) > 1'
             return
 
-        dQ  = self.getQs( a=a, E=E, cm=cm, getQ='diff', theta=theta )
+        x  = ( 2.0 * np.pi * a*c.micron2cm() ) / ( c.kev2lam()/E  )
+        dQ = self.getQs( x=x, cm=[cm.rp(E),cm.ip(E)], getQ='diff', theta=theta )
                            
         return dQ * cgeo
 
