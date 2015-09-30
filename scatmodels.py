@@ -390,11 +390,11 @@ class Mie(object):
         x, cmrp, cmip = params
         return self.getQs( x=x, cm=[cmrp,cmip] )
 
-    def Qsca( self, E, a=1.0, cm=cmi.CmDrude(), with_mp=False ):
+    def Qsca( self, E, a=1.0, cm=cmi.CmDrude(), with_mp=True ):
         x = ( 2.0 * np.pi * a*c.micron2cm() ) / ( c.kev2lam()/E )
-        params = np.vstack([x, cm.rp(E), cm.ip(E)])
+        params = np.vstack( (x, cm.rp(E), cm.ip(E)) )
         if with_mp:
-            pool = Pool(processes=2)
+            pool = Pool(processes=4)
             qsca = np.array(pool.map(self._one_sca,params))
         else:
             qsca = self.getQs( x=x, cm=[cm.rp(E),cm.ip(E)] )
