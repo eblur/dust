@@ -8,7 +8,7 @@ import cmindex as cmi
 from parse_PAH import *
 from scipy.interpolate import interp1d
 
-from multiprocessing import Pool
+#from multiprocessing import Pool
 
 #------------- Scattering Models --------------------------
 # Each model must contain Qsca and Diff functions
