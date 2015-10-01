@@ -202,7 +202,6 @@ class Kappascat(object):
         self.scatm  = scatm
         self.dist   = dist
 
-    def __call__(self, with_mp=False):
         cm   = self.scatm.cmodel
         scat = self.scatm.smodel
 
@@ -247,7 +246,6 @@ class Kappaext(object):
             self.kappa = None
             return
 
-    def __call__(self):
         cm   = self.scatm.cmodel
         scat = self.scatm.smodel
 

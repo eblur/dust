@@ -408,7 +408,7 @@ class Mie(object):
         return self.getQs(x, cm=[cmrp,cmip])
     '''
 
-    def Qsca( self, E, a, cm=cmi.CmDrude() )#, with_mp=False ):
+    def Qsca( self, E, a, cm=cmi.CmDrude() ): #, with_mp=False ):
         if type(E) is not np.ndarray: E = np.array([E])
         if type(a) is not np.ndarray: a = np.array([a])
         # Dan F-M taught me about broadcasting
