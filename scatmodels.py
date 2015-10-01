@@ -401,28 +401,36 @@ class Mie(object):
         else:
             return 0.0
 
-    def _one_sca( self, params ):
+    '''
+    # Needed for multiprocessing
+    def _one_sca(self, params):
         x, cmrp, cmip = params
-        return self.getQs( x=x, cm=[cmrp,cmip] )
+        return self.getQs(x, cm=[cmrp,cmip])
+    '''
 
-    def Qsca( self, E, a=1.0, cm=cmi.CmDrude(), with_mp=False ):
+    def Qsca( self, E, a, cm=cmi.CmDrude() )#, with_mp=False ):
+        if type(E) is not np.ndarray: E = np.array([E])
+        if type(a) is not np.ndarray: a = np.array([a])
         # Dan F-M taught me about broadcasting
         x    = ( 2.0 * np.pi * a[None,:]*c.micron2cm() ) / ( c.kev2lam()/E[:,None] )
         qsca = np.zeros( (len(E),len(a)) )
-        for i in range(len(E)):
-            '''if with_mp:
-                params = np.vstack( (x[:,i], cm.rp(E), cm.ip(E)) )
-                pool = Pool(processes=with_mp)
-                qsca[:,i] = np.array(pool.map(self._one_sca,params))
-            else:
-                qsca[:,i] = self.getQs( x=x[:,i], cm=[cm.rp(E),cm.ip(E)] )'''
+        '''if with_mp:
+            cmrp   = np.tile(cm.rp(E),len(a))#.reshape(len(E),len(a))
+            cmip   = np.tile(cm.ip(E),len(a))#.reshape(len(E),len(a))
+            params = np.vstack( (x.flatten(),cmrp,cmip) ).T
+            pool   = Pool(processes=with_mp)
+            qsca   = np.array(pool.map(self._one_sca,params)).reshape(len(E),len(a))
+        else: '''
+        for i in range(len(E)): 
             qsca[:,i] = self.getQs( x=x[:,i], cm=[cm.rp(E),cm.ip(E)] )
         return qsca
 
-    def Qext( self, E, a=1.0, cm=cmi.CmDrude() ):
+    def Qext( self, E, a, cm=cmi.CmDrude() ):
+        if type(E) is not np.ndarray: E = np.array([E])
+        if type(a) is not np.ndarray: a = np.array([a])
         x    = ( 2.0 * np.pi * a[None,:]*c.micron2cm() ) / ( c.kev2lam()/E[:,None] )
         qext = np.zeros( (len(E),len(a)) )
-        for i in range(len(E)):
+        for i in range(len(E)): 
             qext[:,i] = self.getQs( x=x[:,i], cm=[cm.rp(E),cm.ip(E)], getQ='ext' )
         return qext
 
