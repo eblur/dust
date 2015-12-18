@@ -32,8 +32,7 @@ def find_cmfile( name ):
 
     if file_not_found:
         print("ERROR: Cannot find DM03 file")
-        return result
-
+        return
 
 
 class CmDrude(object):
