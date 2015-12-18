@@ -1,6 +1,7 @@
 import numpy as np
 import constants as c
 from astropy.io import ascii
+import os
 import dust
 import scipy.special as special # Needed for WD01 equations                                                         
 MW_caseA_file = 'Table1.WD.dat'
@@ -14,13 +15,12 @@ def find_wdfile( name ):
     path_list = os.getenv("PYTHONPATH").split(':')
 
     for path in path_list:
-        print("looking in %s" % (path))
         for root, dirs, files in os.walk(path+"/"):
             if name in files:
                 return os.path.join(root, name)
 
     if file_not_found:
-        print("ERROR: Cannot find WD01 Table file")
+        print("ERROR: Cannot find WD01 Table file %s" % (name))
         return result
 
 
@@ -119,7 +119,9 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
 
     return result
 
-def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=dust.adist(), type='Graphite', gal='MW' ):
+DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(0.3), 50)
+
+def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', gal='MW' ):
     """
     make_WD01_Dustspectrum(
     R_V [float],
