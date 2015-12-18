@@ -1,4 +1,3 @@
-
 import numpy as np
 import constants as c
 import asciidata as AD
@@ -8,6 +7,22 @@ MW_caseA_file = 'Table1.WD.dat'
 LMC_avg_file  = 'Table3_LMCavg.WD.dat'
 LMC_2_file    = 'Table3_LMC2.WD.dat'
 SMC_file      = 'Table3_SMC.WD.dat'
+
+def find_wdfile( name ):
+    file_not_found = True
+
+    path_list = os.getenv("PYTHONPATH").split(':')
+
+    for path in path_list:
+        print("looking in %s" % (path))
+        for root, dirs, files in os.walk(path+"/"):
+            if name in files:
+                return os.path.join(root, name)
+
+    if file_not_found:
+        print("ERROR: Cannot find DM03 file")
+        return result
+
 
 def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
     """
@@ -22,12 +37,12 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
     is_MW = False
 
     if gal == 'MW':
-        table_filename = MW_caseA_file
+        table_filename = find_wdfile( MW_caseA_file )
         is_MW = True
     elif gal == 'SMC':
-        table_filename = SMC_file
+        table_filename = find_wdfile( SMC_file )
     elif gal == 'LMC':
-        table_filename = LMC_avg_file
+        table_filename = find_wdfile( LMC_avg_file )
     else:
         print 'Error: Galaxy type not recognized'
         return
