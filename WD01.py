@@ -90,18 +90,18 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
     ## Remember: First index is column, second index is row
 
     if type == 'Graphite':
-        alpha = table_info[2][i_bc]
-        beta  = table_info[3][i_bc]
-        a_t   = table_info[4][i_bc]
-        a_c   = table_info[5][i_bc]
-        C     = table_info[6][i_bc]
+        alpha = table_info['col3'][i_bc]
+        beta  = table_info['col4'][i_bc]
+        a_t   = table_info['col5'][i_bc]
+        a_c   = table_info['col6'][i_bc]
+        C     = table_info['col7'][i_bc]
 
     elif type == 'Silicate':
-        alpha = table_info[7][i_bc]
-        beta  = table_info[8][i_bc]
-        a_t   = table_info[9][i_bc]
+        alpha = table_info['col8'][i_bc]
+        beta  = table_info['col9'][i_bc]
+        a_t   = table_info['col10'][i_bc]
         a_c   = 0.1000
-        C     = table_info[10][i_bc]
+        C     = table_info['col11'][i_bc]
 
     else:
         print "Error: Grain type not recognized.  Must be 'Graphite' or 'Silicate'."
@@ -109,8 +109,8 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
 
     result = (alpha, beta, a_t, a_c, C)
 
-    print 'R_V   = ', table_info[0][i_bc]
-    print 'bc    = ', table_info[1][i_bc]
+    print 'R_V   = ', table_info['col1'][i_bc]
+    print 'bc    = ', table_info['col2'][i_bc]
     print 'alpha = ', alpha
     print 'beta  = ', beta
     print 'a_t   = ', a_t
@@ -119,7 +119,7 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
 
     return result
 
-DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(0.3), 50)
+DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(1.0), 50)
 
 def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', gal='MW' ):
     """
