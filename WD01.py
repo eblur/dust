@@ -1,6 +1,6 @@
 import numpy as np
 import constants as c
-import asciidata as AD
+from astropy.io import ascii
 import dust
 import scipy.special as special # Needed for WD01 equations                                                         
 MW_caseA_file = 'Table1.WD.dat'
@@ -20,7 +20,7 @@ def find_wdfile( name ):
                 return os.path.join(root, name)
 
     if file_not_found:
-        print("ERROR: Cannot find DM03 file")
+        print("ERROR: Cannot find WD01 Table file")
         return result
 
 
@@ -47,10 +47,10 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
         print 'Error: Galaxy type not recognized'
         return
 
-    table_info = AD.open( table_filename )
+    table_info = ascii.read( table_filename )
 
-    RV_col = table_info[0] # either a float or '--' (LMC/SMC case)
-    bc_col = table_info[1].tonumpy()
+    RV_col = table_info['col1'] # either a float or '--' (LMC/SMC case)
+    bc_col = table_info['col2']
 
     # Get index of rows associated with the input R_V value
     # R_V values are not unique, which is why I can't use a dictionary
