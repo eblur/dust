@@ -21,6 +21,8 @@ from scipy.interpolate import interp1d
 
 def find_cmfile( name ):
     file_not_found = True
+    if os.path.exists(name): 
+        return name
 
     path_list = os.getenv("PYTHONPATH").split(':')
 

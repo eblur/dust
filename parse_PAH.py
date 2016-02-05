@@ -6,6 +6,8 @@ import os
 import numpy as np
 
 def find_cmfile( name ):
+    if os.path.exists(name): 
+        return name
     path_list = os.getenv("PYTHONPATH").split(':')
     for path in path_list:
         for root, dirs, files in os.walk(path+"/"):
