@@ -9,12 +9,13 @@ from scipy.interpolate import interp1d
 
 class CosmHalo(object):
     """
-    OBJECT CosmHalo( zs=None, zg=None, cosm=None, igmtype=None )
-    ** An htype abstract class for storing halo properties
-    zs      : float : redshift of X-ray source
-    zg      : float : redshift of an IGM screen
-    cosm    : cosmo.Cosmology object
-    igmtype : labels the type of IGM scattering calculation : 'Uniform' or 'Screen'
+    *An htype abstract class for storing halo properties*
+    
+    | **ATTRIBUTES**
+    | zs      : float : redshift of X-ray source
+    | zg      : float : redshift of an IGM screen
+    | cosm    : cosmo.Cosmology object
+    | igmtype : labels the type of IGM scattering calculation : 'Uniform' or 'Screen'
     """
     def __init__( self, zs=None, zg=None, cosm=None, igmtype=None ):
         self.zs      = zs
@@ -24,14 +25,21 @@ class CosmHalo(object):
 
 class Halo(object):
     """
-    OBJECT Halo( E0, alpha=ss.angles(), rad=dust.Grain(), scatm=ss.Scatmodel() )
-    htype : abstract class containing information about the halo calculation
-    E0    : float : observed energy [keV]
-    alpha : np.array : observed angle [arcsec]
-    rad   : dust.Grain OR dust.Dustdist : grain size distribution
-    dist  : dust.Dustspectrum : initially NONE, stored from calculation
-    scatm : ss.Scatmodel : scattering model used
-    intensity : np.array : fractional intensity [arcsec^-2]
+    | **ATTRIBUTES**
+    | htype : abstract class containing information about the halo calculation
+    | E0    : float : observed energy [keV]
+    | alpha : np.array : observed angle [arcsec]
+    | rad   : dust.Grain OR dust.Dustdist : grain size distribution
+    | dist  : dust.Dustspectrum : initially NONE, stored from calculation
+    | scatm : ss.Scatmodel : scattering model used
+    | intensity : np.array : fractional intensity [arcsec^-2]
+
+    | **FUNCTIONS**
+    | ecf(theta, nth=500)
+    |     theta : float : Value for which to compute enclosed fraction (arcseconds)
+    |     nth   : int (500) : Number of angles to use in calculation
+    |     *returns* the enclosed fraction for the halo surface brightness
+    |     profile, via integral(theta,2pi*theta*halo)/tau.
     """
     def __init__( self, E0,
                   alpha = ss.angles(), 
@@ -47,12 +55,6 @@ class Halo(object):
         self.taux  = None
 
     def ecf( self, theta, nth=500 ):
-        """
-        Returns the enclosed fraction for the halo surface brightness
-        profile, via integral(theta,2pi*theta*halo)/tau.
-        theta : float : Value for which to compute enclosed fraction (arcseconds)
-        nth   : int (500) : Number of angles to use in calculation
-        """
         if self.htype == None:
             print 'Error: Halo has not yet beein calculated.'
             return
@@ -68,13 +70,17 @@ class Halo(object):
 
 def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
     """
-    FUNCTION UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 )
-    MODIFIES halo.htype, halo.dist, halo.intensity, halo.taux
-    --------------------------------------------------------------------
-    halo : Halo object
-    zs   : float : redshift of source
-    cosm : cosmo.Cosmology
-    nz   : int : number of z-values to use in integration
+    Calculates the intensity of a scattering halo from intergalactic
+    dust that is uniformly distributed along the line of sight.
+    
+    | **MODIFIES**
+    | halo.htype, halo.dist, halo.intensity, halo.taux
+    
+    | **INPUT**
+    | halo : Halo object
+    | zs   : float : redshift of source
+    | cosm : cosmo.Cosmology
+    | nz   : int : number of z-values to use in integration
     """
     E0    = halo.energy
     alpha = halo.alpha
@@ -144,14 +150,19 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
 
 def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
     """
-    FUNCTION ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() )
-    MODIFIES halo.htype, halo.dist, halo.intensity, halo.taux
-    --------------------------------------------------------------------
-    halo : Halo object
-    zs   : float : redshift of source
-    zg   : float : redshift of screen
-    md   : float : mass density of dust to use in screen [g cm^-2]
-    cosm : cosmo.Cosmology
+    Calculates the intensity of a scattering halo from intergalactic
+    dust that is situated in an infinitesimally thin screen somewhere
+    along the line of sight.
+
+    | **MODIFIES**
+    | halo.htype, halo.dist, halo.intensity, halo.taux
+    
+    | **INPUTS**
+    | halo : Halo object
+    | zs   : float : redshift of source
+    | zg   : float : redshift of screen
+    | md   : float : mass density of dust to use in screen [g cm^-2]
+    | cosm : cosmo.Cosmology
     """
     if zg >= zs:
         print '%% STOP: zg must be < zs'

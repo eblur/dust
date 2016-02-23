@@ -67,6 +67,8 @@ Modules
    dust
    cmindex
    scatmodels
+   sigma_scat
+   halo
 
 ..
   License

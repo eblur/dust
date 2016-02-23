@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halo &mdash; eblur/dust 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html" />
+    <link rel="prev" title="sigma_scat" href="sigma_scat.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="halo">
+<h1>halo<a class="headerlink" href="#halo" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="index.html"><em>Home doc page for eblur/dust</em></a></p>
+<p>This module is for calculating intensity profiles for dust scattering
+halos from cosmological (z &gt; 0) point sources.</p>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<p>The <strong>Halo</strong> object is used for both Galactic and extragalactic
+sources and contains the attribute <em>htype</em>, which can be filled with
+one of two objects: either <em>CosmHalo</em> (for extragalactic sources) or
+<em>GalHalo</em> (for Galactic sources, see <code class="xref doc docutils literal"><span class="pre">galhalo</span></code>).</p>
+<dl class="class">
+<dt id="halo.Halo">
+<em class="property">class </em><code class="descclassname">halo.</code><code class="descname">Halo</code><span class="sig-paren">(</span><em>E0</em>, <em>alpha=array([   5.</em>, <em>10.</em>, <em>15.</em>, <em>20.</em>, <em>25.</em>, <em>30.</em>, <em>35.</em>, <em>40.</em>, <em>45.</em>, <em>50.</em>, <em>55.</em>, <em>60.</em>, <em>65.</em>, <em>70.</em>, <em>75.</em>, <em>80.</em>, <em>85.</em>, <em>90.</em>, <em>95.</em>, <em>100.])</em>, <em>rad=&lt;dust.Grain object&gt;</em>, <em>scatm=&lt;sigma_scat.Scatmodel object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#halo.Halo" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">htype : abstract class containing information about the halo calculation</div>
+<div class="line">E0    : float : observed energy [keV]</div>
+<div class="line">alpha : np.array : observed angle [arcsec]</div>
+<div class="line">rad   : dust.Grain OR dust.Dustdist : grain size distribution</div>
+<div class="line">dist  : dust.Dustspectrum : initially NONE, stored from calculation</div>
+<div class="line">scatm : ss.Scatmodel : scattering model used</div>
+<div class="line">intensity : np.array : fractional intensity [arcsec^-2]</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>FUNCTIONS</strong></div>
+<div class="line">ecf(theta, nth=500)</div>
+<div class="line-block">
+<div class="line">theta : float : Value for which to compute enclosed fraction (arcseconds)</div>
+<div class="line">nth   : int (500) : Number of angles to use in calculation</div>
+<div class="line"><em>returns</em> the enclosed fraction for the halo surface brightness</div>
+<div class="line">profile, via integral(theta,2pi*theta*halo)/tau.</div>
+</div>
+</div>
+</dd></dl>
+
+<p>Object definition for the halo type <em>CosmHalo</em></p>
+<dl class="class">
+<dt id="halo.CosmHalo">
+<em class="property">class </em><code class="descclassname">halo.</code><code class="descname">CosmHalo</code><span class="sig-paren">(</span><em>zs=None</em>, <em>zg=None</em>, <em>cosm=None</em>, <em>igmtype=None</em><span class="sig-paren">)</span><a class="headerlink" href="#halo.CosmHalo" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>An htype abstract class for storing halo properties</em></p>
+<div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">zs      : float : redshift of X-ray source</div>
+<div class="line">zg      : float : redshift of an IGM screen</div>
+<div class="line">cosm    : cosmo.Cosmology object</div>
+<div class="line">igmtype : labels the type of IGM scattering calculation : &#8216;Uniform&#8217; or &#8216;Screen&#8217;</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<p>Functions within this module modify the <strong>Halo</strong> object by updating
+the <em>htype</em>, <em>intensity</em>, and any other related attributes.</p>
+<dl class="function">
+<dt id="halo.UniformIGM">
+<code class="descclassname">halo.</code><code class="descname">UniformIGM</code><span class="sig-paren">(</span><em>halo</em>, <em>zs=4.0</em>, <em>cosm=&lt;cosmology.Cosmology object&gt;</em>, <em>nz=500</em><span class="sig-paren">)</span><a class="headerlink" href="#halo.UniformIGM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the intensity of a scattering halo from intergalactic
+dust that is uniformly distributed along the line of sight.</p>
+<div class="line-block">
+<div class="line"><strong>MODIFIES</strong></div>
+<div class="line">halo.htype, halo.dist, halo.intensity, halo.taux</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>INPUT</strong></div>
+<div class="line">halo : Halo object</div>
+<div class="line">zs   : float : redshift of source</div>
+<div class="line">cosm : cosmo.Cosmology</div>
+<div class="line">nz   : int : number of z-values to use in integration</div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="halo.ScreenIGM">
+<code class="descclassname">halo.</code><code class="descname">ScreenIGM</code><span class="sig-paren">(</span><em>halo</em>, <em>zs=2.0</em>, <em>zg=1.0</em>, <em>md=1.5e-05</em>, <em>cosm=&lt;cosmology.Cosmology object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#halo.ScreenIGM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the intensity of a scattering halo from intergalactic
+dust that is situated in an infinitesimally thin screen somewhere
+along the line of sight.</p>
+<div class="line-block">
+<div class="line"><strong>MODIFIES</strong></div>
+<div class="line">halo.htype, halo.dist, halo.intensity, halo.taux</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">halo : Halo object</div>
+<div class="line">zs   : float : redshift of source</div>
+<div class="line">zg   : float : redshift of screen</div>
+<div class="line">md   : float : mass density of dust to use in screen [g cm^-2]</div>
+<div class="line">cosm : cosmo.Cosmology</div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dust.html">dust</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmindex.html">cmindex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scatmodels.html">scatmodels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sigma_scat.html">sigma_scat</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">halo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="sigma_scat.html" title="previous chapter">sigma_scat</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/halo.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Lia Corrales.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/halo.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

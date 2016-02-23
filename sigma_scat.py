@@ -32,11 +32,11 @@ def angles( thmin=5.0, thmax=100.0, dth=5.0 ):
 
 class Scatmodel(object):
     """
-    OBJECT Scatmodel( smodel=RGscat(), cmodel=cmi.CmDrude() )
-    smodel : scattering model type object : RGscat(), Mie()
-    cmodel : cmindex type object : CmDrude(), CmGraphite(), CmSilicate()
-    stype  : string : 'RGscat', 'Mie'
-    cmtype : 'Drude', 'Silicate', 'Graphite'
+    | **ATTRIBUTES**
+    | smodel : scattering model object : RGscat(), Mie()
+    | cmodel : cmindex object : CmDrude(), CmGraphite(), CmSilicate()
+    | stype  : string : 'RGscat', 'Mie'
+    | cmtype : 'Drude', 'Silicate', 'Graphite'
     """
     def __init__( self, smodel=sms.RGscat(), cmodel=cmi.CmDrude() ):
         self.smodel = smodel
@@ -52,11 +52,12 @@ class Scatmodel(object):
 
 def makeScatmodel( model_name, material_name ):
     """
-    FUNCTION makeScatmodel( model_name, material_name )
-    RETURNS Scatmodel object
-    ----------------------------------------------------
-    model_name    : string : 'RG' or 'Mie'
-    material_name : string : 'Drude', 'Silicate', 'Graphite', 'SmallGraphite'
+    | **INPUTS**
+    | model_name    : string : 'RG' or 'Mie'
+    | material_name : string : 'Drude', 'Silicate', 'Graphite', 'SmallGraphite'
+
+    | **RETURNS**
+    | Scatmodel object
     """
 
     if model_name == 'RG':
@@ -86,14 +87,15 @@ def makeScatmodel( model_name, material_name ):
 
 class Diffscat(object):
     """
-    A differential scattering cross-section [cm^2 ster^-1]
-    --------------------------------------------------------------
-    OBJECT Diffscat( scatm=Scatmodel(), theta=angles() [arcsec], E=1.0 [keV], a=1.0 [um] )
-    scatm : Scatmodel
-    theta : np.array : arcsec
-    E     : scalar or np.array : Note, must match number of theta values if size > 1
-    a     : scalar : um
-    dsig  : np.array : cm^2 ster^-1
+    A differential scattering cross-section [cm^2 ster^-1] integrated
+    over dust grain size distribution
+
+    | **ATTRIBUTES**
+    | scatm : Scatmodel
+    | theta : np.array : arcsec
+    | E     : scalar or np.array : Note, must match number of theta values if size > 1
+    | a     : scalar : um
+    | dsig  : np.array : cm^2 ster^-1
     """
     def __init__( self, scatm=Scatmodel(), theta=angles(), E=1.0, a=1.0 ):
         self.scatm  = scatm
@@ -113,14 +115,15 @@ class Diffscat(object):
 
 class Sigmascat(object):
     """
-    Total scattering cross-section [cm^2]
-    ---------------------------------------------------------
-    OBJECT Sigmascat( scatm=Scatmodel(), E=1.0 [keV], a=1.0 [um] )
-    scatm : Scatmodel
-    E     : scalar or np.array : keV
-    a     : scalar : um
-    qsca  : scalar or np.array : unitless scattering efficiency
-    sigma : scalar or np.array : cm^2
+    Total scattering cross-section [cm^2] integrated over a dust grain
+    size distribution
+
+    | **ATTRIBUTES**
+    | scatm : Scatmodel
+    | E     : scalar or np.array : keV
+    | a     : scalar : um
+    | qsca  : scalar or np.array : unitless scattering efficiency
+    | sigma : scalar or np.array : cm^2
     """
     def __init__( self, scatm=Scatmodel(), E=1.0, a=1.0 ):
         self.scatm  = scatm
@@ -143,14 +146,15 @@ class Sigmascat(object):
 
 class Sigmaext(object):
     """
-    Total EXTINCTION cross-section [cm^2]
-    ---------------------------------------------------------
-    OBJECT Sigmascat( scatm=Scatmodel(), E=1.0 [keV], a=1.0 [um] )
-    scatm : Scatmodel
-    E     : scalar or np.array : keV
-    a     : scalar : um
-    qext  : scalar or np.array : unitless extinction efficiency
-    sigma : scalar or np.array : cm^2
+    Total EXTINCTION cross-section [cm^2] integrated over a dust grain
+    size distribution
+
+    | **ATTRIBUTES**
+    | scatm : Scatmodel
+    | E     : scalar or np.array : keV
+    | a     : scalar : um
+    | qext  : scalar or np.array : unitless extinction efficiency
+    | sigma : scalar or np.array : cm^2
     """
     def __init__( self, scatm=Scatmodel(), E=1.0, a=1.0 ):
         self.scatm  = scatm
@@ -178,13 +182,13 @@ class Sigmaext(object):
 
 class Kappascat(object):
     """
-    Opacity to scattering [g^-1 cm^2]
-    OBJECT Kappascat( E=1.0 [keV], scatm=Scatmodel(), dist=dust.Dustspectrum() )
-    ---------------------------------
-    scatm : Scatmodel
-    E     : scalar or np.array : keV
-    dist  : dust.Dustspectrum
-    kappa : scalar or np.array : cm^2 g^-1, typically
+    Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
+    
+    | **ATTRIBUTES**
+    | scatm : Scatmodel
+    | E     : scalar or np.array : keV
+    | dist  : dust.Dustspectrum
+    | kappa : scalar or np.array : cm^2 g^-1, typically
     """
     def __init__( self, E=1.0, scatm=Scatmodel(), dist=dust.Dustspectrum() ):
         self.scatm  = scatm
@@ -233,13 +237,14 @@ class Kappascat(object):
 
 class Kappaext(object):
     """
-    Opacity to EXTINCTION [g^-1 cm^2]
-    OBJECT Kappaext( E=1.0 [keV], scatm=Scatmodel(), dist=dust.Dustspectrum() )
-    ---------------------------------
-    scatm : Scatmodel
-    E     : scalar or np.array : keV
-    dist  : dust.Dustspectrum
-    kappa : scalar or np.array : cm^2 g^-1, typically
+    Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size
+    distribution
+    
+    | **ATTRIBUTES**
+    | scatm : Scatmodel
+    | E     : scalar or np.array : keV
+    | dist  : dust.Dustspectrum
+    | kappa : scalar or np.array : cm^2 g^-1, typically
     """
     def __init__( self, E=1.0, scatm=Scatmodel(), dist=dust.Dustspectrum() ):
         self.scatm  = scatm
