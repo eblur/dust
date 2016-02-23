@@ -5,7 +5,7 @@ import constants as c
 #-----------------------------------------------------
 
 def adist( amin=0.1, amax=1.0, na=100 ):
-    """ FUNCTION adist( amin=0.1, amax=1.0, na=100 )
+    """ FUNCTION adist( amin=0.1, amax=1.0, na=100 )  
     Returns np.array of grain sizes between amin and amax (microns) """
     da = (amax-amin)/na
     return np.arange( amin, amax+da, da )
@@ -76,18 +76,17 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
 #-----------------------------------------------------------------
 
 def make_dust_spectrum( amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5 ):
-    """ FUNCTION make_dust_spectrum( amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5 )
-    ----------------------------------------
-    INPUTS
-    amin : [micron]
-    amax : [micron]
-    na   : int
-    p    : scalar for dust power law dn/da \propto a^-p
-    rho  : grain density [g cm^-3]
-    md   : mass density [g cm^-2 or g cm^-3]
-    ----------------------------------------
-    RETURNS
-    dust.Dustspectrum (object)
+    """    
+    | **INPUTS**
+    | amin : [micron]
+    | amax : [micron]
+    | na   : int
+    | p    : scalar for dust power law dn/da \propto a^-p
+    | rho  : grain density [g cm^-3]
+    | md   : mass density [g cm^-2 or g cm^-3]
+    
+    | **RETURNS**  
+    | dust.Dustspectrum (object)
     """
     return Dustspectrum( rad=Dustdist( rad=adist(amin=amin, amax=amax, na=na), p=p, rho=rho ), md=md )
 

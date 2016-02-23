@@ -1,0 +1,17 @@
+
+Modules from *eblur/dust*
+==============================
+
+Dust
+
+.. autofunction:: dust.make_dust_spectrum
+
+
+
+
+.. Contents:
+
+.. toctree::
+   :maxdepth: 2
+
+
