@@ -66,7 +66,7 @@ Modules
    
    dust
    cmindex
-
+   scatmodels
 
 ..
   License

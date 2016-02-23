@@ -16,7 +16,7 @@ from scipy.interpolate import interp1d
 #        a  : scalar [grain size, micron] ) :
 # returns scalar or np.array [scattering efficiency, unitless]
 #
-# Snother option :
+# Another option :
 # Qext ( E  : scalar or np.array [keV]
 #        cm : cmtype object cmindex.py
 #        a  : scalar [grain szie, micron] ) :
@@ -54,13 +54,16 @@ from scipy.interpolate import interp1d
 
 class RGscat(object):
     """
-    OBJECT RGscat()
-    stype : string : 'RGscat'
-    ---------------------------------------------
-    FUNCTIONS
-    Qsca( E, a=1.0 [um], cm=cmi.CmDrude() [see cmindex.py] ) : scattering efficiency [unitless]
-    Char( a=1.0 [um], E=1.0 [keV] ) : characteristc scattering angle [arcsec keV um]
-    Diff( cm=cmi.CmDrude() [see cmindex.py], theta=10.0 [arcsec], a=1.0 [um], E=1.0 [keV] ) : cm^2 ster^-1
+    | **ATTRIBUTES**
+    | stype : string : 'RGscat'
+
+    | **FUNCTIONS**
+    | Qsca( E, a=1.0 [um], cm=cmi.CmDrude() [see cmindex.py] )
+    |    *returns* scattering efficiency [unitless]
+    | Char( a=1.0 [um], E=1.0 [keV] )
+    |    *returns* characteristc scattering angle [arcsec keV um]
+    | Diff( cm=cmi.CmDrude() [see cmindex.py], theta=10.0 [arcsec], a=1.0 [um], E=1.0 [keV] )
+    |    *returns* differential scattering cross-section [cm^2 ster^-1]
     """
 
     stype = 'RGscat'
@@ -108,14 +111,18 @@ class RGscat(object):
 #
 class Mie(object):
     """
-    OBJECT Mie()
-    stype : string : 'Mie'
-    ---------------------------------
-    FUNCTIONS
-    getQs( a=1.0 [um], E=1.0 [keV], cm=cmi.CmDrude(), getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] ) : Efficiency factors [unitless or ster^-1]
-    Qsca( E [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Scattering efficiency [unitless]
-    Qext( E [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Extinction efficiency [unitless]
-    Diff( theta [arcsec], E=1.0 [keV], a=1.0 [um], cm=cmi.CmDrude() ) : Differential cross-section [cm^2 ster^-1]
+    | **ATTRIBUTES**
+    | stype : string : 'Mie'
+
+    | **FUNCTIONS**
+    | getQs( a=1.0 [um], E=1.0 [keV], cm=cmi.CmDrude(), getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] )
+    |     *returns* Efficiency factors depending on getQ [unitless or ster^-1]
+    | Qsca( E [keV], a=1.0 [um], cm=cmi.CmDrude() )
+    |     *returns* Scattering efficiency [unitless]
+    | Qext( E [keV], a=1.0 [um], cm=cmi.CmDrude() )
+    |     *returns* Extinction efficiency [unitless]
+    | Diff( theta [arcsec], E=1.0 [keV], a=1.0 [um], cm=cmi.CmDrude() )
+    |     *returns* Differential cross-section [cm^2 ster^-1]
     """
 
     stype = 'Mie'
@@ -402,14 +409,17 @@ class Mie(object):
 
 class PAH( object ):
     """
-    OBJECT PAH( type )
-    type  : string : 'ion' or 'neu'
-    stype : string : 'PAH' + type
-    ---------------------------------------------
-    FUNCTIONS
-    Qsca( E, a=0.01 [um], cm=None ) : scattering efficiency [unitless]
-    Qabs( E, a=0.01 [um], cm=None ) : absorption efficiency [unitless]
-    Qext( E, a=0.01 [um], cm=None ) : extincton efficiency [unitless]
+    | **ATTRIBUTES**
+    | type  : string : 'ion' or 'neu'
+    | stype : string : 'PAH' + type
+    
+    | **FUNCTIONS**
+    | Qsca( E, a=0.01 [um], cm=None )
+    |     *returns* scattering efficiency [unitless]
+    | Qabs( E, a=0.01 [um], cm=None )
+    |     *returns* absorption efficiency [unitless]
+    | Qext( E, a=0.01 [um], cm=None )
+    |     *returns* extincton efficiency [unitless]
     """
     
     def __init__( self, type ):

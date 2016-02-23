@@ -4,6 +4,7 @@ import numpy as np
 import constants as c
 from scipy.interpolate import interp1d
 
+
 #------------- Index of Refraction object comes in handy --
 
 #class CM(object):       # Complex index of refraction
@@ -18,6 +19,7 @@ from scipy.interpolate import interp1d
 #  rp     : either a function or scipy.interp1d object that is callable
 #         : rp(E) where E is in [keV]
 #  ip     : same as above, ip(E) where E is in [keV]
+
 
 def find_cmfile( name ):
     file_not_found = True
