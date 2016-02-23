@@ -35,16 +35,14 @@ def find_cmfile( name ):
 
 
 class CmDrude(object):
-    """ OBJECT cmindex.CmDrude
-    ---------------------------------------
-    __init__(self, rho=3.0)
-    ---------------------------------------
-    cmtype : 'Drude'
-    rho    : grain density [g cm^-3]
-    ---------------------------------------
-    FUNCTION
-    rp(E)  : real part of complex index of refraction [E in keV]
-    ip(E)  : imaginary part of complex index of refraction [always 0.0]
+    """ 
+    | **ATTRIBUTES**
+    | cmtype : 'Drude'
+    | rho    : grain density [g cm^-3]
+
+    | ** FUNCTIONS**
+    | rp(E)  : real part of complex index of refraction [E in keV]
+    | ip(E)  : imaginary part of complex index of refraction [always 0.0]
     """
     def __init__(self, rho=3.0):  # Returns a CM using the Drude approximation
         self.cmtype = 'Drude'
@@ -61,15 +59,13 @@ class CmDrude(object):
             return 0.0
 
 class CmGraphite(object):
-    """ OBJECT cmindex.CmGraphite
-    ---------------------------------------
-    __init__( self, size='big', orient='perp' )
-    ---------------------------------------
-    cmtype : 'Graphite'
-    size   : 'big' or 'small'
-    orient : 'perp' or 'para'
-    rp(E)  : scipy.interp1d object
-    ip(E)  : scipy.interp1d object [E in keV]
+    """ 
+    | **ATTRIBUTES**
+    | cmtype : 'Graphite'
+    | size   : 'big' or 'small'
+    | orient : 'perp' or 'para'
+    | rp(E)  : scipy.interp1d object
+    | ip(E)  : scipy.interp1d object [E in keV]
     """
     def __init__( self, size='big', orient='perp' ):
         # size : string ('big' or 'small')
@@ -114,13 +110,11 @@ class CmGraphite(object):
         self.ip  = interp1d( lamEvals, imvals )
 
 class CmSilicate(object):
-    """ OBJECT cmindex.CmSilicate
-    ---------------------------------------
-    __init__( self )
-    ---------------------------------------
-    cmtype : 'Silicate'
-    rp(E)  : scipy.interp1d object
-    ip(E)  : scipy.interp1d object [E in keV]
+    """
+    | **ATTRIBUTES**
+    | cmtype : 'Silicate'
+    | rp(E)  : scipy.interp1d object
+    | ip(E)  : scipy.interp1d object [E in keV]
     """
     def __init__( self ):
         self.cmtype = 'Silicate'
@@ -139,14 +133,13 @@ class CmSilicate(object):
 #------------- A quick way to grab a single CM ------------
 
 def getCM( E, model=CmDrude() ):
-    """ FUNCTION getCM( E, model=CmDrude() )
-    ---------------------------------------
-    INPUTS
-    E     : scalar or np.array [keV]
-    model : any Cm-type object
-    ---------------------------------------
-    RETURNS
-    Complex index of refraction : scalar or np.array of dtype='complex'
+    """
+    | **INPUTS**
+    | E     : scalar or np.array [keV]
+    | model : any Cm-type object
+
+    | **RETURNS**
+    | Complex index of refraction : scalar or np.array of dtype='complex'
     """
     return model.rp(E) + 1j * model.ip(E)
 

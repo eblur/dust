@@ -2,6 +2,8 @@
 dust 
 ====
 
+:doc:`index`
+
 Classes
 -------
 
@@ -14,6 +16,8 @@ Functions
 
 .. autofunction:: dust.make_dust_spectrum
 .. autofunction:: dust.MRN
+
+
 
 
 

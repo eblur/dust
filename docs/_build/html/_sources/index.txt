@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to *eblur/dust*
-=======================
+Home doc page for *eblur/dust*
+==============================
 
 The *eblur/dust* set of python modules calculate scattering absorption
 and scattering efficiencies for dust from the infrared to the X-ray.
@@ -62,9 +62,10 @@ github repo into a directory in your python path.::
 Modules
 -------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    dust
+   cmindex
 
 
 ..
