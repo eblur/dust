@@ -105,13 +105,11 @@ Modules
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ..
 
-..
-  Indices and tables
-  ==================
-  
-  * :ref:`genindex`
-  * :ref:`modindex`
-  * :ref:`search`
-..
+Indices and tables
+------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 
