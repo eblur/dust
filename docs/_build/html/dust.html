@@ -40,6 +40,57 @@
             
   <div class="section" id="dust">
 <h1>dust<a class="headerlink" href="#dust" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dust.Grain">
+<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Grain</code><span class="sig-paren">(</span><em>rad=1.0</em>, <em>rho=3.0</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Grain" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">a   : scalar [micron]</div>
+<div class="line">rho : scalar grain density [g cm^-3]</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>FUNCTIONS</strong></div>
+<div class="line">ndens ( md : mass density [g cm^-2 or g cm^-3] )</div>
+<div class="line-block">
+<div class="line"><em>returns</em> scalar number density [cm^-3]</div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="dust.Dustdist">
+<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustdist</code><span class="sig-paren">(</span><em>p=3.5</em>, <em>rho=3.0</em>, <em>rad=array([ 0.1</em>, <em>0.109</em>, <em>0.118</em>, <em>0.127</em>, <em>0.136</em>, <em>0.145</em>, <em>0.154</em>, <em>0.163</em>, <em>0.172</em>, <em>0.181</em>, <em>0.19</em>, <em>0.199</em>, <em>0.208</em>, <em>0.217</em>, <em>0.226</em>, <em>0.235</em>, <em>0.244</em>, <em>0.253</em>, <em>0.262</em>, <em>0.271</em>, <em>0.28</em>, <em>0.289</em>, <em>0.298</em>, <em>0.307</em>, <em>0.316</em>, <em>0.325</em>, <em>0.334</em>, <em>0.343</em>, <em>0.352</em>, <em>0.361</em>, <em>0.37</em>, <em>0.379</em>, <em>0.388</em>, <em>0.397</em>, <em>0.406</em>, <em>0.415</em>, <em>0.424</em>, <em>0.433</em>, <em>0.442</em>, <em>0.451</em>, <em>0.46</em>, <em>0.469</em>, <em>0.478</em>, <em>0.487</em>, <em>0.496</em>, <em>0.505</em>, <em>0.514</em>, <em>0.523</em>, <em>0.532</em>, <em>0.541</em>, <em>0.55</em>, <em>0.559</em>, <em>0.568</em>, <em>0.577</em>, <em>0.586</em>, <em>0.595</em>, <em>0.604</em>, <em>0.613</em>, <em>0.622</em>, <em>0.631</em>, <em>0.64</em>, <em>0.649</em>, <em>0.658</em>, <em>0.667</em>, <em>0.676</em>, <em>0.685</em>, <em>0.694</em>, <em>0.703</em>, <em>0.712</em>, <em>0.721</em>, <em>0.73</em>, <em>0.739</em>, <em>0.748</em>, <em>0.757</em>, <em>0.766</em>, <em>0.775</em>, <em>0.784</em>, <em>0.793</em>, <em>0.802</em>, <em>0.811</em>, <em>0.82</em>, <em>0.829</em>, <em>0.838</em>, <em>0.847</em>, <em>0.856</em>, <em>0.865</em>, <em>0.874</em>, <em>0.883</em>, <em>0.892</em>, <em>0.901</em>, <em>0.91</em>, <em>0.919</em>, <em>0.928</em>, <em>0.937</em>, <em>0.946</em>, <em>0.955</em>, <em>0.964</em>, <em>0.973</em>, <em>0.982</em>, <em>0.991</em>, <em>1.   ])</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustdist" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">p   : scalar for power law dn/da propto a^-p</div>
+<div class="line">rho : scalar grain density [g cm^-3] </div>
+<div class="line">a   : np.array of grain sizes [microns]</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>FUNCTIONS</strong></div>
+<div class="line">dnda ( md : mass density [g cm^-2 or g cm^-3] )</div>
+<div class="line-block">
+<div class="line"><em>returns</em> number density [cm^-3 um^-1]</div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="dust.Dustspectrum">
+<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustspectrum</code><span class="sig-paren">(</span><em>rad=&lt;dust.Dustdist object&gt;</em>, <em>md=1.5e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustspectrum" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">rad : Dustdist or Grain</div>
+<div class="line">md  : mass density of dust [units arbitrary, usually g cm^-2]</div>
+<div class="line">nd  : number density of dust [set by md units]</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="dust.make_dust_spectrum">
 <code class="descclassname">dust.</code><code class="descname">make_dust_spectrum</code><span class="sig-paren">(</span><em>amin=0.1</em>, <em>amax=1.0</em>, <em>na=100</em>, <em>p=4.0</em>, <em>rho=3.0</em>, <em>md=1.5e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.make_dust_spectrum" title="Permalink to this definition">¶</a></dt>
@@ -53,11 +104,30 @@
 <div class="line">md   : mass density [g cm^-2 or g cm^-3]</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>RETURNS</strong>  </div>
-<div class="line">dust.Dustspectrum (object)</div>
+<div class="line"><strong>RETURNS</strong></div>
+<div class="line">dust.Dustspectrum( object )</div>
 </div>
 </dd></dl>
 
+<dl class="function">
+<dt id="dust.MRN">
+<code class="descclassname">dust.</code><code class="descname">MRN</code><span class="sig-paren">(</span><em>amin=0.005</em>, <em>amax=0.3</em>, <em>p=3.5</em>, <em>na=100</em>, <em>spectrum=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.MRN" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">amin : [micron]</div>
+<div class="line">amax : [micron]</div>
+<div class="line">p    : scalar for dust power law dn/da propto a^-p</div>
+<div class="line">na   : int</div>
+<div class="line">spectrum : boolean that sets output type</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>RETURNS</strong></div>
+<div class="line">if spectrum == True: dust.Dustspectrum (object)</div>
+<div class="line">if spectrum == False: dust.Dustdist (object)</div>
+</div>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -65,7 +135,16 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dust</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
