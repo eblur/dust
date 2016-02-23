@@ -69,6 +69,10 @@ Modules
    scatmodels
    sigma_scat
    halo
+   galhalo
+   analytic
+   halodict
+   model_halo
 
 ..
   License

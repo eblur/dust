@@ -51,15 +51,16 @@ ALPHA  = np.power( 10.0, np.arange(0.0,3.01,0.1) )
 def screen( halodict, xg=0.5, NH=NH, d2g=0.009, verbose=False ):
     """
     Performs numerical integration dust screen calculation with each halo in halodict
-    ----------------------------------------------------
-    FUNCTION screen( halodict, xg=0.5, NH=NH, d2g=0.009, verbose=False )
-    RETURNS  : empty 
-    ----------------------------------------------------
-    halodict : halodict.HaloDict object
-    xg       : float [0-1] : position of screen where 0 = point source, 1 = observer
-    NH       : float [cm^-2] : Hydrogen column
-    d2g      : float : Dust-to-gas mass ratio
-    verbose  : boolean : If true, print halo energy at each calculation step
+
+    | **MODIFIES**
+    | halodict.intensity, halodict.htype
+    
+    | **INPUTS**
+    | halodict : halodict.HaloDict object
+    | xg       : float [0-1] : position of screen where 0 = point source, 1 = observer
+    | NH       : float [cm^-2] : Hydrogen column
+    | d2g      : float : Dust-to-gas mass ratio
+    | verbose  : boolean : If true, print halo energy at each calculation step
     """
     print 'Numerically integrating halo model for a dust screen at x =', xg
     AH.set_htype( halodict, xg=xg, NH=NH, d2g=d2g )
@@ -75,14 +76,15 @@ def uniform( halodict, NH=NH, d2g=0.009, verbose=False ):
     """
     Performs numerical integration with uniform dust distribution
         calculation with each halo in halodict
-    ----------------------------------------------------
-    FUNCTION uniform( halodict, NH=NH, d2g=0.009, verbose=False )
-    RETURNS  : empty 
-    ----------------------------------------------------
-    halodict : halodict.HaloDict object
-    NH       : float [cm^-2] : Hydrogen column
-    d2g      : float : Dust-to-gas mass ratio
-    verbose  : boolean : If true, print halo energy at each calculation step
+    
+    | **MODIFIES**
+    | halodict.intensity, halodict.htype
+    
+    | **INPUTS**
+    | halodict : halodict.HaloDict object
+    | NH       : float [cm^-2] : Hydrogen column
+    | d2g      : float : Dust-to-gas mass ratio
+    | verbose  : boolean : If true, print halo energy at each calculation step
     """
     print 'Numerically integrating halo model for uniform ISM'
     AH.set_htype( halodict, NH=NH, d2g=d2g )
@@ -101,13 +103,17 @@ def uniform( halodict, NH=NH, d2g=0.009, verbose=False ):
 def totalhalo( halodict, spectrum ):
     """
     Alters halodict by running halodict.HaloDict.total_halo( corrflux )
-    ----------------------------------------------------
-    FUNCTION totalhalo( halodict, spectrum )
-    RETURNS  : np.array : Corrected flux before scattering (F_a)
-        assuming F_PS = F_a exp(-tau)
-    ----------------------------------------------------
+    
+    **MODIFIES**
+    halodict.total
+
+    **INPUTS**
     halodict : halodict.HaloDict object
     spectrum : flux for the energy values associated with halodict
+
+    **RETURNS**
+    np.array : Corrected flux before scattering (F_a)
+        assuming F_PS = F_a exp(-tau)
     """
     corrflux = spectrum * np.exp( halodict.taux )
     halodict.total_halo( corrflux )
@@ -117,14 +123,16 @@ def totalhalo( halodict, spectrum ):
 
 def simulate_intensity( halodict, spectrum ):
     '''
-    Take a halo dictionary with a simulated halo, 
-    and simulate a Chandra surface brightness profile with it.
-    ----------------------------------------------------
-    FUNCTION simulate_intensity( halodict, spectrum )
-    RETURNS : scipy.interpolate.interp1d object : x = arcsec, y = flux/arcsec^2
-    ----------------------------------------------------
-    halodict : halodict.HaloDict object
-    spectrum : flux for each energy value in halodict
+    Take a halo dictionary with an evaluated profile, 
+    and simulate a surface brightness profile with it. 
+    The arcsec to pixel conversion is based on Chandra.
+
+    | **INPUTS**
+    | halodict : halodict.HaloDict object
+    | spectrum : corrected flux for each energy value in halodict
+
+    | **RETURNS**
+    | scipy.interpolate.interp1d object : x = arcsec, y = flux/arcsec^2
     '''
     arcsec2pix = 0.5  #arcsec/pix (Chandra)
     result = 0.0
@@ -144,27 +152,27 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     '''
     Simulate a surface brightness profile from spectrum file
     for a screen of dust at xg, using 3-5 free parameters
-    ----------------------------------------------------
-    FUNCTION simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
-    	alpha=ALPHA, dict=False, scatm=SCATM, elim=None, na=50 )
-    RETURNS : if dict == False : 
-        scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
-              if dict == True :
-        HaloDict object with full benefits of information
-    ----------------------------------------------------
-    specfile : string : Name of spectrum file
-    a0       : float [um] : Minimum (or single) grain size to use (0.05)
-    a1       : float [um] : Maximum grain size for distribution (if None, single used)
-    p        : float : Power law index for grain size distribution
-    NH       : float [cm^-2] : Hyrdogen column (1.0e22)
-    d2g      : float : Dust-to-gas mass ratio (0.009)
-    rho      : float [g cm^-3] : mass density of a dust grain (3)
-    dict     : boolean (False) : if True, returns halodict instead of interp object
-    xg       : float [0-1] : Position of screen where 0 = point source, 1 = observer
-    alpha    : np.array [arcsec] : Angles for halo intensity values
-    scatm    : ss.Scatmodel()
-    elim     : tuple containing energy limits [keV]
-    na       : number of bins to use for grain size distribution
+
+    | **INPUTS**
+    | specfile : string : Name of spectrum file
+    | a0       : float [um] : Minimum (or single) grain size to use (0.05)
+    | a1       : float [um] : Maximum grain size for distribution (if None, single used)
+    | p        : float : Power law index for grain size distribution
+    | NH       : float [cm^-2] : Hyrdogen column (1.0e22)
+    | d2g      : float : Dust-to-gas mass ratio (0.009)
+    | rho      : float [g cm^-3] : mass density of a dust grain (3)
+    | dict     : boolean (False) : if True, returns halodict instead of interp object
+    | xg       : float [0-1] : Position of screen where 0 = point source, 1 = observer
+    | alpha    : np.array [arcsec] : Angles for halo intensity values
+    | scatm    : ss.Scatmodel()
+    | elim     : tuple containing energy limits [keV]
+    | na       : number of bins to use for grain size distribution
+
+    | **RETURNS**
+    | if dict == False : 
+    |     scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
+    | if dict == True :
+    |     HaloDict object with full benefits of information
     '''
     energy, flux = HD.get_spectrum( specfile )
     if a1 == None:
@@ -191,28 +199,28 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     '''
     Simulate a surface brightness profile from spectrum file
     for a uniform distribution of dust, using 2-4 free parameters
-    ----------------------------------------------------
-    FUNCTION simulate_screen( specfile, a0=0.1, a1=None, p=3.5, d2g=0.009, xg=0.5, \
-    	alpha=ALPHA, dict=False, scatm=SCATM, elim=None, na=50 )
-    RETURNS : if dict == False : 
-        scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
-              if dict == True :
-        HaloDict object with full benefits of information
-    ----------------------------------------------------
-    specfile : string : Name of spectrum file
-    a0       : float [um] : Minimum (or single) grain size to use
-    a1       : float [um] : Maximum grain size for distribution (if None, single used)
-    p        : float : Power law index for grain size distribution
-    NH       : float [cm^-2] : Hyrdogen column (1.0e22)
-    d2g      : float : Dust-to-gas mass ratio (0.009)
-    rho      : float [g cm^-3] : mass density of a dust grain (3)
-    dict     : boolean (False) : if True, returns halodict instead of interp object
-    alpha    : np.array [arcsec] : Angles for halo intensity values
-    aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
-    exposure : float [sec] : Observation exposure time
-    scatm    : ss.Scatmodel()
-    elim     : tuple containing energy limits [keV]
-    na       : number of bins to use for grain size distribution
+    
+    | **INPUTS**
+    | specfile : string : Name of spectrum file
+    | a0       : float [um] : Minimum (or single) grain size to use
+    | a1       : float [um] : Maximum grain size for distribution (if None, single used)
+    | p        : float : Power law index for grain size distribution
+    | NH       : float [cm^-2] : Hyrdogen column (1.0e22)
+    | d2g      : float : Dust-to-gas mass ratio (0.009)
+    | rho      : float [g cm^-3] : mass density of a dust grain (3)
+    | dict     : boolean (False) : if True, returns halodict instead of interp object
+    | alpha    : np.array [arcsec] : Angles for halo intensity values
+    | aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
+    | exposure : float [sec] : Observation exposure time
+    | scatm    : ss.Scatmodel()
+    | elim     : tuple containing energy limits [keV]
+    | na       : number of bins to use for grain size distribution
+    
+    | **RETURNS**
+    | if dict == False : 
+    |     scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
+    | if dict == True :
+    |     HaloDict object with full benefits of information
     '''
     energy, flux = HD.get_spectrum( specfile )
     if a1 == None:

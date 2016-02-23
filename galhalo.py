@@ -9,12 +9,13 @@ from halo import Halo
 
 class GalHalo(object):
     """
-    OBJECT Galhalo( NH=None, d2g=None, xs=None, ismtype=None )
-    ** An htype abstract class for storing halo properties (see halo.py)
-    NH  : float : hydrogen column density [cm^-2]
-    d2g : float : dust-to-gas mass ratio
-    xd  : float[0-1] : position of a dust screen
-    ismtype : string : 'Uniform' or 'Screen'
+    *An htype class for storing halo properties (see halo.py)*
+
+    | **ATTRIBUTES**
+    | NH  : float : hydrogen column density [cm^-2]
+    | d2g : float : dust-to-gas mass ratio
+    | xd  : float[0-1] : position of a dust screen
+    | ismtype : string : 'Uniform' or 'Screen'
     """
     def __init__( self, NH=None, d2g=None, xg=None, ismtype=None ):
         self.NH      = NH
@@ -36,15 +37,16 @@ def power_angles( lmin=0.0, lmax=3.5, dl=0.05 ):
 class Ihalo(object):
     """
     A self-similar halo object [i(theta)], azimuthally symmetric, interpolatable
-    ------------------------------------------------------------------
-    theta : np.array : theta values used to derive the object [arcsec]
-    itemp : np.array : values with respective theta [cm^2 arcsec^-2]
-    rad   : float : Grain size used to derive the object [um]
-    ener  : float : Photon energy used to derive the object [keV]
-    scatm : ss.Scatmodel : Scattering model used to derive the object
-    -------------------------------------------------------------------
-    __init__( theta[np.array], rad[float], ener[float], scatm[ss.Scatmodel] )
-    ihalo( theta ) : [cm^2 arcsec^-2]
+    
+    | **ATTRIBUTES**
+    | theta : np.array : theta values used to derive the object [arcsec]
+    | itemp : np.array : values with respective theta [cm^2 arcsec^-2]
+    | rad   : float : Grain size used to derive the object [um]
+    | ener  : float : Photon energy used to derive the object [keV]
+    | scatm : ss.Scatmodel : Scattering model used to derive the object
+    
+    | **CALL**
+    | ihalo( theta ) : [cm^2 arcsec^-2]
     """
     def __init__( self, theta=power_angles(), \
                       scatm=ss.Scatmodel(), \
@@ -110,8 +112,8 @@ def make_Ihalo_dict( rad=dust.adist(), ener=1.0, \
                          theta=power_angles(), 
                          scatm=ss.Scatmodel(), nx=1000 ):
     """
-    def make_Ihalo_dict( rad[np.array], ener[float], theta[np.array], scatm[ss.Scatmodel], nx[int] )
-    RETURNS : A dictionary of Ihalo objects, with grain sizes as keys.
+    | **RETURNS**
+    | A dictionary of Ihalo objects, with grain sizes as keys.
     """
 
     if np.size(ener) > 1:
@@ -136,14 +138,12 @@ def make_Ihalo_dict( rad=dust.adist(), ener=1.0, \
 
 def path_diff( alpha, x ):
     """
-    path_diff( alpha, x )
-    -----------------------
-    INPUT
-    alpha  : scalar : observation angle [arcsec]
-    x      : scalar or np.array : position of dust patch (source is at x=0, observer at x=1)
-    -----------------------
-    OUTPUT
-    path difference associated with a particular alpha and x : alpha^2*(1-x)/(2x)
+    | **INPUTS**
+    | alpha  : scalar : observation angle [arcsec]
+    | x      : scalar or np.array : position of dust patch (source is at x=0, observer at x=1)
+    
+    | **RETURNS**
+    | path difference associated with a particular alpha and x : alpha^2*(1-x)/(2x)
     """
     
     if np.size( alpha ) > 1:
@@ -160,14 +160,18 @@ def path_diff( alpha, x ):
 ## May 16, 2012: Added e^-kappa_x \delta x to the integral
 def UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
     """
-    FUNCTION UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False )
-    MODIFIES halo.htype, halo.dist, halo.taux, halo.intensity
-    ----------------------------------------------------------------------------
-    halo : Halo object
-    NH   : float : column density [cm^-2]
-    d2g  : float : dust-to-gass mass ratio
-    nx   : int : number of values to use in integration
-    usepathdiff : boolean : True = use extinction due to path difference e^(-tau*path_diff)
+    Calculate the X-ray scattering intensity for dust distributed
+    uniformly along the line of sight
+    
+    | **MODIFIES**
+    | halo.htype, halo.dist, halo.taux, halo.intensity
+    
+    | **INPUTS**
+    | halo : Halo object
+    | NH   : float : column density [cm^-2]
+    | d2g  : float : dust-to-gass mass ratio
+    | nx   : int : number of values to use in integration
+    | usepathdiff : boolean : True = use extinction due to path difference e^(-tau*path_diff)
     """
     E0    = halo.energy
     alpha = halo.alpha
@@ -236,13 +240,17 @@ def UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
 
 def DiscreteISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
     """
-    FUNCTION DiscreteISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 )
-    MODIFIES halo.htype, halo.dist, halo.taux, halo.intensity
-    ----------------------------------------------------------------------------
-    halo : Halo object
-    xg   : float : distance FROM source / distance between source and observer
-    NH   : float : column density [cm^-2]
-    d2g  : float : dust-to-gass mass ratio
+    Calculate the X-ray scattering intensity for dust in an
+    infinitesimally thin wall somewhere on the line of sight.
+    
+    | **MODIFIES**
+    | halo.htype, halo.dist, halo.taux, halo.intensity
+    
+    | **INPUTS**
+    | halo : Halo object
+    | xg   : float : distance FROM source / distance between source and observer
+    | NH   : float : column density [cm^-2]
+    | d2g  : float : dust-to-gass mass ratio
     """
     E0    = halo.energy
     alpha = halo.alpha

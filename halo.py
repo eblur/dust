@@ -9,7 +9,7 @@ from scipy.interpolate import interp1d
 
 class CosmHalo(object):
     """
-    *An htype abstract class for storing halo properties*
+    *An htype class for storing halo properties*
     
     | **ATTRIBUTES**
     | zs      : float : redshift of X-ray source

@@ -23,6 +23,39 @@ from astropy.io import fits
 class HaloDict( object ):
     """
     A dictionary of halos where each property can be looked up with energy as a key.
+
+    | **ATTRIBUTES**
+    | alpha  : np.array : Observation angles [arcsec]
+    | energy : np.array : Energy values [keV]
+    | index  : dict : maps energy value to integer index
+    | rad    : dust.Grain or dust.Dustdist object
+    | scatm  : sigma_scat.Scatmodel object
+    | intensity : np.array : 2-D array with intensity values as a function of alpha and energy
+    | htype  : halo type object (halo.CosmHalo or galhalo.GalHalo)
+    | dist   : dust.Dustspectrum object
+    | taux   : np.array : Scattering cross-section as a function of energy
+    | total  : np.array : Total halo flux as a function of osbervation angle [e.g. phot cm^-2 s^-1 arcsec^-2]
+
+    | **PROPERTIES**
+    | len    : length in E dimension
+    | hsize  : length in alpha dimension
+    | superE : a 2-D array with the energy values duplicated along axis 1
+    | superA : a 2-D array with the observation angles duplicated along axis 0
+    
+    | **CALL**
+    | halodict[E] : halo intensity I_h/F_a at E (keV) [arcsec^-2]
+    | halodict[emin:emax] : sum of halo intensities betwen emin (keV) and emax (keV)
+
+    | **FUNCTIONS**
+    | total_halo(fluxes)
+    |     fluxes : np.array : Source apparent flux as a function of energy [e.g. phot cm^-2 s^-1]
+    |     *Creates / updates the self.total parameter with the sum of the halo flux from each energy bin*
+    | ecf(theta, nth=500)
+    |     theta : float : Value for which to compute enclosed fraction (arcseconds)
+    |     nth   : int (500) : Number of angles to use in calculation
+    |     *returns* the enclosed fraction for the halo surface brightness
+    |     profile, as a function of energy via 
+    |     integral(theta,2pi*theta*halo)/total_halo_counts
     """
     
     def __init__( self, energy, alpha=np.power(10.0, np.arange(0.0,3.01,0.05)), \
@@ -81,10 +114,6 @@ class HaloDict( object ):
         return np.tile( self.alpha, (NE,1) ) # NE x NA
     
     def total_halo( self, fluxes ):
-        """
-        Sums the halos from different energy bins to create a total halo profile.
-        Creates / updates the self.total parameter
-        """
         NE, NA = len(self.energy), len(self.alpha)
         if len(fluxes) != NE:
             print 'Error: Number of flux bins must equal the number of halo energy bins'
@@ -97,14 +126,6 @@ class HaloDict( object ):
 
         # Update -- Feb 10, 2015 to match halo.ecf
     def ecf( self, theta, nth=500 ):
-        """
-        Returns the enclosed fraction for the halo surface brightness
-        profile, as a function of energy via 
-        integral(theta,2pi*theta*halo)/total_halo_counts
-        -------------------------------------------------------------------------
-        theta : float : Value for which to compute enclosed fraction (arcseconds)
-        nth   : int (500) : Number of angles to use in calculation
-        """
         NE, NA = len(self.energy), len(self.alpha)
         result = np.zeros( NE ) # NE x NA
         taux   = self.taux
@@ -137,6 +158,14 @@ def aeff( filename ):
 ## 2015.01.29 - Add a function that will save and load halo dicts into/from fits files
 
 def fitsify_halodict( hd, outfile, clobber=False ):
+    """
+    Save a halo dictionary to a fits file, with some useful information in the header
+    
+    | **INPUTS**
+    | hd      : HaloDict object
+    | outfile : string : output file name
+    | clobber : boolean (False) : set to True to overwrite outfile if it already exists
+    """
     # Set up the header
     prihdr = fits.Header()
     prihdr['COMMENT'] = "This is a fits file containing halo dictionary information"
@@ -167,6 +196,15 @@ def fitsify_halodict( hd, outfile, clobber=False ):
     return
 
 def read_halodict_fits( infile ):
+    """
+    Read in a fits file and pass on as much information as possible to a halo dict object
+    
+    | **INPUTS**
+    | infile : string : fits file name to read
+    
+    | **RETURNS**
+    | intensity values from the fits file
+    """
     hdulist = fits.open(infile)
     header  = hdulist[0].header
     

@@ -108,12 +108,18 @@ def screen_eq( halo, xg=0.5, verbose=False, **kwargs ):
     '''
     Analytic function for a screen of dust particles 
         from parameters set in halo (taux, a0, a1, p, xg)
-    --------------------------------------------------------------
-    FUNCTION screen_eq( halo )
-    RETURNS : np.array [arcsec^-2] : I_h/F_a
-    Also alters halo.intensity with the resulting valuesa
-    --------------------------------------------------------------
-    halo : halo.Halo object
+
+    | **MODIFIES**
+    | halo.htype, halo.intensity
+    
+    | **INPUTS**
+    | halo : halo.Halo object
+    | xg   : float (0.5) : parameterized location of dust screen 
+    |     [unitless, 0 = location of observer, 1 = location of source]
+    | verbose : boolean (False) : prints some information
+
+    | **RETURNS**
+    | np.array [arcsec^-2] : I_h/F_a
     '''
     
     set_htype( halo, xg=xg, **kwargs )
@@ -177,12 +183,16 @@ def uniform_eq( halo, verbose=False, **kwargs ):
     '''
     Analytic function for a uniform distribution of dust particles 
         from parameters set in halo (taux, a0, a1, p)
-    --------------------------------------------------------------
-    FUNCTION uniform_eq( halo )
-    RETURNS : np.array [arcsec^-2] : I_h/F_a
-    Also alter halo.intensity with the resulting valuesa
-    --------------------------------------------------------------
-    halo : halo.Halo object
+    
+    | **MODIFIES**
+    | halo.htype, halo.intensity
+    
+    | **INPUTS**
+    | halo : halo.Halo object
+    | verbose : boolean (False) : boolean (False) : prints some information
+    
+    | **RETURNS**
+    | np.array [arcsec^-2] : I_h/F_a
     '''
     
     set_htype( halo, xg=None, **kwargs )
