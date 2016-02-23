@@ -41,7 +41,23 @@
   <div class="section" id="cmindex">
 <h1>cmindex<a class="headerlink" href="#cmindex" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="index.html"><em>Home doc page for eblur/dust</em></a></p>
-<div class="section" id="classes">
+<p>This module contains built-in complex indices of refraction typically
+used for astrophysical dust.</p>
+<p>Users wishing to create their own index of refraction should adhere to
+the format:</p>
+<p><em>class</em> <strong>CmIndex</strong> (object)</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">cmtype : string (&#8216;Drude&#8217;, &#8216;Graphite&#8217;, or &#8216;Silicate&#8217;)</div>
+<div class="line">rp     : either a function or scipy.interp1d object that can called,</div>
+<div class="line-block">
+<div class="line">e.g. rp(E) where E is in [keV]</div>
+</div>
+<div class="line">ip     : same as above, ip(E) where E is in [keV]</div>
+</div>
+</div></blockquote>
+<span class="target" id="module-cmindex"></span><div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cmindex.CmDrude">
