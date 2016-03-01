@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cmindex &mdash; eblur/dust 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/>
+        <link rel="next" title="scatmodels" href="scatmodels.html"/>
+        <link rel="prev" title="dust" href="dust.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> eblur/dust
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dust.html">dust</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">cmindex</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scatmodels.html">scatmodels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sigma_scat.html">sigma_scat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="halo.html">halo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="galhalo.html">galhalo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analytic.html">analytic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="halodict.html">halodict</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_halo.html">model_halo</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">eblur/dust</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>cmindex</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/cmindex.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cmindex">
+<h1>cmindex<a class="headerlink" href="#cmindex" title="Permalink to this headline">¶</a></h1>
+<p>This module contains built-in complex indices of refraction typically
+used for astrophysical dust.</p>
+<p>Users wishing to create their own index of refraction should adhere to
+the format:</p>
+<p><em>class</em> <strong>CmIndex</strong> (object)</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">cmtype : string (&#8216;Drude&#8217;, &#8216;Graphite&#8217;, or &#8216;Silicate&#8217;)</div>
+<div class="line">rp     : either a function or scipy.interp1d object that can called,</div>
+<div class="line-block">
+<div class="line">e.g. rp(E) where E is in [keV]</div>
+</div>
+<div class="line">ip     : same as above, ip(E) where E is in [keV]</div>
+</div>
+</div></blockquote>
+<span class="target" id="module-cmindex"></span><div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cmindex.CmDrude">
+<em class="property">class </em><code class="descclassname">cmindex.</code><code class="descname">CmDrude</code><span class="sig-paren">(</span><em>rho=3.0</em><span class="sig-paren">)</span><a class="headerlink" href="#cmindex.CmDrude" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">cmtype : &#8216;Drude&#8217;</div>
+<div class="line">rho    : grain density [g cm^-3]</div>
+</div>
+<div class="line-block">
+<div class="line">** FUNCTIONS**</div>
+<div class="line">rp(E)  : real part of complex index of refraction [E in keV]</div>
+<div class="line">ip(E)  : imaginary part of complex index of refraction [always 0.0]</div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="cmindex.CmGraphite">
+<em class="property">class </em><code class="descclassname">cmindex.</code><code class="descname">CmGraphite</code><span class="sig-paren">(</span><em>size='big'</em>, <em>orient='perp'</em><span class="sig-paren">)</span><a class="headerlink" href="#cmindex.CmGraphite" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">cmtype : &#8216;Graphite&#8217;</div>
+<div class="line">size   : &#8216;big&#8217; or &#8216;small&#8217;</div>
+<div class="line">orient : &#8216;perp&#8217; or &#8216;para&#8217;</div>
+<div class="line">rp(E)  : scipy.interp1d object</div>
+<div class="line">ip(E)  : scipy.interp1d object [E in keV]</div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="cmindex.CmSilicate">
+<em class="property">class </em><code class="descclassname">cmindex.</code><code class="descname">CmSilicate</code><a class="headerlink" href="#cmindex.CmSilicate" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">cmtype : &#8216;Silicate&#8217;</div>
+<div class="line">rp(E)  : scipy.interp1d object</div>
+<div class="line">ip(E)  : scipy.interp1d object [E in keV]</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cmindex.getCM">
+<code class="descclassname">cmindex.</code><code class="descname">getCM</code><span class="sig-paren">(</span><em>E</em>, <em>model=&lt;cmindex.CmDrude object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#cmindex.getCM" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">E     : scalar or np.array [keV]</div>
+<div class="line">model : any Cm-type object</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>RETURNS</strong></div>
+<div class="line">Complex index of refraction : scalar or np.array of dtype=&#8217;complex&#8217;</div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="scatmodels.html" class="btn btn-neutral float-right" title="scatmodels" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dust.html" class="btn btn-neutral" title="dust" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Lia Corrales.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
