@@ -2,8 +2,6 @@
 analytic
 ========
 
-:doc:`index`
-
 This module contains semi-analytic functions for calculating X-ray
 scattering halo intensities from a power-law distribution of dust
 grain sizes (see Appendix of `Corrales & Paerels, 2015

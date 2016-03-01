@@ -2,8 +2,6 @@
 galhalo
 =======
 
-:doc:`index`
-
 This module is for calculating intensity profiles for dust scattering
 halos from Galactic point sources
 

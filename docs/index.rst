@@ -12,10 +12,8 @@ This code can also be used to calculate dust scattering halo images in
 the X-ray, in both interstellar and intergalactic (cosmological)
 contexts.
 
-| **First published version of this code** 
-  (released with `Corrales & Paerels, 2015 
-  <http://adsabs.harvard.edu/abs/2015MNRAS.453.1121C>`_)
-| http://dx.doi.org/10.5281/zenodo.15991
+**First published version of this code** (released with `Corrales & Paerels, 2015 <http://adsabs.harvard.edu/abs/2015MNRAS.453.1121C>`_)
+http://dx.doi.org/10.5281/zenodo.15991
 
 **Source code:** github.com/eblur/dust
 

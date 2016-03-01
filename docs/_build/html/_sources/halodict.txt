@@ -2,8 +2,6 @@
 halodict
 ========
 
-:doc:`index`
-
 Classes
 -------
 

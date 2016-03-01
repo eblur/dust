@@ -2,8 +2,6 @@
 dust 
 ====
 
-:doc:`index`
-
 Classes
 -------
 

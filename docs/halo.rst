@@ -2,8 +2,6 @@
 halo
 ====
 
-:doc:`index`
-
 This module is for calculating intensity profiles for dust scattering
 halos from cosmological (z > 0) point sources.
 

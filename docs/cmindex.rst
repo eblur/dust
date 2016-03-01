@@ -2,8 +2,6 @@
 cmindex
 =======
 
-:doc:`index`
-
 This module contains built-in complex indices of refraction typically
 used for astrophysical dust.
 

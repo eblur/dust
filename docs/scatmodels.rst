@@ -2,8 +2,6 @@
 scatmodels
 ==========
 
-:doc:`index`
-
 This module contains built-in algorithms for Mie scattering and the
 Rayleigh-Gans approximation.
 
