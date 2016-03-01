@@ -104,16 +104,16 @@ def totalhalo( halodict, spectrum ):
     """
     Alters halodict by running halodict.HaloDict.total_halo( corrflux )
     
-    **MODIFIES**
-    halodict.total
+    | **MODIFIES**
+    | halodict.total
 
-    **INPUTS**
-    halodict : halodict.HaloDict object
-    spectrum : flux for the energy values associated with halodict
+    | **INPUTS**
+    | halodict : halodict.HaloDict object
+    | spectrum : flux for the energy values associated with halodict
 
-    **RETURNS**
-    np.array : Corrected flux before scattering (F_a)
-        assuming F_PS = F_a exp(-tau)
+    | **RETURNS**
+    | np.array : Corrected flux before scattering (F_a)
+    |     assuming F_PS = F_a exp(-tau)
     """
     corrflux = spectrum * np.exp( halodict.taux )
     halodict.total_halo( corrflux )
