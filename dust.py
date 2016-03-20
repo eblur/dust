@@ -11,6 +11,10 @@ NA       = 100    # default number for grain size dist resolution
 PDIST    = 3.5    # default slope for power law distribution
 AMICRON  = 1.0    # grain radius (1 micron)
 
+# min and max grain radii for MRN distribution
+AMIN     = 0.005  # micron
+AMAX     = 0.3    # micron
+
 #---------------------------------------------------------------
 # This is gratuitous but it's helpful for reading the code
 def make_rad(amin, amax, na, log=False):
@@ -33,21 +37,7 @@ def make_rad(amin, amax, na, log=False):
         return np.linspace(amin, amax, na)
 
 GREY_RAD = make_rad(0.1, 1.0, NA)
-MRN_RAD  = make_rad(0.005, 0.3, NA)
-
-#-----------------------------------------------------
-
-# Print all the default values
-def print_defaults():
-    print("Default values:")
-    print("MDUST = %.3e" % (MDUST))
-    print("RHO_G = %.3f" % (RHO_G))
-    print("NA = %d" % (NA))
-    print("PDIST = %.3f" % (PDIST))
-    print("AMICRON = %.3f" % (AMICRON))
-    print("GREY_RAD (amin, amax): (%.3f, %.3f)" % (GREY_RAD[0], GREY_RAD[-1]))
-    print("MRN_RAD (amin, amax): (%.3f, %.3f)" % (MRN_RAD[0], MRN_RAD[-1]))
-    return
+MRN_RAD  = make_rad(AMIN, AMAX, NA)
 
 #-----------------------------------------------------
 
@@ -113,18 +103,30 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
     | rho  : dust grain material density [g cm^-3]
     
     >>> np.sum(Dustspectrum(md=0.0).nd) == 0
-    >>> np.abs(_integrate_dust_mass(Dustspectrum())/MDUST - 1.0) < 0.01
-    >>> np.abs(_integrate_dust_mass(Dustspectrum(rad=Grain()))/MDUST - 1.0) < 0.01
+    
+    >>> test_grain = Dustspectrum()
+    >>> test_grain.calc_from_dist(Grain())
+    >>> np.abs(_integrate_dust_mass(test_grain)/MDUST - 1.0) < 0.01
+    
+    >>> test_powlaw = Dustspectrum()
+    >>> test_powlaw.calc_from_dist(Powerlaw())
+    >>> np.abs(_integrate_dust_mass(test_powlaw)/MDUST - 1.0) < 0.01
     """
-    def __init__( self, rad=Powerlaw(), md=MDUST ):
+    def __init__(self, a=None, rho=None, nd=None, md=None):
         self.md  = md
-        self.a   = rad.a
-        self.rho = rad.rho
-        self.nd  = rad.ndens(md)
+        self.a   = a
+        self.rho = rho
+        self.nd  = nd
+    
+    def calc_from_dist(self, dist, md=MDUST):
+        self.md  = md
+        self.a   = dist.a
+        self.rho = dist.rho
+        self.nd  = dist.ndens(md)
 
 #-----------------------------------------------------------------
 
-def MRN_dist(amin, amax, p, rho=RHO_G, md=MDUST, **kwargs):
+def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, rho=RHO_G, md=MDUST, **kwargs):
     """
     Returns a dust spectrum for a power law distribution of dust grains
     
@@ -137,10 +139,12 @@ def MRN_dist(amin, amax, p, rho=RHO_G, md=MDUST, **kwargs):
     | md   : mass density [g cm^-2 or g cm^-3]
 
     | **RETURNS**
-    | dust.Dustspectrum( object )
+    | dust.Dustspectrum object
     """
-    ddist = Powerlaw(amin=amin, amax=amax, p=p, rho=rho, **kwargs)
-    return Dustspectrum(rad=ddist, md=md)
+    ddist  = Powerlaw(amin=amin, amax=amax, p=p, rho=rho, **kwargs)
+    result = Dustspectrum()
+    result.calc_from_dist(ddist, md=md)
+    return result
 
 def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
     print("WARNING: make_dust_spectrum is deprecated. Use MRN_dist")

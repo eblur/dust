@@ -11,20 +11,20 @@ SMC_file      = 'Table3_SMC.WD.dat'
 
 def find_wdfile( name ):
     file_not_found = True
-
+    
     path_list = os.getenv("PYTHONPATH").split(':')
-
+    
     for path in path_list:
         for root, dirs, files in os.walk(path+"/"):
             if name in files:
                 return os.path.join(root, name)
-
+    
     if file_not_found:
         print("ERROR: Cannot find WD01 Table file %s" % (name))
         return result
 
 
-def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
+def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
     """
     get_dist_params( 
     R_V [float : 3.1, 4.0, or 5.5]
@@ -109,19 +109,20 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW' ):
 
     result = (alpha, beta, a_t, a_c, C)
 
-    print 'R_V   = ', table_info['col1'][i_bc]
-    print 'bc    = ', table_info['col2'][i_bc]
-    print 'alpha = ', alpha
-    print 'beta  = ', beta
-    print 'a_t   = ', a_t
-    print 'a_c   = ', a_c
-    print 'C     = ', C
+    if verbose:
+        print 'R_V   = ', table_info['col1'][i_bc]
+        print 'bc    = ', table_info['col2'][i_bc]
+        print 'alpha = ', alpha
+        print 'beta  = ', beta
+        print 'a_t   = ', a_t
+        print 'a_c   = ', a_c
+        print 'C     = ', C
 
     return result
 
 DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(1.0), 50)
 
-def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', gal='MW' ):
+def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', gal='MW', verbose=True ):
     """
     make_WD01_Dustspectrum(
     R_V [float],
@@ -130,7 +131,14 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
     type [string : 'Graphite' or 'Silicate'] )
     gal [string : 'MW', 'LMC', or 'SMC'], 
     -------------------------------------------
-    Returns a dust.Dustspectrum object containing a (grain sizes), nd (dn/da), and md (total mass density of dust)
+    Returns a dust.Dustspectrum object containing a 
+    (grain sizes), nd (dn/da), and md (total mass density of dust)
+    
+    >>> wd01_sil = make_WD01_Dustspectrum(type='Silicate')
+    >>> (dust._integrate_dust_mass(wd01_sil)/wd01_sil.md) - 1.0 < 0.01
+    
+    >>> wd01_gra = make_WD01_Dustspectrum(type='Graphite')
+    >>> (dust._integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
     """
 
     if type == 'Graphite':
@@ -140,17 +148,14 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
     else:
         print 'Error: Dust type not recognized'
         return
-
-    dist   = dust.Powerlaw( rad=rad, rho=rho_d, p=4 )
-    result = dust.Dustspectrum( rad=dist )
-
+    
     ANGS2MICRON = 1.e-10 * 1.e6
-    a    = dist.a
-    a_cm = dist.a * c.micron2cm
+    a    = rad  # Easier than changing variable names further down
+    a_cm = rad * c.micron2cm
     NA   = np.size( a )
 
 
-    (alpha, beta, a_t, a_c, C) = get_dist_params( R_V=R_V, bc=bc, type=type, gal=gal )
+    (alpha, beta, a_t, a_c, C) = get_dist_params( R_V=R_V, bc=bc, type=type, gal=gal, verbose=verbose )
 
     if type == 'Graphite':
 
@@ -211,12 +216,13 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
 
         Dist_WD01 = C/a_cm * (a/a_t)**alpha * F_s * Case_s #cm^-4 per n_H
 
-    ## Modify result Dustspectrum so we get a proper WD01 dist!
-
     mg = 4.0/3.0*np.pi*a_cm**3 * rho_d  # mass of each dust grain
     Md = c.intz( a_cm, Dist_WD01 * mg )
-
-    result.nd = Dist_WD01 * c.micron2cm  # cm^-3 per um per n_H
-    result.md = Md
+    
+    result = dust.Dustspectrum()
+    result.a   = a
+    result.rho = rho_d
+    result.nd  = Dist_WD01 * c.micron2cm  # cm^-3 per um per n_H
+    result.md  = Md
 
     return result
