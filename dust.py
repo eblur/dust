@@ -24,6 +24,8 @@ def make_rad(amin, amax, na, log=False):
     
     | **RETURNS**
     | A numpy array of length na
+    
+    >>> len(make_rad(0.1,1.0,10)) == 10
     """
     if log:
         return np.logspace( np.log10(amin), np.log10(amax), na )
@@ -44,6 +46,9 @@ class Grain(object):
     | **FUNCTIONS**
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* scalar number density [cm^-3]
+    
+    >>> Grain().ndens(0.0) == 0.0
+    >>> Grain(rho=0.0).ndens() == np.inf
     """
     def __init__(self, rad=AMICRON, rho=RHO_G):
         self.a   = rad
@@ -62,6 +67,9 @@ class Dustdist(object):  # power (p), rho, radius (a)
     | **FUNCTIONS**
     | dnda ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
+    
+    >>> np.sum(Dustdist().dnda(0.0)) == 0.0
+    >>> np.all(np.isinf(Dustdist(rho=0.0).dnda()))
     """
     def __init__(self, rad=MRN_RAD, p=PDIST, rho=RHO_G):
         self.p   = p
@@ -80,6 +88,8 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
     | rad : Dustdist or Grain
     | md  : mass density of dust [units arbitrary, usually g cm^-2]
     | nd  : number density of dust [set by md units]
+    
+    >>> np.sum(Dustspectrum(md=0.0).nd) == 0
     """
     def __init__( self, rad=Dustdist(), md=MDUST ):
         self.md  = md
