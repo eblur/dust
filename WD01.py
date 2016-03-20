@@ -146,7 +146,7 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
 
     ANGS2MICRON = 1.e-10 * 1.e6
     a    = dist.a
-    a_cm = dist.a * c.micron2cm()
+    a_cm = dist.a * c.micron2cm
     NA   = np.size( a )
 
 
@@ -158,13 +158,13 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
         rho     = 2.24             # g cm^-3                                                                                
         sig     = 0.4
         a_01    = 3.5*ANGS2MICRON      # 3.5 angstroms in units of microns                                                  
-        a_01_cm = a_01 * c.micron2cm()
+        a_01_cm = a_01 * c.micron2cm
         bc1     = 0.75 * bc * 1.e-5
         B_1     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_01_cm**3 * 0.4) \
             * bc1 * mc / (1 + special.erf( 3*0.4/np.sqrt(2) + np.log(a_01/3.5e-4)/(0.4*np.sqrt(2)) ) )
         
         a_02    = 30.0*ANGS2MICRON       # 30 angtroms in units of microns                                                  
-        a_02_cm = a_02 * c.micron2cm()
+        a_02_cm = a_02 * c.micron2cm
         bc2     = 0.25 * bc * 1.e-5
         B_2     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_02_cm**3 * 0.4) \
             * bc2 * mc / (1 + special.erf( 3*0.4/np.sqrt(2) + np.log(a_02/3.5e-4)/(0.4*np.sqrt(2)) ) )
@@ -216,7 +216,7 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
     mg = 4.0/3.0*np.pi*a_cm**3 * rho_d  # mass of each dust grain
     Md = c.intz( a_cm, Dist_WD01 * mg )
 
-    result.nd = Dist_WD01 * c.micron2cm()  # cm^-3 per um per n_H
+    result.nd = Dist_WD01 * c.micron2cm  # cm^-3 per um per n_H
     result.md = Md
 
     return result

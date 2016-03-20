@@ -79,7 +79,7 @@ class Ihalo(object):
             itemp = np.append( itemp, \
                                    c.intz( xi, dsig/(xi**2) ) )
 
-        self.itemp = itemp * c.arcs2rad()**2
+        self.itemp = itemp * c.arcs2rad**2
 
 
     def ihalo( self, theta ):
@@ -153,7 +153,7 @@ def path_diff( alpha, x ):
         print 'Error: x must be between 0 and 1'
         return
 
-    alpha_rad = alpha * c.arcs2rad()
+    alpha_rad = alpha * c.arcs2rad
 
     return alpha_rad**2 * (1-x) / (2*x)
 
@@ -176,7 +176,7 @@ def UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
     E0    = halo.energy
     alpha = halo.alpha
     scatm = halo.scatm
-    md    = NH * c.mp() * d2g
+    md    = NH * c.m_p * d2g
 
     halo.htype = GalHalo( NH=NH, d2g=d2g, ismtype='Uniform' )
     halo.dist  = dust.Dustspectrum( rad=halo.rad, md=md )
@@ -235,7 +235,7 @@ def UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
         
     # Set the halo intensity
 
-    halo.intensity  = intensity * np.power( c.arcs2rad(), 2 )  # arcsec^-2
+    halo.intensity  = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
     # halo.taux set at beginning of function so it could be called for later use
 
 def DiscreteISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
@@ -255,7 +255,7 @@ def DiscreteISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
     E0    = halo.energy
     alpha = halo.alpha
     scatm = halo.scatm
-    md    = NH * c.mp() * d2g
+    md    = NH * c.m_p * d2g
 
     halo.htype = GalHalo( xg=xg, NH=NH, d2g=d2g, ismtype='Screen' )
     halo.dist  = dust.Dustspectrum( rad=halo.rad, md=md )
@@ -280,7 +280,7 @@ def DiscreteISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
         print '%% Must input type dust.Grain or dust.Dustdist'
         intensity = np.zeros( np.size(xvals) )
 
-    halo.intensity = intensity * np.power( c.arcs2rad(), 2 )  # arcsec^-2
+    halo.intensity = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
     halo.taux      = ss.Kappascat( E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * md
 
 

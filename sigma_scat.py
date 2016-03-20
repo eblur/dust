@@ -133,7 +133,7 @@ class Sigmascat(object):
         cm   = scatm.cmodel
         scat = scatm.smodel
 
-        cgeo  = np.pi * np.power( a*c.micron2cm(), 2 )
+        cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
 
         if cm.cmtype == 'Graphite':
             qsca_pe = scat.Qsca( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
@@ -169,7 +169,7 @@ class Sigmaext(object):
         cm   = scatm.cmodel
         scat = scatm.smodel
 
-        cgeo  = np.pi * np.power( a*c.micron2cm(), 2 )
+        cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
 
         if cm.cmtype == 'Graphite':
             qext_pe = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
@@ -198,7 +198,7 @@ class Kappascat(object):
         cm   = scatm.cmodel
         scat = scatm.smodel
 
-        cgeo = np.pi * np.power( dist.a * c.micron2cm(), 2 )
+        cgeo = np.pi * np.power( dist.a * c.micron2cm, 2 )
 
         qsca    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
         qsca_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
@@ -259,7 +259,7 @@ class Kappaext(object):
         cm   = scatm.cmodel
         scat = scatm.smodel
 
-        cgeo = np.pi * np.power( dist.a * c.micron2cm(), 2 )
+        cgeo = np.pi * np.power( dist.a * c.micron2cm, 2 )
 
         qext    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
         qext_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )

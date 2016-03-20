@@ -98,7 +98,7 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
 
     X     = DP/Dtot
         
-    c_H0_cm = c.cperh0() * (c.h0() / cosm.h0)  #cm
+    c_H0_cm = c.cperh0 * (c.h0 / cosm.h0)  #cm
     hfac    = np.sqrt( cosm.m * np.power( 1+zpvals, 3) + cosm.l )
         
     Evals  = E0 * (1+zpvals)
@@ -143,7 +143,7 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
 
     #----- Finally, set the halo intensity --------
 
-    halo.intensity  = intensity * np.power( c.arcs2rad(), 2 )  # arcsec^-2
+    halo.intensity  = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
     halo.taux       = cosmo.CosmTauX( zs, E=halo.energy, dist=halo.rad, scatm=halo.scatm, cosm=halo.htype.cosm )
     
 #----------------- Infinite Screen Case --------------------------
@@ -204,7 +204,7 @@ def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
         print '%% Must input type dust.Grain or dust.Dustdist'
         intensity = np.zeros( np.size(zpvals) )
 
-    halo.intensity = intensity * np.power( c.arcs2rad(), 2 )  # arcsec^-2
+    halo.intensity = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
     halo.taux      = cosmo.CosmTauScreen( zg, E=halo.energy, dist=halo.dist, scatm=halo.scatm )
 
 

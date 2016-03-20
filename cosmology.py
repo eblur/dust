@@ -14,7 +14,7 @@ def zvalues( zs=4.0, z0=0.0, nz=100 ):
 #-----------------------------------------------------
 
 class Cosmology(object):
-    def __init__( self, h0=c.h0(), m=c.omega_m(), l=c.omega_l(), d=c.omega_d() ):
+    def __init__( self, h0=c.h0, m=c.omega_m, l=c.omega_l, d=c.omega_d ):
         """
         Cosmology object
         ------------------------------
@@ -44,7 +44,7 @@ class Cosmdens(object):  # h0, omega, mass density (md)
         """
         self.h0    = cosm.h0
         self.omega = cosm.d
-        self.md    = cosm.d * c.rho_crit() * np.power( cosm.h0/c.h0(), 2 )
+        self.md    = cosm.d * c.rho_crit * np.power( cosm.h0/c.h0, 2 )
 
 #-----------------------------------------------------
 
@@ -72,8 +72,8 @@ def DChi( z, zp=0.0, cosm=Cosmology(), nz=100 ):
     nz   : int (100) : number of z-values to use in calculation
     """
     zvals     = zvalues( zs=z, z0=zp, nz=nz )
-    integrand = c.cperh0() * ( c.h0()/cosm.h0 ) / np.sqrt( cosm.m * np.power(1+zvals,3) + cosm.l )
-    return c.intz( zvals, integrand ) / (1e9 * c.pc2cm() ) # Gpc, in comoving coordinates
+    integrand = c.cperh0 * ( c.h0/cosm.h0 ) / np.sqrt( cosm.m * np.power(1+zvals,3) + cosm.l )
+    return c.intz( zvals, integrand ) / (1e9 * c.pc2cm ) # Gpc, in comoving coordinates
 
 def DA( theta, z, cosm=Cosmology(), nz=100 ):
     """
@@ -85,7 +85,7 @@ def DA( theta, z, cosm=Cosmology(), nz=100 ):
     nz    : int (100) : number of z-values to use in DChi calculation
     """
     dchi = DChi( z, cosm=cosm, nz=nz )
-    return theta * c.arcs2rad() * dchi / (1+z)
+    return theta * c.arcs2rad * dchi / (1+z)
     
 
 def CosmTauX( z, E=1.0, dist=dust.Dustdist(), scatm=ss.Scatmodel(), cosm=Cosmology(), nz=100 ):
@@ -115,13 +115,13 @@ def CosmTauX( z, E=1.0, dist=dust.Dustdist(), scatm=ss.Scatmodel(), cosm=Cosmolo
             kappa     = ss.Kappascat( E=Evals, scatm=scatm, dist=spec ).kappa
             hfac      = np.sqrt( cosm.m * np.power( 1+zvals, 3 ) + cosm.l )
             integrand = kappa * md * np.power( 1+zvals, 2 ) * \
-                c.cperh0() * ( c.h0()/cosm.h0 ) / hfac
+                c.cperh0 * ( c.h0/cosm.h0 ) / hfac
             result    = np.append( result, c.intz( zvals, integrand ) )
     else:
         Evals     = E * (1 + zvals)
         kappa     = ss.Kappascat( E=Evals, scatm=scatm, dist=spec ).kappa
         hfac      = np.sqrt( cosm.m * np.power( 1+zvals, 3 ) + cosm.l )
-        integrand = kappa * md * np.power( 1+zvals, 2 ) * c.cperh0() * ( c.h0()/cosm.h0 ) / hfac
+        integrand = kappa * md * np.power( 1+zvals, 2 ) * c.cperh0 * ( c.h0/cosm.h0 ) / hfac
         result    = c.intz( zvals, integrand )
 
     return result

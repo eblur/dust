@@ -198,7 +198,7 @@ def multiscreen_tau( sample, d2g=0.009, scatm=ss.makeScatmodel('RG','Drude') ):
     result = []
     for walker in sample:
         logNHu, logNHs, a_u, a_s, p_u, p_s, x_s = walker
-        MDu, MDs = np.power(10.0,logNHu) * c.mp() * d2g, np.power(10.0,logNHs) * c.mp() * d2g
+        MDu, MDs = np.power(10.0,logNHu) * c.m_p * d2g, np.power(10.0,logNHs) * c.m_p * d2g
         da_u, da_s = (a_u-AMIN)/10.0, (a_s-AMIN)/10.0
         Udust = dust.Dustdist( rad=np.arange(AMIN,a_u+da_u,da_u), p=p_u )
         Sdust = dust.Dustdist( rad=np.arange(AMIN,a_s+da_s,da_s), p=p_s )
@@ -213,10 +213,10 @@ def sample_tau( sample, d2g=0.009, mscreen=False ):
         if mscreen: 
             x1, x2, logNH1, logNH2, amax, p = walker
             nhtot = np.power(10.0,logNH1) + np.power(10.0,logNH2)
-            md    = nhtot * c.mp() * d2g
+            md    = nhtot * c.m_p * d2g
         else:
             logNH, amax, p = walker
-            md = np.power(10.0,logNH) * c.mp() * d2g
+            md = np.power(10.0,logNH) * c.m_p * d2g
         da = (amax-AMIN)/100.0
         DD = dust.Dustdist( rad=np.arange(AMIN,amax+da,da), p=p )
         DS = dust.Dustspectrum( rad=DD, md=md )
@@ -227,14 +227,14 @@ def sample_tau( sample, d2g=0.009, mscreen=False ):
 def sample_logMD( sample, d2g=0.009, replace=False, mscreen=False ):
     if mscreen:
         nhtot = np.power(10.0,sample[:,2]) + np.power(10.0,sample[:,3])
-        logmd = np.log10( nhtot * c.mp() * d2g )
+        logmd = np.log10( nhtot * c.m_p * d2g )
         if replace:
             result = np.copy( sample )
-            result[:,2] = sample[:,2] + np.log10( c.mp()*d2g )
-            result[:,3] = sample[:,3] + np.log10( c.mp()*d2g )
+            result[:,2] = sample[:,2] + np.log10( c.m_p*d2g )
+            result[:,3] = sample[:,3] + np.log10( c.m_p*d2g )
             return result
     else:
-        logmd = sample[:,0] + np.log10( c.mp()*d2g )
+        logmd = sample[:,0] + np.log10( c.m_p*d2g )
         if replace :
             result = np.copy( sample )
             result[:,0] = logmd
@@ -244,7 +244,7 @@ def sample_logMD( sample, d2g=0.009, replace=False, mscreen=False ):
 def sample_extinction( sample, lam, isample, \
     NA=20, d2g=0.009, scatm=ss.makeScatmodel('RG','Drude') ):
     
-    energy = c.kev2lam() / lam # lam must be in cm to get keV
+    energy = c.hc / lam # lam must be in cm to get keV
     logMD  = sample_logMD( sample )
     MD     = np.power( 10.0, logMD )
     

@@ -26,7 +26,7 @@ class Grain(object):
         self.a   = rad
         self.rho = rho
     def ndens(self, md=1.5e-5 ):
-        gvol = 4./3. * np.pi * np.power( self.a*c.micron2cm(), 3 )
+        gvol = 4./3. * np.pi * np.power( self.a*c.micron2cm, 3 )
         return md / ( gvol*self.rho )
 
 class Dustdist(object):  # power (p), rho, radius (a)
@@ -47,7 +47,7 @@ class Dustdist(object):  # power (p), rho, radius (a)
 
     def dnda(self, md=1.5e-5):
         adep  = np.power( self.a, -self.p )   # um^-p
-        dmda  = adep * 4./3. * np.pi * self.rho * np.power( self.a*c.micron2cm(), 3 ) # g um^-p
+        dmda  = adep * 4./3. * np.pi * self.rho * np.power( self.a*c.micron2cm, 3 ) # g um^-p
         const = md / c.intz( self.a, dmda ) # cm^-? um^p-1
         return const * adep # cm^-? um^-1
 

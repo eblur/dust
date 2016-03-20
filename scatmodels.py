@@ -74,8 +74,8 @@ class RGscat(object):
             print 'Error: Must specify only 1 value of a'
             return
 
-        a_cm = a * c.micron2cm()        # cm -- Can only be a single value
-        lam  = c.kev2lam() / E          # cm -- Can be many values
+        a_cm = a * c.micron2cm        # cm -- Can only be a single value
+        lam  = c.hc / E               # cm -- Can be many values
         x    = 2.0 * np.pi * a_cm / lam
         mm1  = cm.rp(E) - 1 + 1j * cm.ip(E)
         return 2.0 * np.power( x, 2 ) * np.power( np.abs(mm1), 2 )
@@ -95,8 +95,8 @@ class RGscat(object):
             print 'Error: If specifying > 1 energy, must have same number of values for theta'
             return
 
-        a_cm  = a * c.micron2cm()      # cm -- Can only be a single value
-        lam   = c.kev2lam() / E   # cm
+        a_cm  = a * c.micron2cm      # cm -- Can only be a single value
+        lam   = c.hc / E             # cm
         x     = 2.0 * np.pi * a_cm / lam
         mm1   = cm.rp(E) + 1j * cm.ip(E) - 1
         thdep = 2./9. * np.exp( -np.power( theta/self.Char(a=a, E=E) , 2 ) / 2.0 )
@@ -151,7 +151,7 @@ class Mie(object):
             if np.size( theta ) == 1:
                 theta = np.array( [theta] )
             
-            theta_rad = theta * c.arcs2rad()
+            theta_rad = theta * c.arcs2rad
             amu       = np.abs( np.cos(theta_rad) )
 
             indl90    = np.where( theta_rad < np.pi/2.0 )
@@ -167,7 +167,7 @@ class Mie(object):
 
         refrel = cm.rp(E) + 1j*cm.ip(E)
 
-        x      = ( 2.0 * np.pi * a*c.micron2cm() ) / ( c.kev2lam()/E  )
+        x      = ( 2.0 * np.pi * a*c.micron2cm ) / ( c.hc/E  )
         y      = x * refrel
         ymod   = np.abs(y)
         nx     = np.size( x )
@@ -394,7 +394,7 @@ class Mie(object):
 
     def Diff( self, theta, E=1.0, a=1.0, cm=cmi.CmDrude() ):
         
-        cgeo = np.pi * np.power( a*c.micron2cm(), 2 )
+        cgeo = np.pi * np.power( a*c.micron2cm, 2 )
                            
         if np.size(a) != 1:
             print 'Error: Must specify only 1 value of a'
@@ -443,7 +443,7 @@ class PAH( object ):
         # Wavelengths were listed in reverse order
         q_interp = interp1d( wavel[::-1], qvals[::-1] )
         
-        E_um = ( c.kev2lam() / E ) * 1.e4   # cm to um
+        E_um = ( c.hc/E ) * 1.e4   # cm to um
         return q_interp( E_um )
     
     def Qabs( self, E, a=0.01 ):

@@ -51,7 +51,7 @@ class CmDrude(object):
         self.rho    = rho
 
     def rp( self, E ):
-        mm1 = self.rho / ( 2.0*c.mp() ) * c.re()/(2.0*np.pi) * np.power( c.kev2lam()/E , 2 )
+        mm1 = self.rho / ( 2.0*c.m_p ) * c.r_e/(2.0*np.pi) * np.power( c.hc/E , 2 )
         return mm1+1
 
     def ip( self, E ):
@@ -107,7 +107,7 @@ class CmGraphite(object):
                 revals  = D03vals['Cpa_001_re']
                 imvals  = D03vals['Cpa_001_im']
 
-        lamEvals = c.kev2lam() / c.micron2cm() / lamvals # keV
+        lamEvals = c.hc / c.micron2cm / lamvals # keV
         self.rp  = interp1d( lamEvals, revals )
         self.ip  = interp1d( lamEvals, imvals )
 
@@ -128,7 +128,7 @@ class CmSilicate(object):
         revals  = D03vals['Sil_re']
         imvals  = D03vals['Sil_im']
         
-        lamEvals = c.kev2lam() / c.micron2cm() / lamvals # keV
+        lamEvals = c.hc / c.micron2cm / lamvals # keV
         self.rp  = interp1d( lamEvals, revals )
         self.ip  = interp1d( lamEvals, imvals )
 

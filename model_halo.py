@@ -5,11 +5,9 @@ import numpy as np
 import galhalo as GH
 import halodict as HD
 import analytic as AH
-import constants as c
 
 from scipy.interpolate import interp1d
 from scipy import logical_and
-## Bizzare -- I had to import logical_and for some reason
 
 ## December 11, 2014 : Remove dependence on AEFF, which came from PIMMS
 ##    Instead of simulating counts/pix^2, using raw flux/arcsec^2
