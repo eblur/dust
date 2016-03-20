@@ -52,7 +52,7 @@ class Dustdist(object):  # power (p), rho, radius (a)
     | dnda ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
     """
-    def __init__(self, p=PDIST, rho=RHO_G, rad=mrn_rad ):
+    def __init__(self, p=PDIST, rho=RHO_G, rad=MRN_RAD ):
         self.p   = p
         self.rho = rho
         self.a   = rad
@@ -96,7 +96,7 @@ def MRN_dist(amin, amax, p, na=NA, rho=RHO_G, md=MDUST):
     | **RETURNS**
     | dust.Dustspectrum( object )
     """
-    return Dustspectrum( rad=make_rad(amin,amax,na), p=p, rho=rho), md=md)
+    return Dustspectrum( rad=make_rad(amin,amax,na), p=p, rho=rho, md=md)
 
 def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
     print("WARNING: make_dust_spectrum is deprecated. Use MRN_dist")
