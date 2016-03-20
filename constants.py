@@ -27,7 +27,8 @@ pc2cm     = 3.09e18       # cm/pc
 arcs2rad  = (2.0*np.pi) / (360.*60.*60.)  # rad/arcsec
 arcm2rad  = (2.0*np.pi) / (360.*60.)      # rad/arcmin
 
-const_hc  = (clight * hplanck) # keV cm
+hc        = (clight * hplanck) # keV cm
+hc_angs   = (clight * hplanck) * 1.e8  # keV angs
 
 ##----------------------------------------------------------
 ## Cosmology related constants
