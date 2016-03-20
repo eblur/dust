@@ -37,6 +37,20 @@ MRN_RAD  = make_rad(0.005, 0.3, NA)
 
 #-----------------------------------------------------
 
+# Print all the default values
+def print_defaults():
+    print("Default values:")
+    print("MDUST = %.3e" % (MDUST))
+    print("RHO_G = %.3f" % (RHO_G))
+    print("NA = %d" % (NA))
+    print("PDIST = %.3f" % (PDIST))
+    print("AMICRON = %.3f" % (AMICRON))
+    print("GREY_RAD (amin, amax): (%.3f, %.3f)" % (GREY_RAD[0], GREY_RAD[-1]))
+    print("MRN_RAD (amin, amax): (%.3f, %.3f)" % (MRN_RAD[0], MRN_RAD[-1]))
+    return
+
+#-----------------------------------------------------
+
 class Grain(object):
     """
     | **ATTRIBUTES**
@@ -88,12 +102,16 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
     | rad : Dustdist or Grain
     | md  : mass density of dust [units arbitrary, usually g cm^-2]
     | nd  : number density of dust [set by md units]
+    | rho : dust grain material density [g cm^-3]
     
     >>> np.sum(Dustspectrum(md=0.0).nd) == 0
+    >>> np.abs(_integrate_dust_mass(Dustspectrum())/MDUST - 1.0) < 0.01
+    >>> np.abs(_integrate_dust_mass(Dustspectrum(rad=Grain()))/MDUST - 1.0) < 0.01
     """
     def __init__( self, rad=Dustdist(), md=MDUST ):
         self.md  = md
         self.a   = rad.a
+        self.rho = rad.rho
 
         if type( rad ) == Dustdist:
             self.nd = rad.dnda( md=md )
@@ -125,4 +143,13 @@ def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
     print("WARNING: make_dust_spectrum is deprecated. Use MRN_dist")
     return MRN_dist(amin, amax, p, na=na, rho=rho, md=md)
 
+##------------------------------------------------------------------------
+## Functions for testing purposes
 
+def _integrate_dust_mass(dustspec):
+    from scipy.integrate import trapz
+    mass = (4.*np.pi/3.) * dustspec.rho * (c.micron2cm*dustspec.a)**3
+    if np.size(dustspec.a) == 1:
+        return mass * dustspec.nd
+    else:
+        return trapz(mass * dustspec.nd, dustspec.a)
