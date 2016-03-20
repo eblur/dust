@@ -406,7 +406,7 @@ class Mie(object):
     def Qsca( self, E, a=1.0, cm=cmi.CmDrude() ):
         return self.getQs( a=a, E=E, cm=cm )
     
-   def Qext( self, E, a=1.0, cm=cmi.CmDrude() ):
+    def Qext( self, E, a=1.0, cm=cmi.CmDrude() ):
         return self.getQs( a=a, E=E, cm=cm, getQ='ext' )
     
     def Diff( self, theta, E=1.0, a=1.0, cm=cmi.CmDrude() ):
