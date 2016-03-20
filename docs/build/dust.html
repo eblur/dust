@@ -166,7 +166,7 @@
 
 <dl class="class">
 <dt id="dust.Dustdist">
-<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustdist</code><span class="sig-paren">(</span><em>rad=array([ 0.005</em>, <em>0.0079798</em>, <em>0.0109596</em>, <em>0.01393939</em>, <em>0.01691919</em>, <em>0.01989899</em>, <em>0.02287879</em>, <em>0.02585859</em>, <em>0.02883838</em>, <em>0.03181818</em>, <em>0.03479798</em>, <em>0.03777778</em>, <em>0.04075758</em>, <em>0.04373737</em>, <em>0.04671717</em>, <em>0.04969697</em>, <em>0.05267677</em>, <em>0.05565657</em>, <em>0.05863636</em>, <em>0.06161616</em>, <em>0.06459596</em>, <em>0.06757576</em>, <em>0.07055556</em>, <em>0.07353535</em>, <em>0.07651515</em>, <em>0.07949495</em>, <em>0.08247475</em>, <em>0.08545455</em>, <em>0.08843434</em>, <em>0.09141414</em>, <em>0.09439394</em>, <em>0.09737374</em>, <em>0.10035354</em>, <em>0.10333333</em>, <em>0.10631313</em>, <em>0.10929293</em>, <em>0.11227273</em>, <em>0.11525253</em>, <em>0.11823232</em>, <em>0.12121212</em>, <em>0.12419192</em>, <em>0.12717172</em>, <em>0.13015152</em>, <em>0.13313131</em>, <em>0.13611111</em>, <em>0.13909091</em>, <em>0.14207071</em>, <em>0.14505051</em>, <em>0.1480303</em>, <em>0.1510101</em>, <em>0.1539899</em>, <em>0.1569697</em>, <em>0.15994949</em>, <em>0.16292929</em>, <em>0.16590909</em>, <em>0.16888889</em>, <em>0.17186869</em>, <em>0.17484848</em>, <em>0.17782828</em>, <em>0.18080808</em>, <em>0.18378788</em>, <em>0.18676768</em>, <em>0.18974747</em>, <em>0.19272727</em>, <em>0.19570707</em>, <em>0.19868687</em>, <em>0.20166667</em>, <em>0.20464646</em>, <em>0.20762626</em>, <em>0.21060606</em>, <em>0.21358586</em>, <em>0.21656566</em>, <em>0.21954545</em>, <em>0.22252525</em>, <em>0.22550505</em>, <em>0.22848485</em>, <em>0.23146465</em>, <em>0.23444444</em>, <em>0.23742424</em>, <em>0.24040404</em>, <em>0.24338384</em>, <em>0.24636364</em>, <em>0.24934343</em>, <em>0.25232323</em>, <em>0.25530303</em>, <em>0.25828283</em>, <em>0.26126263</em>, <em>0.26424242</em>, <em>0.26722222</em>, <em>0.27020202</em>, <em>0.27318182</em>, <em>0.27616162</em>, <em>0.27914141</em>, <em>0.28212121</em>, <em>0.28510101</em>, <em>0.28808081</em>, <em>0.29106061</em>, <em>0.2940404</em>, <em>0.2970202</em>, <em>0.3       ])</em>, <em>p=3.5</em>, <em>rho=3.0</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustdist" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustdist</code><span class="sig-paren">(</span><em>amin=0.0050000000000000001</em>, <em>amax=0.29999999999999999</em>, <em>p=3.5</em>, <em>rho=3.0</em>, <em>na=100</em>, <em>log=False</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustdist" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
 <div class="line"><strong>ATTRIBUTES</strong></div>
 <div class="line">p   : scalar for power law dn/da propto a^-p</div>
@@ -175,13 +175,13 @@
 </div>
 <div class="line-block">
 <div class="line"><strong>FUNCTIONS</strong></div>
-<div class="line">dnda ( md : mass density [g cm^-2 or g cm^-3] )</div>
+<div class="line">ndens ( md : mass density [g cm^-2 or g cm^-3] )</div>
 <div class="line-block">
 <div class="line"><em>returns</em> number density [cm^-3 um^-1]</div>
 </div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Dustdist</span><span class="p">()</span><span class="o">.</span><span class="n">dnda</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span> <span class="o">==</span> <span class="mf">0.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">Dustdist</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">dnda</span><span class="p">()))</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Dustdist</span><span class="p">()</span><span class="o">.</span><span class="n">ndens</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span> <span class="o">==</span> <span class="mf">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">Dustdist</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">ndens</span><span class="p">()))</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -191,11 +191,14 @@
 <em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustspectrum</code><span class="sig-paren">(</span><em>rad=&lt;dust.Dustdist object&gt;</em>, <em>md=1.5e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustspectrum" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
 <div class="line"><strong>ATTRIBUTES</strong></div>
-<div class="line">rad : Dustdist or Grain</div>
-<div class="line">md  : mass density of dust [units arbitrary, usually g cm^-2]</div>
-<div class="line">nd  : number density of dust [set by md units]</div>
+<div class="line">dist : A dust distribution that contains attributes a and rho and ndens function</div>
+<div class="line">md   : mass density of dust [units arbitrary, usually g cm^-2]</div>
+<div class="line">nd   : number density of dust [set by md units]</div>
+<div class="line">rho  : dust grain material density [g cm^-3]</div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Dustspectrum</span><span class="p">(</span><span class="n">md</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_integrate_dust_mass</span><span class="p">(</span><span class="n">Dustspectrum</span><span class="p">())</span><span class="o">/</span><span class="n">MDUST</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_integrate_dust_mass</span><span class="p">(</span><span class="n">Dustspectrum</span><span class="p">(</span><span class="n">rad</span><span class="o">=</span><span class="n">Grain</span><span class="p">()))</span><span class="o">/</span><span class="n">MDUST</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -205,7 +208,7 @@
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="dust.MRN_dist">
-<code class="descclassname">dust.</code><code class="descname">MRN_dist</code><span class="sig-paren">(</span><em>amin</em>, <em>amax</em>, <em>p</em>, <em>na=100</em>, <em>rho=3.0</em>, <em>md=1.5e-05</em>, <em>log=False</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.MRN_dist" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dust.</code><code class="descname">MRN_dist</code><span class="sig-paren">(</span><em>amin</em>, <em>amax</em>, <em>p</em>, <em>rho=3.0</em>, <em>md=1.5e-05</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.MRN_dist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dust spectrum for a power law distribution of dust grains</p>
 <div class="line-block">
 <div class="line"><strong>INPUTS</strong></div>

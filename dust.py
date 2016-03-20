@@ -81,6 +81,9 @@ class Dustdist(object):
     | **FUNCTIONS**
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
+    
+    >>> np.sum(Dustdist().ndens(0.0)) == 0.0
+    >>> np.all(np.isinf(Dustdist(rho=0.0).ndens()))
     """
     def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, \
                  na=NA, log=False):
