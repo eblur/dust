@@ -14,6 +14,17 @@ AMICRON  = 1.0    # grain radius (1 micron)
 #---------------------------------------------------------------
 # This is gratuitous but it's helpful for reading the code
 def make_rad( amin, amax, na, log=False ):
+    """
+    Make a grid of dust grain radius values
+    
+    | **INPUTS**
+    | amin : scalar [micron] : Minimum grain size to use
+    | amax : scalar [micron] : Maximum grain size to use
+    | na   : integer         : Number of points in grid
+    
+    | **RETURNS**
+    | A numpy array of length na
+    """
     if log:
         return np.logspace( np.log10(amin), np.log10(amax), na )
     else:
@@ -81,7 +92,7 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
 
 #-----------------------------------------------------------------
 
-def MRN_dist(amin, amax, p, na=NA, rho=RHO_G, md=MDUST):
+def MRN_dist(amin, amax, p, na=NA, rho=RHO_G, md=MDUST, log=False):
     """
     Returns a dust spectrum for a power law distribution of dust grains
     
@@ -96,7 +107,8 @@ def MRN_dist(amin, amax, p, na=NA, rho=RHO_G, md=MDUST):
     | **RETURNS**
     | dust.Dustspectrum( object )
     """
-    return Dustspectrum( rad=make_rad(amin,amax,na), p=p, rho=rho, md=md)
+    radii = make_rad(amin, amax, na, log=log)
+    return Dustspectrum(rad=radii, p=p, rho=rho, md=md)
 
 def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
     print("WARNING: make_dust_spectrum is deprecated. Use MRN_dist")
