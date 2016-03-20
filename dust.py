@@ -63,7 +63,7 @@ class Dustdist(object):  # power (p), rho, radius (a)
     | dnda ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
     """
-    def __init__(self, rad, p, rho=RHO_G):
+    def __init__(self, rad=MRN_RAD, p=PDIST, rho=RHO_G):
         self.p   = p
         self.rho = rho
         self.a   = rad
@@ -81,7 +81,7 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
     | md  : mass density of dust [units arbitrary, usually g cm^-2]
     | nd  : number density of dust [set by md units]
     """
-    def __init__( self, rad, md=MDUST ):
+    def __init__( self, rad=Dustdist(), md=MDUST ):
         self.md  = md
         self.a   = rad.a
 
