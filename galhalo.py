@@ -108,7 +108,7 @@ class Ihalo(object):
 
 ##------------------------------------------------------------------------------
 
-def make_Ihalo_dict( rad=dust.adist(), ener=1.0, \
+def make_Ihalo_dict( rad=dust.MRN_RAD, ener=1.0, \
                          theta=power_angles(), 
                          scatm=ss.Scatmodel(), nx=1000 ):
     """
