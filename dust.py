@@ -71,7 +71,7 @@ class Grain(object):
         gvol = 4./3. * np.pi * np.power( self.a*c.micron2cm, 3 )
         return md / ( gvol*self.rho )
 
-class Dustdist(object):  # power (p), rho, radius (a)
+class Dustdist(object):
     """ 
     | **ATTRIBUTES**
     | p   : scalar for power law dn/da \propto a^-p
@@ -79,30 +79,31 @@ class Dustdist(object):  # power (p), rho, radius (a)
     | a   : np.array of grain sizes [microns]
 
     | **FUNCTIONS**
-    | dnda ( md : mass density [g cm^-2 or g cm^-3] )
+    | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
-    
-    >>> np.sum(Dustdist().dnda(0.0)) == 0.0
-    >>> np.all(np.isinf(Dustdist(rho=0.0).dnda()))
     """
-    def __init__(self, rad=MRN_RAD, p=PDIST, rho=RHO_G):
-        self.p   = p
-        self.rho = rho
-        self.a   = rad
-
-    def dnda(self, md=MDUST):
+    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, \
+                 na=NA, log=False):
+        self.amin = amin
+        self.amax = amax
+        self.a    = make_rad(amin, amax, na, log=log)
+        self.p    = p
+        self.rho  = rho
+    
+    def ndens(self, md=MDUST):
         adep  = np.power( self.a, -self.p )   # um^-p
         dmda  = adep * 4./3. * np.pi * self.rho * np.power( self.a*c.micron2cm, 3 ) # g um^-p
         const = md / c.intz( self.a, dmda ) # cm^-? um^p-1
         return const * adep # cm^-? um^-1
 
+
 class Dustspectrum(object):  #radius (a), number density (nd), and mass density (md)
     """
     | **ATTRIBUTES**
-    | rad : Dustdist or Grain
-    | md  : mass density of dust [units arbitrary, usually g cm^-2]
-    | nd  : number density of dust [set by md units]
-    | rho : dust grain material density [g cm^-3]
+    | dist : A dust distribution that contains attributes a and rho and ndens function
+    | md   : mass density of dust [units arbitrary, usually g cm^-2]
+    | nd   : number density of dust [set by md units]
+    | rho  : dust grain material density [g cm^-3]
     
     >>> np.sum(Dustspectrum(md=0.0).nd) == 0
     >>> np.abs(_integrate_dust_mass(Dustspectrum())/MDUST - 1.0) < 0.01
@@ -112,15 +113,11 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
         self.md  = md
         self.a   = rad.a
         self.rho = rad.rho
-
-        if type( rad ) == Dustdist:
-            self.nd = rad.dnda( md=md )
-        if type( rad ) == Grain:
-            self.nd = rad.ndens( md=md )
+        self.nd  = rad.ndens(md)
 
 #-----------------------------------------------------------------
 
-def MRN_dist(amin, amax, p, na=NA, rho=RHO_G, md=MDUST, log=False):
+def MRN_dist(amin, amax, p, rho=RHO_G, md=MDUST, **kwargs):
     """
     Returns a dust spectrum for a power law distribution of dust grains
     
@@ -135,8 +132,7 @@ def MRN_dist(amin, amax, p, na=NA, rho=RHO_G, md=MDUST, log=False):
     | **RETURNS**
     | dust.Dustspectrum( object )
     """
-    radii = make_rad(amin, amax, na, log=log)
-    ddist = Dustdist(rad=radii, p=p, rho=rho)
+    ddist = Dustdist(amin=amin, amax=amax, p=p, rho=rho, **kwargs)
     return Dustspectrum(rad=ddist, md=md)
 
 def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
