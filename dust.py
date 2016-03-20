@@ -13,7 +13,7 @@ AMICRON  = 1.0    # grain radius (1 micron)
 
 #---------------------------------------------------------------
 # This is gratuitous but it's helpful for reading the code
-def make_rad( amin, amax, na, log=False ):
+def make_rad(amin, amax, na, log=False):
     """
     Make a grid of dust grain radius values
     
@@ -63,12 +63,12 @@ class Dustdist(object):  # power (p), rho, radius (a)
     | dnda ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
     """
-    def __init__(self, p=PDIST, rho=RHO_G, rad=MRN_RAD ):
+    def __init__(self, rad, p, rho=RHO_G):
         self.p   = p
         self.rho = rho
         self.a   = rad
 
-    def dnda(self, md=1.5e-5):
+    def dnda(self, md=MDUST):
         adep  = np.power( self.a, -self.p )   # um^-p
         dmda  = adep * 4./3. * np.pi * self.rho * np.power( self.a*c.micron2cm, 3 ) # g um^-p
         const = md / c.intz( self.a, dmda ) # cm^-? um^p-1
@@ -81,7 +81,7 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
     | md  : mass density of dust [units arbitrary, usually g cm^-2]
     | nd  : number density of dust [set by md units]
     """
-    def __init__( self, rad=Dustdist(), md=MDUST ):
+    def __init__( self, rad, md=MDUST ):
         self.md  = md
         self.a   = rad.a
 
@@ -108,7 +108,8 @@ def MRN_dist(amin, amax, p, na=NA, rho=RHO_G, md=MDUST, log=False):
     | dust.Dustspectrum( object )
     """
     radii = make_rad(amin, amax, na, log=log)
-    return Dustspectrum(rad=radii, p=p, rho=rho, md=md)
+    ddist = Dustdist(rad=radii, p=p, rho=rho)
+    return Dustspectrum(rad=ddist, md=md)
 
 def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
     print("WARNING: make_dust_spectrum is deprecated. Use MRN_dist")
