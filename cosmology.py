@@ -60,7 +60,7 @@ def cosmdustspectrum( amin=0.1, amax=1.0, na=100., p=4.0, rho=3.0, cosm=Cosmolog
     -----------------------------
     RETURNS : dust.Dustspectrum
     """
-    return dust.Dustspectrum( rad = dust.Dustdist( rad=dust.make_rad( amin=amin, amax=amax, na=na ), p=p, rho=rho ),
+    return dust.Dustspectrum( rad = dust.Powerlaw( rad=dust.make_rad( amin=amin, amax=amax, na=na ), p=p, rho=rho ),
                               md = Cosmdens( cosm=cosm ).md )
 
 def DChi( z, zp=0.0, cosm=Cosmology(), nz=100 ):
@@ -88,14 +88,14 @@ def DA( theta, z, cosm=Cosmology(), nz=100 ):
     return theta * c.arcs2rad * dchi / (1+z)
     
 
-def CosmTauX( z, E=1.0, dist=dust.Dustdist(), scatm=ss.Scatmodel(), cosm=Cosmology(), nz=100 ):
+def CosmTauX( z, E=1.0, dist=dust.Powerlaw(), scatm=ss.Scatmodel(), cosm=Cosmology(), nz=100 ):
     """
-    FUNCTION CosmTauX( z, E=1.0, dist=dust.Dustdist(), scatm=ss.Scatmodel(), cosm=Cosmology(), nz=100 
+    FUNCTION CosmTauX( z, E=1.0, dist=dust.Powerlaw(), scatm=ss.Scatmodel(), cosm=Cosmology(), nz=100 
     ---------------------------------
     INPUT
     z : redshift of source
     E : scalar or np.array [keV]
-    dist  : dust.Dustdist or dust.Grain
+    dist  : dust.Powerlaw or dust.Grain
     scatm : ss.Scatmodel
     cosm  : cosm.Cosmology
     ---------------------------------
@@ -134,7 +134,7 @@ def CosmTauScreen( zg, E=1.0, dist=dust.Dustspectrum(), scatm=ss.Scatmodel() ):
     INPUT
     zg : redshift of screen
     E  : scalar or np.array [keV]
-    dist  : dust.Dustdist or dust.Grain
+    dist  : dust.Powerlaw or dust.Grain
     scatm : ss.Scatmodel
     ---------------------------------
     OUTPUT

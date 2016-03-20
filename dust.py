@@ -82,8 +82,8 @@ class Powerlaw(object):
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
     
-    >>> np.sum(Dustdist().ndens(0.0)) == 0.0
-    >>> np.all(np.isinf(Dustdist(rho=0.0).ndens()))
+    >>> np.sum(Powerlaw().ndens(0.0)) == 0.0
+    >>> np.all(np.isinf(Powerlaw(rho=0.0).ndens()))
     """
     def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, \
                  na=NA, log=False):
@@ -139,7 +139,7 @@ def MRN_dist(amin, amax, p, rho=RHO_G, md=MDUST, **kwargs):
     | **RETURNS**
     | dust.Dustspectrum( object )
     """
-    ddist = Dustdist(amin=amin, amax=amax, p=p, rho=rho, **kwargs)
+    ddist = Powerlaw(amin=amin, amax=amax, p=p, rho=rho, **kwargs)
     return Dustspectrum(rad=ddist, md=md)
 
 def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):

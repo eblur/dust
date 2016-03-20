@@ -39,7 +39,7 @@ NH   = 3.6e22
 NA     = 50
 da     = ( np.log10(AMAX) - np.log10(AMIN) ) / NA
 avals  = np.power( 10.0, np.arange( np.log10(AMIN), np.log10(AMAX)+da, da ) )
-grains = GH.dust.Dustdist( p=P, rad=avals )
+grains = GH.dust.Powerlaw( p=P, rad=avals )
 
 SCATM  = GH.ss.Scatmodel()
 ALPHA  = np.power( 10.0, np.arange(0.0,3.01,0.1) )
@@ -177,7 +177,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
         dust_dist = GH.dust.Grain( rad=a0, rho=rho )
     else:
         dth = (a1-a0)/na
-        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth), rho=rho )
+        dust_dist = GH.dust.Powerlaw( p=p, rad=np.arange(a0,a1+dth,dth), rho=rho )
     
     ii = range( len(energy) )
     if elim != None:
@@ -225,7 +225,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
         dust_dist = GH.dust.Grain( rad=a0, rho=rho )
     else:
         dth = (a1-a0)/na
-        dust_dist = GH.dust.Dustdist( p=p, rad=np.arange(a0,a1+dth,dth), rho=rho )
+        dust_dist = GH.dust.Powerlaw( p=p, rad=np.arange(a0,a1+dth,dth), rho=rho )
     
     ii = range( len(energy) )
     if elim != None:

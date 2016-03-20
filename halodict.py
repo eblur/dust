@@ -28,7 +28,7 @@ class HaloDict( object ):
     | alpha  : np.array : Observation angles [arcsec]
     | energy : np.array : Energy values [keV]
     | index  : dict : maps energy value to integer index
-    | rad    : dust.Grain or dust.Dustdist object
+    | rad    : dust.Grain or dust.Powerlaw object
     | scatm  : sigma_scat.Scatmodel object
     | intensity : np.array : 2-D array with intensity values as a function of alpha and energy
     | htype  : halo type object (halo.CosmHalo or galhalo.GalHalo)
@@ -216,7 +216,7 @@ def read_halodict_fits( infile ):
     powr    = header['DUSTPOWR']
     alpha   = hdulist[3].data['alpha']
     
-    dd      = dust.Dustdist( rad=rad, p=powr, rho=rho )
+    dd      = dust.Powerlaw( rad=rad, p=powr, rho=rho )
     result  = HaloDict( energy, alpha=alpha, rad=dd )
     result.taux = taux
     result.dist = dust.Dustspectrum( rad=dd, md=md )

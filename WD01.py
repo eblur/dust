@@ -141,7 +141,7 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
         print 'Error: Dust type not recognized'
         return
 
-    dist   = dust.Dustdist( rad=rad, rho=rho_d, p=4 )
+    dist   = dust.Powerlaw( rad=rad, rho=rho_d, p=4 )
     result = dust.Dustspectrum( rad=dist )
 
     ANGS2MICRON = 1.e-10 * 1.e6

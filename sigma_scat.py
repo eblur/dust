@@ -1,6 +1,5 @@
 
 import numpy as np
-#np.seterr(all='warn')
 import constants as c
 import dust
 import cmindex as cmi
