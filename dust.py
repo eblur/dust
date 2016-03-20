@@ -71,7 +71,7 @@ class Grain(object):
         gvol = 4./3. * np.pi * np.power( self.a*c.micron2cm, 3 )
         return md / ( gvol*self.rho )
 
-class Dustdist(object):
+class Powerlaw(object):
     """ 
     | **ATTRIBUTES**
     | p   : scalar for power law dn/da \propto a^-p
@@ -99,6 +99,10 @@ class Dustdist(object):
         const = md / c.intz( self.a, dmda ) # cm^-? um^p-1
         return const * adep # cm^-? um^-1
 
+# For backwards compatibility
+def Dustdist(amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, na=NA, log=False):
+    print("WARNING: dust.Dustdist is deprecated. Use Powerlaw")
+    return Powerlaw(amin=amin, amax=amax, p=p, rho=rho, na=na, log=log)
 
 class Dustspectrum(object):  #radius (a), number density (nd), and mass density (md)
     """
@@ -112,7 +116,7 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
     >>> np.abs(_integrate_dust_mass(Dustspectrum())/MDUST - 1.0) < 0.01
     >>> np.abs(_integrate_dust_mass(Dustspectrum(rad=Grain()))/MDUST - 1.0) < 0.01
     """
-    def __init__( self, rad=Dustdist(), md=MDUST ):
+    def __init__( self, rad=Powerlaw(), md=MDUST ):
         self.md  = md
         self.a   = rad.a
         self.rho = rad.rho
