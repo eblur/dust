@@ -3,6 +3,52 @@ import math
 import numpy as np
 import scipy as sp
 
+##----------------------------------------------------------
+## Generic constants
+
+# Speed of light
+clight = 3.e10 # cm/s
+
+# Planck's h constant
+hplanck = np.float64( 4.136e-18 )  # keV s
+
+# Electron radius
+r_e = 2.83e-13 # cm
+
+# Mass of proton
+m_p = np.float64( 1.673e-24 ) # g
+
+##----------------------------------------------------------
+## Constants for converting things
+
+micron2cm = 1.e-6 * 100.0 # cm/micron
+pc2cm     = 3.09e18       # cm/pc
+
+arcs2rad  = (2.0*np.pi) / (360.*60.*60.)  # rad/arcsec
+arcm2rad  = (2.0*np.pi) / (360.*60.)      # rad/arcmin
+
+const_hc  = (clight * hplanck) # keV cm
+
+##----------------------------------------------------------
+## Cosmology related constants
+
+# Hubble's constant
+h0 = 75. #km/s/Mpc
+
+# Critical density for Universe
+rho_crit = np.float64(1.1e-29)
+
+# Density in units of rho_crit
+omega_d = 1.e-5 # dust
+omega_m = 0.3   # matter
+omega_l = 0.7   # dark energy
+
+# c/H term in distance integral (a distance)
+# c/H = Mpc, then convert to cm
+cperh0  = (clight * 1.e-5 / h0) * (1.e6 * pc2cm)
+
+
+
 def h0():
     return 75.  #km/s/Mpc
 
