@@ -12,8 +12,7 @@ Classes
 Functions
 ---------
 
-.. autofunction:: dust.make_dust_spectrum
-.. autofunction:: dust.MRN
+.. autofunction:: dust.MRN_dist
 
 
 
