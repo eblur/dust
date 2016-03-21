@@ -11,7 +11,6 @@ from scipy.interpolate import interp1d
 --------------------------------------------------------------
     META
 --------------------------------------------------------------
-
  A dust scattering model should contain functions that take 
  energy value, complex index of refraction object (see cmindex.py), 
  and grain sizes
@@ -91,7 +90,7 @@ class RGscat(object):
     def Qsca( self, E, a=1.0, cm=cmi.CmDrude() ):
 
         if np.size(a) != 1:
-            print 'Error: Must specify only 1 value of a'
+            print('Error: Must specify only 1 value of a')
             return
 
         a_cm = a * c.micron2cm        # cm -- Can only be a single value
@@ -108,11 +107,11 @@ class RGscat(object):
     def Diff( self, theta, E=1.0, a=1.0, cm=cmi.CmDrude() ): # cm^2 ster^-1
         
         if np.size(a) != 1:
-            print 'Error: Must specify only 1 value of a'
+            print('Error: Must specify only 1 value of a')
             return
         if np.logical_and( np.size(E) > 1,                  # If more than 1 energy is specified
                            np.size(E) != np.size(theta) ):  # theta must be of the same size
-            print 'Error: If specifying > 1 energy, must have same number of values for theta'
+            print('Error: If specifying > 1 energy, must have same number of values for theta')
             return
 
         a_cm  = a * c.micron2cm      # cm -- Can only be a single value
@@ -152,7 +151,7 @@ class Mie(object):
     def getQs( self, a=1.0, E=1.0, cm=cmi.CmDrude(), getQ='sca', theta=None ):  # Takes single a and E argument
         
         if np.size(a) > 1:
-            print 'Error: Can only specify one value for a'
+            print('Error: Can only specify one value for a')
             return
         
         indl90 = np.array([])  # Empty arrays indicate that there are no theta values set
@@ -167,7 +166,7 @@ class Mie(object):
         
         if theta != None:
             if np.size(E) > 1 and np.size(E) != np.size(theta):
-                print 'Error: If more than one E value specified, theta must have same size as E'
+                print('Error: If more than one E value specified, theta must have same size as E')
                 return
             
             if np.size( theta ) == 1:
@@ -419,10 +418,10 @@ class Mie(object):
         cgeo = np.pi * np.power( a*c.micron2cm, 2 )
                            
         if np.size(a) != 1:
-            print 'Error: Must specify only 1 value of a'
+            print('Error: Must specify only 1 value of a')
             return
         if np.logical_and( np.size(E) > 1, np.size(E) != np.size(theta) ):
-            print 'Error: E and theta must have same size if np.size(E) > 1'
+            print('Error: E and theta must have same size if np.size(E) > 1')
             return
         
         dQ  = self.getQs( a=a, E=E, cm=cm, getQ='diff', theta=theta )
@@ -452,14 +451,14 @@ class PAH( object ):
         try :
             data = parse_PAH( self.type )
         except :
-            print 'ERROR: Cannot find PAH type', self.type
+            print('ERROR: Cannot find PAH type', self.type)
             return
         
         try :
             qvals = np.array( data[a][qtype] )
             wavel = np.array( data[a]['w(micron)'] )
         except :
-            print 'ERROR: Cannot get grain size', a, 'for', self.stype
+            print('ERROR: Cannot get grain size', a, 'for', self.stype)
             return
         
         # Wavelengths were listed in reverse order
