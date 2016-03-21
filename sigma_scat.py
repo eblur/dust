@@ -206,14 +206,16 @@ class Kappascat(object):
                                 
         # Test for graphite case
         if cm.cmtype == 'Graphite':
+            cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
+            cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
 
             if np.size(dist.a) > 1:
                 for i in range( np.size(dist.a) ):
-                    qsca_pe[:,i] = scat.Qsca( E, a=dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-                    qsca_pa[:,i] = scat.Qsca( E, a=dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='para') )
+                    qsca_pe[:,i] = scat.Qsca( E, a=dist.a[i], cm=cmGraphitePerp )
+                    qsca_pa[:,i] = scat.Qsca( E, a=dist.a[i], cm=cmGraphitePara )
             else:
-                qsca_pe = scat.Qsca( E, a=dist.a, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-                qsca_pa = scat.Qsca( E, a=dist.a, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+                qsca_pe = scat.Qsca( E, a=dist.a, cm=cmGraphitePerp )
+                qsca_pa = scat.Qsca( E, a=dist.a, cm=cmGraphitePara )
             
             qsca    = ( qsca_pa + 2.0 * qsca_pe ) / 3.0
 
@@ -267,14 +269,16 @@ class Kappaext(object):
                                 
         # Test for graphite case
         if cm.cmtype == 'Graphite':
+            cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
+            cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
 
             if np.size(dist.a) > 1:
                 for i in range( np.size(dist.a) ):
-                    qext_pe[:,i] = scat.Qext( E, a=dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-                    qext_pa[:,i] = scat.Qext( E, a=dist.a[i], cm=cmi.CmGraphite(size=cm.size, orient='para') )
+                    qext_pe[:,i] = scat.Qext( E, a=dist.a[i], cm=cmGraphitePerp )
+                    qext_pa[:,i] = scat.Qext( E, a=dist.a[i], cm=cmGraphitePara )
             else:
-                qext_pe = scat.Qext( E, a=dist.a, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-                qext_pa = scat.Qext( E, a=dist.a, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+                qext_pe = scat.Qext( E, a=dist.a, cm=cmGraphitePerp )
+                qext_pa = scat.Qext( E, a=dist.a, cm=cmGraphitePara )
             
             qext    = ( qext_pa + 2.0 * qext_pe ) / 3.0
 
