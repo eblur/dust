@@ -166,29 +166,12 @@
 
 <dl class="class">
 <dt id="dust.Dustdist">
-<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustdist</code><span class="sig-paren">(</span><em>amin=0.0050000000000000001</em>, <em>amax=0.29999999999999999</em>, <em>p=3.5</em>, <em>rho=3.0</em>, <em>na=100</em>, <em>log=False</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustdist" title="Permalink to this definition">¶</a></dt>
-<dd><div class="line-block">
-<div class="line"><strong>ATTRIBUTES</strong></div>
-<div class="line">p   : scalar for power law dn/da propto a^-p</div>
-<div class="line">rho : scalar grain density [g cm^-3] </div>
-<div class="line">a   : np.array of grain sizes [microns]</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>FUNCTIONS</strong></div>
-<div class="line">ndens ( md : mass density [g cm^-2 or g cm^-3] )</div>
-<div class="line-block">
-<div class="line"><em>returns</em> number density [cm^-3 um^-1]</div>
-</div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Dustdist</span><span class="p">()</span><span class="o">.</span><span class="n">ndens</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span> <span class="o">==</span> <span class="mf">0.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">Dustdist</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">ndens</span><span class="p">()))</span>
-</pre></div>
-</div>
-</dd></dl>
+<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustdist</code><a class="headerlink" href="#dust.Dustdist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="class">
 <dt id="dust.Dustspectrum">
-<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustspectrum</code><span class="sig-paren">(</span><em>rad=&lt;dust.Dustdist object&gt;</em>, <em>md=1.5e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustspectrum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustspectrum</code><span class="sig-paren">(</span><em>rad=&lt;dust.Powerlaw object&gt;</em>, <em>md=1.5e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustspectrum" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
 <div class="line"><strong>ATTRIBUTES</strong></div>
 <div class="line">dist : A dust distribution that contains attributes a and rho and ndens function</div>

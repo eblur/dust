@@ -7,61 +7,66 @@ import cmindex as cmi
 from parse_PAH import *
 from scipy.interpolate import interp1d
 
-#-----------------------  META  -------------------------------
-# A dust scattering model should contain functions that take 
-# energy value, complex index of refraction object (see cmindex.py), 
-# and grain sizes
-#
-# Qsca ( E  : scalar or np.array [keV]
-#        cm : cmtype object from cmindex.py
-#        a  : scalar [grain size, micron] ) :
-# returns scalar or np.array [scattering efficiency, unitless]
-#
-# Diff ( cm : cmtype object from cmindex.py
-#        theta : scalar or np.array [angle, arcsec]
-#        a  : scalar [grain size, micron]
-#        E  : scalar or np.array [energy, keV]
-#        ** if len(E) > 1 and len(theta) > 1, then len(E) must equal len(theta)
-#           returns dsigma/dOmega of values (E0,theta0), (E1,theta1) etc...
-#
-# Some (but not all) scattering models may also contain related extinction terms
-#
-# Qext ( E  : scalar or np.array [keV]
-#        cm : cmtype object cmindex.py
-#        a  : scalar [grain size, micron] ) :
-# returns scalar or np.array [extinction efficiency, unitless]
-#
-# Qabs ( E  : scalar or np.array [keV]
-#        cm : cmtype object cmindex.py
-#        a  : scalar [grain size, micron] ) :
-# returns scalar or np.array [absorption efficiency, unitless]
-#
-#--------------------------------------------------------------
-# SCATTERING MODELS CONTAINED IN THIS FILE
-#
-# RGscat()
-#    stype = 'RGscat'
-#    Qsca( E, a=1.0, cm=cmi.CmDrude() ) : scalar or np.array [unitless]
-#    Char( E=1.0, a=1.0 ) : scalar or np.array [char scattering angle, arcsec]
-#    Diff( theta, E=1.0, a=1.0, cm=cmi.CmDrude() ) : scalar or np.array [diff cross-section, cm^2 ster^-1]
-#
-# Based on bhmie.pro (see Bohren & Huffman 1993)
-# Mie()
-#    stype = 'Mie'
-#    getQs( a=1.0, E=1.0, cm=cmi.CmDrude(), getQ='sca', theta=None )
-#    Qsca( E, a=1.0, cm=cmi.CmDrude() )
-#    Qext( E, a=1.0, cm=cmi.CmDrude() )
-#    Diff( theta, E=1.0, a=1.0, cm=cmi.CmDrude() )
-#
-# PAH( type )
-#   stype = 'PAH' + type
-#   type  = type
-#   get_Q( E, qtype, a )
-#   Qsca( E, a=0.01 )
-#   Qabs( E, a=0.01 )
-#   Qext( E, a=0.01 )
-#--------------------------------------------------------------
+"""
+--------------------------------------------------------------
+    META
+--------------------------------------------------------------
 
+ A dust scattering model should contain functions that take 
+ energy value, complex index of refraction object (see cmindex.py), 
+ and grain sizes
+
+ Qsca ( E  : scalar or np.array [keV]
+        cm : cmtype object from cmindex.py
+        a  : scalar [grain size, micron] ) :
+ returns scalar or np.array [scattering efficiency, unitless]
+
+ Diff ( cm : cmtype object from cmindex.py
+        theta : scalar or np.array [angle, arcsec]
+        a  : scalar [grain size, micron]
+        E  : scalar or np.array [energy, keV]
+        ** if len(E) > 1 and len(theta) > 1, then len(E) must equal len(theta)
+           returns dsigma/dOmega of values (E0,theta0), (E1,theta1) etc...
+
+ Some (but not all) scattering models may also contain related extinction terms
+
+ Qext ( E  : scalar or np.array [keV]
+        cm : cmtype object cmindex.py
+        a  : scalar [grain size, micron] ) :
+ returns scalar or np.array [extinction efficiency, unitless]
+
+ Qabs ( E  : scalar or np.array [keV]
+        cm : cmtype object cmindex.py
+        a  : scalar [grain size, micron] ) :
+ returns scalar or np.array [absorption efficiency, unitless]
+
+--------------------------------------------------------------
+   SCATTERING MODELS CONTAINED IN THIS FILE
+--------------------------------------------------------------
+
+ RGscat()
+    stype = 'RGscat'
+    Qsca( E, a=1.0, cm=cmi.CmDrude() ) : scalar or np.array [unitless]
+    Char( E=1.0, a=1.0 ) : scalar or np.array [char scattering angle, arcsec]
+    Diff( theta, E=1.0, a=1.0, cm=cmi.CmDrude() ) : scalar or np.array [diff cross-section, cm^2 ster^-1]
+
+ Based on bhmie.pro (see Bohren & Huffman 1993)
+ Mie()
+    stype = 'Mie'
+    getQs( a=1.0, E=1.0, cm=cmi.CmDrude(), getQ='sca', theta=None )
+    Qsca( E, a=1.0, cm=cmi.CmDrude() )
+    Qext( E, a=1.0, cm=cmi.CmDrude() )
+    Diff( theta, E=1.0, a=1.0, cm=cmi.CmDrude() )
+
+ PAH( type )
+   stype = 'PAH' + type
+   type  = type
+   get_Q( E, qtype, a )
+   Qsca( E, a=0.01 )
+   Qabs( E, a=0.01 )
+   Qext( E, a=0.01 )
+--------------------------------------------------------------
+"""
 
 class RGscat(object):
     """
