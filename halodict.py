@@ -216,10 +216,9 @@ def read_halodict_fits( infile ):
     powr    = header['DUSTPOWR']
     alpha   = hdulist[3].data['alpha']
     
-    dd      = dust.Powerlaw( rad=rad, p=powr, rho=rho )
-    result  = HaloDict( energy, alpha=alpha, rad=dd )
+    result  = HaloDict( energy, alpha=alpha, rad=rad )
     result.taux = taux
-    result.dist = dust.Dustspectrum( rad=dd, md=md )
+    result.dist = dust.Dustspectrum(a=rad, p=powr, rho=rho, md=md)
     
     for i in np.arange(len(energy))+3:
         result.intensity[i-3,:] = hdulist[i].data['intensity']

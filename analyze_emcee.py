@@ -200,8 +200,8 @@ def multiscreen_tau( sample, d2g=0.009, scatm=ss.makeScatmodel('RG','Drude') ):
         logNHu, logNHs, a_u, a_s, p_u, p_s, x_s = walker
         MDu, MDs = np.power(10.0,logNHu) * c.m_p * d2g, np.power(10.0,logNHs) * c.m_p * d2g
         da_u, da_s = (a_u-AMIN)/10.0, (a_s-AMIN)/10.0
-        Udust = dust.Powerlaw( rad=np.arange(AMIN,a_u+da_u,da_u), p=p_u )
-        Sdust = dust.Powerlaw( rad=np.arange(AMIN,a_s+da_s,da_s), p=p_s )
+        Udust = dust.Powerlaw(AMIN, a_u, na=(a_u-AMIN)/da_u, p=p_u)
+        Sdust = dust.Powerlaw(AMIN, a_s, na=(a_s-AMIN)/da_s, p=p_s)
         Ukappa = ss.Kappascat( E=1.0, dist=dust.Dustspectrum( rad=Udust, md=MDu ), scatm=scatm ).kappa[0]
         Skappa = ss.Kappascat( E=1.0, dist=dust.Dustspectrum( rad=Sdust, md=MDs ), scatm=scatm ).kappa[0]
         result.append( Ukappa*MDu + Skappa*MDs )
@@ -218,7 +218,7 @@ def sample_tau( sample, d2g=0.009, mscreen=False ):
             logNH, amax, p = walker
             md = np.power(10.0,logNH) * c.m_p * d2g
         da = (amax-AMIN)/100.0
-        DD = dust.Powerlaw( rad=np.arange(AMIN,amax+da,da), p=p )
+        DD = dust.Powerlaw(AMIN, amax, na=(amax-AMIN)/da, p=p)
         DS = dust.Dustspectrum( rad=DD, md=md )
         KK = ss.Kappascat( E=1.0, dist=DS ).kappa[0]
         result.append( KK * md )
@@ -253,7 +253,7 @@ def sample_extinction( sample, lam, isample, \
         logNH, amax, p = sample[i]
         print 'logNH =', logNH, '\tamax =', amax, '\tp =', p
         da    = (amax-AMIN)/np.float(NA)
-        dist  = dust.Powerlaw( rad=np.arange(AMIN,amax+da,da), p=p )
+        dist  = dust.Powerlaw(AMIN, amax, na=(amax-AMIN)/da, p=p)
         spec  = dust.Dustspectrum( rad=dist, md=MD[i] )
         kappa = ss.Kappascat( E=energy, dist=spec, scatm=scatm ).kappa
         result.append( 1.086 * MD[i] * kappa )

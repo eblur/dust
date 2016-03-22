@@ -171,7 +171,7 @@
 
 <dl class="class">
 <dt id="dust.Dustspectrum">
-<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustspectrum</code><span class="sig-paren">(</span><em>rad=&lt;dust.Powerlaw object&gt;</em>, <em>md=1.5e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustspectrum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">dust.</code><code class="descname">Dustspectrum</code><span class="sig-paren">(</span><em>a=None</em>, <em>rho=None</em>, <em>nd=None</em>, <em>md=None</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.Dustspectrum" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
 <div class="line"><strong>ATTRIBUTES</strong></div>
 <div class="line">dist : A dust distribution that contains attributes a and rho and ndens function</div>
@@ -180,8 +180,16 @@
 <div class="line">rho  : dust grain material density [g cm^-3]</div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Dustspectrum</span><span class="p">(</span><span class="n">md</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_integrate_dust_mass</span><span class="p">(</span><span class="n">Dustspectrum</span><span class="p">())</span><span class="o">/</span><span class="n">MDUST</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_integrate_dust_mass</span><span class="p">(</span><span class="n">Dustspectrum</span><span class="p">(</span><span class="n">rad</span><span class="o">=</span><span class="n">Grain</span><span class="p">()))</span><span class="o">/</span><span class="n">MDUST</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_grain</span> <span class="o">=</span> <span class="n">Dustspectrum</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_grain</span><span class="o">.</span><span class="n">calc_from_dist</span><span class="p">(</span><span class="n">Grain</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_integrate_dust_mass</span><span class="p">(</span><span class="n">test_grain</span><span class="p">)</span><span class="o">/</span><span class="n">MDUST</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_powlaw</span> <span class="o">=</span> <span class="n">Dustspectrum</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_powlaw</span><span class="o">.</span><span class="n">calc_from_dist</span><span class="p">(</span><span class="n">Powerlaw</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_integrate_dust_mass</span><span class="p">(</span><span class="n">test_powlaw</span><span class="p">)</span><span class="o">/</span><span class="n">MDUST</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -191,7 +199,7 @@
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="dust.MRN_dist">
-<code class="descclassname">dust.</code><code class="descname">MRN_dist</code><span class="sig-paren">(</span><em>amin</em>, <em>amax</em>, <em>p</em>, <em>rho=3.0</em>, <em>md=1.5e-05</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.MRN_dist" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dust.</code><code class="descname">MRN_dist</code><span class="sig-paren">(</span><em>amin=0.005</em>, <em>amax=0.3</em>, <em>p=3.5</em>, <em>rho=3.0</em>, <em>md=1.5e-05</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#dust.MRN_dist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dust spectrum for a power law distribution of dust grains</p>
 <div class="line-block">
 <div class="line"><strong>INPUTS</strong></div>
@@ -204,7 +212,7 @@
 </div>
 <div class="line-block">
 <div class="line"><strong>RETURNS</strong></div>
-<div class="line">dust.Dustspectrum( object )</div>
+<div class="line">dust.Dustspectrum object</div>
 </div>
 </dd></dl>
 

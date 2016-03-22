@@ -60,8 +60,8 @@ def cosmdustspectrum( amin=0.1, amax=1.0, na=100., p=4.0, rho=3.0, cosm=Cosmolog
     -----------------------------
     RETURNS : dust.Dustspectrum
     """
-    return dust.Dustspectrum( rad = dust.Powerlaw( rad=dust.make_rad( amin=amin, amax=amax, na=na ), p=p, rho=rho ),
-                              md = Cosmdens( cosm=cosm ).md )
+    return dust.Dustspectrum(rad=dust.Powerlaw(amin, amax, na=na, p=p, rho=rho), \
+        md = Cosmdens( cosm=cosm ).md )
 
 def DChi( z, zp=0.0, cosm=Cosmology(), nz=100 ):
     """
