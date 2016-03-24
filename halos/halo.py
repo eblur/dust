@@ -14,8 +14,7 @@ class Halo(object):
     | htype : abstract class containing information about the halo calculation
     | E0    : float : observed energy [keV]
     | alpha : np.array : observed angle [arcsec]
-    | rad   : distlib.Grain OR distlib.Dustdist : grain size distribution
-    | dist  : distlib.Dustspectrum : initially NONE, stored from calculation
+    | dist  : distlib.DustSpectrum
     | scatm : ss.ScatModel : scattering model used
     | intensity : np.array : fractional intensity [arcsec^-2]
 
@@ -28,13 +27,12 @@ class Halo(object):
     """
     def __init__( self, E0,
                   alpha = ss.angles(),
-                  rad   = distlib.Grain(),
+                  dist  = distlib.MRN_dist(),
                   scatm = ss.ScatModel() ):
         self.htype  = None
         self.energy = E0
         self.alpha  = alpha
-        self.rad    = rad    # Two options: distlib.Grain or distlib.Dustdist
-        self.dist   = None   # distlib.Dustspectrum will be stored here when halo is calculated
+        self.dist   = dist
         self.scatm  = scatm
         self.intensity = np.zeros( np.size(alpha) )
         self.taux  = None
