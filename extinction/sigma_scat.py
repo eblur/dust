@@ -1,7 +1,10 @@
 
 import numpy as np
-import scatmodels as sms
 from scipy.interpolate import interp1d
+
+from . import scatmodels as sms
+from ..distlib.composition import cmindex as cmi
+from .. import distlib
 
 #----------------------------------------------------------
 # evals( emin=1.0, emax=2.0, de=0.1 ) : np.array [keV]
@@ -34,7 +37,7 @@ class Scatmodel(object):
     | stype  : string : 'RGscat', 'Mie'
     | cmtype : 'Drude', 'Silicate', 'Graphite'
     """
-    def __init__( self, smodel=sms.RGscat(), cmodel=cmindex.CmDrude() ):
+    def __init__( self, smodel=sms.RGscat(), cmodel=cmi.CmDrude() ):
         self.smodel = smodel
         self.cmodel = cmodel
         self.stype  = smodel.stype
@@ -65,13 +68,13 @@ def makeScatmodel( model_name, material_name ):
         return
 
     if material_name == 'Drude':
-        cm = cmindex.CmDrude()
+        cm = cmi.CmDrude()
     elif material_name == 'Silicate':
-        cm = cmindex.CmSilicate()
+        cm = cmi.CmSilicate()
     elif material_name == 'Graphite':
-        cm = cmindex.CmGraphite()
+        cm = cmi.CmGraphite()
     elif material_name == 'SmallGraphite': # Small Graphite ~ 0.01 um
-        cm = cmindex.CmGraphite( size='small' )
+        cm = cmi.CmGraphite( size='small' )
     else:
         print 'Error: CM name not recognized'
         return
@@ -103,8 +106,8 @@ class Diffscat(object):
         scat = scatm.smodel
 
         if cm.cmtype == 'Graphite':
-            dsig_pe = scat.Diff( theta=theta, a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='perp') )
-            dsig_pa = scat.Diff( theta=theta, a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='para') )
+            dsig_pe = scat.Diff( theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+            dsig_pa = scat.Diff( theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
             self.dsig = ( dsig_pa + 2.0 * dsig_pe ) / 3.0
         else:
             self.dsig   = scat.Diff( theta=theta, a=a, E=E, cm=cm )
@@ -132,8 +135,8 @@ class Sigmascat(object):
         cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
 
         if cm.cmtype == 'Graphite':
-            qsca_pe = scat.Qsca( a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='perp') )
-            qsca_pa = scat.Qsca( a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='para') )
+            qsca_pe = scat.Qsca( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+            qsca_pa = scat.Qsca( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
             self.qsca = ( qsca_pa + 2.0*qsca_pe ) / 3.0
         else:
             self.qsca = scat.Qsca( a=a, E=E, cm=cm )
@@ -168,8 +171,8 @@ class Sigmaext(object):
         cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
 
         if cm.cmtype == 'Graphite':
-            qext_pe = scat.Qext( a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='perp') )
-            qext_pa = scat.Qext( a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='para') )
+            qext_pe = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
+            qext_pa = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
             self.qext = ( qext_pa + 2.0*qext_pe ) / 3.0
         else:
             self.qext = scat.Qext( a=a, E=E, cm=cm )
@@ -183,10 +186,10 @@ class Kappascat(object):
     | **ATTRIBUTES**
     | scatm : Scatmodel
     | E     : scalar or np.array : keV
-    | dist  : dust.Dustspectrum
+    | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    def __init__( self, E=1.0, scatm=Scatmodel(), dist=dust.Dustspectrum() ):
+    def __init__( self, E=1.0, scatm=Scatmodel(), dist=distlib.DustSpectrum() ):
         self.scatm  = scatm
         self.E      = E
         self.dist   = dist
@@ -202,8 +205,8 @@ class Kappascat(object):
 
         # Test for graphite case
         if cm.cmtype == 'Graphite':
-            cmGraphitePerp = cmindex.CmGraphite(size=cm.size, orient='perp')
-            cmGraphitePara = cmindex.CmGraphite(size=cm.size, orient='para')
+            cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
+            cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
 
             if np.size(dist.a) > 1:
                 for i in range( np.size(dist.a) ):
@@ -241,10 +244,10 @@ class Kappaext(object):
     | **ATTRIBUTES**
     | scatm : Scatmodel
     | E     : scalar or np.array : keV
-    | dist  : dust.Dustspectrum
+    | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    def __init__( self, E=1.0, scatm=Scatmodel(), dist=dust.Dustspectrum() ):
+    def __init__( self, E=1.0, scatm=Scatmodel(), dist=distlib.DustSpectrum() ):
         self.scatm  = scatm
         self.E      = E
         self.dist   = dist
@@ -265,8 +268,8 @@ class Kappaext(object):
 
         # Test for graphite case
         if cm.cmtype == 'Graphite':
-            cmGraphitePerp = cmindex.CmGraphite(size=cm.size, orient='perp')
-            cmGraphitePara = cmindex.CmGraphite(size=cm.size, orient='para')
+            cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
+            cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
 
             if np.size(dist.a) > 1:
                 for i in range( np.size(dist.a) ):
@@ -305,7 +308,7 @@ class KappaSpec( object ):
     OBJECT Kappaspec( E=None, kappa=None, scatm=None, dspec=None )
     E     : np.array : keV
     scatm : Scatmodel
-    dspec : dust.Dustspectrum
+    dspec : distlib.DustSpectrum
     kappa : scipy.interpolate.interp1d object with (E, kappa) as arguments
     """
     def __init__(self, E=None, kappa=None, scatm=None, dspec=None ):

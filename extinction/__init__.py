@@ -1,5 +1,3 @@
 
-import cmlib
-
-import scatmodels
-import sigma_scat
+from . import scatmodels
+from . import sigma_scat

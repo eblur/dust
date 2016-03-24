@@ -5,3 +5,6 @@ def test_dust():
 
 def test_distlib():
     import distlib
+
+def test_extinction():
+    import extinction

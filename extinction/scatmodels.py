@@ -1,6 +1,8 @@
 
 import numpy as np
 
+from ..distlib.composition import cmindex as cmi
+
 ## Needed for PSH model
 from parse_PAH import *
 from scipy.interpolate import interp1d
@@ -14,11 +16,11 @@ from scipy.interpolate import interp1d
  and grain sizes
 
  Qsca ( E  : scalar or np.array [keV]
-        cm : cmtype object from cmlib.py
+        cm : cmtype object from cmi.py
         a  : scalar [grain size, micron] ) :
  returns scalar or np.array [scattering efficiency, unitless]
 
- Diff ( cm : cmtype object from cmlib.py
+ Diff ( cm : cmtype object from cmi.py
         theta : scalar or np.array [angle, arcsec]
         a  : scalar [grain size, micron]
         E  : scalar or np.array [energy, keV]
@@ -28,12 +30,12 @@ from scipy.interpolate import interp1d
  Some (but not all) scattering models may also contain related extinction terms
 
  Qext ( E  : scalar or np.array [keV]
-        cm : cmtype object cmlib.py
+        cm : cmtype object cmi.py
         a  : scalar [grain size, micron] ) :
  returns scalar or np.array [extinction efficiency, unitless]
 
  Qabs ( E  : scalar or np.array [keV]
-        cm : cmtype object cmlib.py
+        cm : cmtype object cmi.py
         a  : scalar [grain size, micron] ) :
  returns scalar or np.array [absorption efficiency, unitless]
 
@@ -43,17 +45,17 @@ from scipy.interpolate import interp1d
 
  RGscat()
     stype = 'RGscat'
-    Qsca( E, a=1.0, cm=cmlib.CmDrude() ) : scalar or np.array [unitless]
+    Qsca( E, a=1.0, cm=cmi.CmDrude() ) : scalar or np.array [unitless]
     Char( E=1.0, a=1.0 ) : scalar or np.array [char scattering angle, arcsec]
-    Diff( theta, E=1.0, a=1.0, cm=cmlib.CmDrude() ) : scalar or np.array [diff cross-section, cm^2 ster^-1]
+    Diff( theta, E=1.0, a=1.0, cm=cmi.CmDrude() ) : scalar or np.array [diff cross-section, cm^2 ster^-1]
 
  Based on bhmie.pro (see Bohren & Huffman 1993)
  Mie()
     stype = 'Mie'
-    getQs( a=1.0, E=1.0, cm=cmlib.CmDrude(), getQ='sca', theta=None )
-    Qsca( E, a=1.0, cm=cmlib.CmDrude() )
-    Qext( E, a=1.0, cm=cmlib.CmDrude() )
-    Diff( theta, E=1.0, a=1.0, cm=cmlib.CmDrude() )
+    getQs( a=1.0, E=1.0, cm=cmi.CmDrude(), getQ='sca', theta=None )
+    Qsca( E, a=1.0, cm=cmi.CmDrude() )
+    Qext( E, a=1.0, cm=cmi.CmDrude() )
+    Diff( theta, E=1.0, a=1.0, cm=cmi.CmDrude() )
 
  PAH( type )
    stype = 'PAH' + type
@@ -75,17 +77,17 @@ class RGscat(object):
     | stype : string : 'RGscat'
 
     | **FUNCTIONS**
-    | Qsca( E, a=1.0 [um], cm=cmlib.CmDrude() [see cmlib.py] )
+    | Qsca( E, a=1.0 [um], cm=cmi.CmDrude() [see cmi.py] )
     |    *returns* scattering efficiency [unitless]
     | Char( a=1.0 [um], E=1.0 [keV] )
     |    *returns* characteristc scattering angle [arcsec keV um]
-    | Diff( cm=cmlib.CmDrude() [see cmlib.py], theta=10.0 [arcsec], a=1.0 [um], E=1.0 [keV] )
+    | Diff( cm=cmi.CmDrude() [see cmi.py], theta=10.0 [arcsec], a=1.0 [um], E=1.0 [keV] )
     |    *returns* differential scattering cross-section [cm^2 ster^-1]
     """
 
     stype = 'RGscat'
 
-    def Qsca( self, E, a=1.0, cm=cmlib.CmDrude() ):
+    def Qsca( self, E, a=1.0, cm=cmi.CmDrude() ):
 
         if np.size(a) != 1:
             print('Error: Must specify only 1 value of a')
@@ -102,7 +104,7 @@ class RGscat(object):
 
     # Can take multiple theta, but should only use one 'a' value
     # Can take multiple E, but should be same size as theta
-    def Diff( self, theta, E=1.0, a=1.0, cm=cmlib.CmDrude() ): # cm^2 ster^-1
+    def Diff( self, theta, E=1.0, a=1.0, cm=cmi.CmDrude() ): # cm^2 ster^-1
 
         if np.size(a) != 1:
             print('Error: Must specify only 1 value of a')
@@ -135,18 +137,18 @@ class Mie(object):
     | stype : string : 'Mie'
 
     | **FUNCTIONS**
-    | getQs( a=1.0 [um], E=1.0 [keV], cm=cmlib.CmDrude(), getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] )
+    | getQs( a=1.0 [um], E=1.0 [keV], cm=cmi.CmDrude(), getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] )
     |     *returns* Efficiency factors depending on getQ [unitless or ster^-1]
-    | Qsca( E [keV], a=1.0 [um], cm=cmlib.CmDrude() )
+    | Qsca( E [keV], a=1.0 [um], cm=cmi.CmDrude() )
     |     *returns* Scattering efficiency [unitless]
-    | Qext( E [keV], a=1.0 [um], cm=cmlib.CmDrude() )
+    | Qext( E [keV], a=1.0 [um], cm=cmi.CmDrude() )
     |     *returns* Extinction efficiency [unitless]
-    | Diff( theta [arcsec], E=1.0 [keV], a=1.0 [um], cm=cmlib.CmDrude() )
+    | Diff( theta [arcsec], E=1.0 [keV], a=1.0 [um], cm=cmi.CmDrude() )
     |     *returns* Differential cross-section [cm^2 ster^-1]
     """
     stype = 'Mie'
 
-    def getQs( self, a=1.0, E=1.0, cm=cmlib.CmDrude(), getQ='sca', theta=None ):  # Takes single a and E argument
+    def getQs( self, a=1.0, E=1.0, cm=cmi.CmDrude(), getQ='sca', theta=None ):  # Takes single a and E argument
 
         if np.size(a) > 1:
             print('Error: Can only specify one value for a')
@@ -405,13 +407,13 @@ class Mie(object):
             return 0.0
 
 
-    def Qsca( self, E, a=1.0, cm=cmlib.CmDrude() ):
+    def Qsca( self, E, a=1.0, cm=cmi.CmDrude() ):
         return self.getQs( a=a, E=E, cm=cm )
 
-    def Qext( self, E, a=1.0, cm=cmlib.CmDrude() ):
+    def Qext( self, E, a=1.0, cm=cmi.CmDrude() ):
         return self.getQs( a=a, E=E, cm=cm, getQ='ext' )
 
-    def Diff( self, theta, E=1.0, a=1.0, cm=cmlib.CmDrude() ):
+    def Diff( self, theta, E=1.0, a=1.0, cm=cmi.CmDrude() ):
 
         cgeo = np.pi * np.power( a*c.micron2cm, 2 )
 
