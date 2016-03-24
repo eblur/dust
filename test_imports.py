@@ -8,3 +8,6 @@ def test_distlib():
 
 def test_extinction():
     import extinction
+
+def test_halos():
+    import halos
