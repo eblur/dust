@@ -13,3 +13,6 @@ def test_DustSpectrum():
 
 def test_MRN_dist():
     assert type(distlib.MRN_dist()) == distlib.DustSpectrum
+
+def test_WD01_dist():
+    assert type(distlib.make_WD01_DustSpectrum()) == distlib.DustSpectrum

@@ -8,6 +8,9 @@ from astropy.io import ascii
 import os
 import scipy.special as special # Needed for WD01 equations
 
+from .. import constants as c
+from . import sizedist
+
 MW_caseA_file = 'Table1.WD.dat'
 LMC_avg_file  = 'Table3_LMCavg.WD.dat'
 LMC_2_file    = 'Table3_LMC2.WD.dat'
@@ -129,7 +132,7 @@ def make_WD01_DustSpectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
     type [string : 'Graphite' or 'Silicate'] )
     gal [string : 'MW', 'LMC', or 'SMC'],
     -------------------------------------------
-    Returns a dust.DustSpectrum object containing a
+    Returns a sizedist.DustSpectrum object containing a
     (grain sizes), nd (dn/da), and md (total mass density of dust)
 
     >>> wd01_sil = make_WD01_DustSpectrum(type='Silicate')
@@ -217,7 +220,7 @@ def make_WD01_DustSpectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
     mg = 4.0/3.0*np.pi*a_cm**3 * rho_d  # mass of each dust grain
     Md = c.intz( a_cm, Dist_WD01 * mg )
 
-    result = dust.DustSpectrum()
+    result = sizedist.DustSpectrum()
     result.a   = a
     result.rho = rho_d
     result.nd  = Dist_WD01 * c.micron2cm  # cm^-3 per um per n_H
