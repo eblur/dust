@@ -206,7 +206,7 @@ class Mie(object):
 #        nmxx   = 150000
         
 #        if (nmx > nmxx):
-#            print 'error: nmx > nmxx=', nmxx, ' for |m|x=', ymod
+#            print('error: nmx > nmxx=', nmxx, ' for |m|x=', ymod)
         
         # *** Logarithmic derivative D(J) calculated by downward recurrence
         # beginning with initial value (0.,0.) at J=NMX

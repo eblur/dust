@@ -32,7 +32,7 @@ from scipy.special import expi
 
 def GammaInc( a, z ):
     if z.any() < 0:
-        print 'ERROR: z must be >= 0'
+        print('ERROR: z must be >= 0')
         return
     if a == 0:
         return -expi(-z)
@@ -57,7 +57,7 @@ def set_htype( halo, xg=None, NH=1.0e20, d2g=0.009 ):
     d2g : float : Dust-to-gas mass ratio
     '''
     if halo.htype != None:
-        print 'WARNING: Halo already has an htype. Overwriting now'
+        print('WARNING: Halo already has an htype. Overwriting now')
 
     if xg == None:
         halo.htype = GH.GalHalo( NH=NH, d2g=d2g, ismtype='Uniform' )
@@ -126,24 +126,24 @@ def screen_eq( halo, xg=0.5, verbose=False, **kwargs ):
     hfrac, energy, alpha = np.array([]), np.array([]), np.array([])
     
     if type(halo) == Halo:
-        if verbose: print 'Using a Halo object'
+        if verbose: print('Using a Halo object')
         hfrac = halo.taux
         energy, alpha = halo.energy, halo.alpha
     
     if type(halo) == HaloDict:
-        if verbose: print 'Using a halo dictionary'
+        if verbose: print('Using a halo dictionary')
         NE, NA = len(halo.energy), len(halo.alpha)
         hfrac  = np.tile( halo.taux.reshape(NE,1), NA ) # NE x NA
         energy, alpha = halo.superE, halo.superA # NE x NA
     
     if type(halo.rad) == dust.Grain:
-        if verbose: print 'Using a dust grain'
+        if verbose: print('Using a dust grain')
         charsig = 1.04 * 60. / halo.rad.a  / energy  #arcsec
         gterm  = np.exp( -alpha**2 / (2 * charsig**2 * xg**2) )
         result = hfrac * gterm / ( xg**2 * 2.0*np.pi*charsig**2 )
     
     if type(halo.rad) == dust.Dustdist:
-        if verbose: print 'Using a distribution of grain sizes'
+        if verbose: print('Using a distribution of grain sizes')
         charsig0 = 1.04 * 60.0 / energy
         const = hfrac / ( 2.0*np.pi*charsig0**2 )
         result = const / xg**2 * G_s(halo) / G_p(halo)
@@ -198,24 +198,24 @@ def uniform_eq( halo, verbose=False, **kwargs ):
     set_htype( halo, xg=None, **kwargs )
     
     if type(halo) == Halo:
-        if verbose: print 'Using a Halo object'
+        if verbose: print('Using a Halo object')
         hfrac = halo.taux
         energy, alpha = halo.energy, halo.alpha
     
     if type(halo) == HaloDict:
-        if verbose: print 'Using a halo dictionary'
+        if verbose: print('Using a halo dictionary')
         NE, NA = len(halo.energy), len(halo.alpha)
         hfrac = np.tile( halo.taux.reshape(NE,1), NA ) # NE x NA
         energy, alpha = halo.superE, halo.superA # NE x NA
     
     if type(halo.rad) == dust.Grain:
-        if verbose: print 'Using a dust grain'
+        if verbose: print('Using a dust grain')
         charsig = 1.04 * 60. / halo.rad.a  / energy  #arcsec
         eterm  = 1 - erf( alpha / charsig / np.sqrt(2.) )
         result = hfrac * eterm * np.sqrt(np.pi/2.0) / (2.0*np.pi*charsig*alpha)
     
     if type(halo.rad) == dust.Dustdist:
-        if verbose: print 'Using a distribution of grain sizes'
+        if verbose: print('Using a distribution of grain sizes')
         charsig = 1.04 * 60.0 / energy
         const = hfrac / ( alpha * charsig * np.sqrt(8.0*np.pi) )
         result = const * G_u(halo) / G_p(halo)

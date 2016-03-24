@@ -35,13 +35,13 @@ plt.errorbar( i, x * y, yerr=test_mult, ls='', color='0.7', lw=3, alpha=0.3 )
 plt.ylim(-1,1)
 fig.show()
 
-print 'Add, no yerr:', prop_add( xerr )
-print 'Add, no xerr:', prop_add( yerr=yerr )
-print 'Div, no yerr:', prop_div( x, y, xerr )
-print 'Should be:', xerr / y
-print 'Div, no xerr:', prop_div( x, y, yerr=yerr )
-print 'Mult, no yerr:', prop_mult( x, y, xerr )
-print 'Should be:', y * xerr
-print 'Mult, no xerr:', prop_mult( x, y, yerr=yerr )
-print 'Should be:', x * yerr
+print('Add, no yerr:', prop_add( xerr ))
+print('Add, no xerr:', prop_add( yerr=yerr ))
+print('Div, no yerr:', prop_div( x, y, xerr ))
+print('Should be:', xerr / y)
+print('Div, no xerr:', prop_div( x, y, yerr=yerr ))
+print('Mult, no yerr:', prop_mult( x, y, xerr ))
+print('Should be:', y * xerr)
+print('Mult, no xerr:', prop_mult( x, y, yerr=yerr ))
+print('Should be:', x * yerr)
 """

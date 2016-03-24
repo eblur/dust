@@ -58,7 +58,7 @@ class Ihalo(object):
         # sample logarithmically.
 
         if np.size(theta) < 2:
-            print 'Error: Must give more than one theta value'
+            print('Error: Must give more than one theta value')
             self.theta = None
             self.rad   = None
             self.ener  = None
@@ -85,16 +85,16 @@ class Ihalo(object):
     def ihalo( self, theta ):
 
         if self.theta == None:
-            print 'Error: Empty ihalo object'
+            print('Error: Empty ihalo object')
             return
 
         min_th = np.min(self.theta)
         max_th = np.max(self.theta)
 
         if np.min(theta) < min_th:
-            print 'Note: Lower bounds of interpolation exceeded.'
+            print('Note: Lower bounds of interpolation exceeded.')
         if np.max(theta) > max_th:
-            print 'Note: Upper bounds of interpolation exceeded.'
+            print('Note: Upper bounds of interpolation exceeded.')
 
         just_right = np.where( np.logical_and( theta >= min_th, theta <= max_th ) )
 
@@ -117,13 +117,13 @@ def make_Ihalo_dict( rad=dust.MRN_RAD, ener=1.0, \
     """
 
     if np.size(ener) > 1:
-        print 'Error: Can only choose one value for energy'
+        print('Error: Can only choose one value for energy')
         return
     if np.size(theta) < 2:
-        print 'Error: Must give more than one theta value'
+        print('Error: Must give more than one theta value')
         return
     if np.size(rad) == 1:
-        print 'Error: Input "rad" must be an iterable object.'
+        print('Error: Input "rad" must be an iterable object.')
         return
 
     keys = []
@@ -147,10 +147,10 @@ def path_diff( alpha, x ):
     """
     
     if np.size( alpha ) > 1:
-        print 'Error: np.size(alpha) cannot be greater than one.'
+        print('Error: np.size(alpha) cannot be greater than one.')
         return
     if np.max( x ) > 1.0 or np.min( x ) < 0:
-        print 'Error: x must be between 0 and 1'
+        print('Error: x must be between 0 and 1')
         return
 
     alpha_rad = alpha * c.arcs2rad
@@ -196,10 +196,10 @@ def UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
 
             delta_tau = 0.0
             if usepathdiff:
-                print 'Using path difference'
+                print('Using path difference')
                 delta_x   = path_diff( al, xvals )
                 delta_tau = halo.taux * delta_x
-                print np.max( delta_x )
+                print(np.max( delta_x ))
 
             itemp  = np.power( xvals, -2.0 ) * dsig * halo.dist.nd * np.exp( -delta_tau )
             intensity = np.append( intensity, c.intz( xvals, itemp ) )
@@ -219,10 +219,10 @@ def UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
 
                 delta_tau = 0.0
                 if usepathdiff:
-                    print 'Using path difference'
+                    print('Using path difference')
                     delta_x   = path_diff( al, xvals )
                     delta_tau = halo.taux * delta_x
-                    print max( delta_x )
+                    print(max( delta_x ))
 
                 dtemp  = np.power( xvals, -2.0 ) * dsig * np.exp( -delta_tau )
                 iatemp = np.append( iatemp, c.intz( xvals, dtemp ) )
@@ -230,7 +230,7 @@ def UniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
             intensity = np.append( intensity, c.intz( avals, halo.dist.nd * iatemp ) )
 
     else:
-        print '%% Must input type dust.Grain or dust.Dustdist'
+        print('%% Must input type dust.Grain or dust.Dustdist')
         intensity = np.zeros( np.size(xvals) )
         
     # Set the halo intensity
@@ -277,7 +277,7 @@ def DiscreteISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
             intensity.append( c.intz( avals, iatemp[:,i] * halo.dist.nd ) )
         intensity = np.array( intensity )
     else:
-        print '%% Must input type dust.Grain or dust.Dustdist'
+        print('%% Must input type dust.Grain or dust.Dustdist')
         intensity = np.zeros( np.size(xvals) )
 
     halo.intensity = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
