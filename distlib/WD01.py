@@ -1,25 +1,21 @@
+"""
+Contains helper functions for producing a DustSpectrum object for the
+Weingartner & Draine (2001) dust grain size distributions.
+"""
+
 import numpy as np
 from astropy.io import ascii
 import os
 import scipy.special as special # Needed for WD01 equations
+
 MW_caseA_file = 'Table1.WD.dat'
 LMC_avg_file  = 'Table3_LMCavg.WD.dat'
 LMC_2_file    = 'Table3_LMC2.WD.dat'
 SMC_file      = 'Table3_SMC.WD.dat'
 
 def find_wdfile( name ):
-    file_not_found = True
-
-    path_list = os.getenv("PYTHONPATH").split(':')
-
-    for path in path_list:
-        for root, dirs, files in os.walk(path+"/"):
-            if name in files:
-                return os.path.join(root, name)
-
-    if file_not_found:
-        print("ERROR: Cannot find WD01 Table file %s" % (name))
-        return result
+    data_path = os.path.join(os.path.dirname(__file__), 'tables/')
+    return data_path + name
 
 
 def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
@@ -42,10 +38,13 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
     elif gal == 'LMC':
         table_filename = find_wdfile( LMC_avg_file )
     else:
-        print 'Error: Galaxy type not recognized'
+        print('Error: Galaxy type not recognized')
         return
 
-    table_info = ascii.read( table_filename )
+    try:
+        table_info = ascii.read( table_filename )
+    except:
+        print('Error: File %s not found' % (table_filename))
 
     RV_col = table_info['col1'] # either a float or '--' (LMC/SMC case)
     bc_col = table_info['col2']
@@ -120,23 +119,24 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
 
 DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(1.0), 50)
 
-def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', gal='MW', verbose=True ):
+def make_WD01_DustSpectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
+    type='Graphite', gal='MW', verbose=True ):
     """
-    make_WD01_Dustspectrum(
+    make_WD01_DustSpectrum(
     R_V [float],
     bc [float],
     rad [np.array : grain sizes (um)],
     type [string : 'Graphite' or 'Silicate'] )
     gal [string : 'MW', 'LMC', or 'SMC'],
     -------------------------------------------
-    Returns a dust.Dustspectrum object containing a
+    Returns a dust.DustSpectrum object containing a
     (grain sizes), nd (dn/da), and md (total mass density of dust)
 
-    >>> wd01_sil = make_WD01_Dustspectrum(type='Silicate')
-    >>> (dust._integrate_dust_mass(wd01_sil)/wd01_sil.md) - 1.0 < 0.01
+    >>> wd01_sil = make_WD01_DustSpectrum(type='Silicate')
+    >>> (wd01_sil.integrate_dust_mass(wd01_sil)/wd01_sil.md) - 1.0 < 0.01
 
-    >>> wd01_gra = make_WD01_Dustspectrum(type='Graphite')
-    >>> (dust._integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
+    >>> wd01_gra = make_WD01_DustSpectrum(type='Graphite')
+    >>> (wd01_gra.integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
     """
 
     if type == 'Graphite':
