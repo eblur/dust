@@ -1,9 +1,9 @@
 
 import numpy as np
-import constants as c
+
+__all__ = ['Grain','Powerlaw','DustSpectrum','MRN_dist']
 
 ## Some default values
-
 MDUST    = 1.5e-5 # g cm^-2 (dust mass column)
 RHO_G    = 3.0    # g cm^-3 (average grain material density)
 
@@ -20,15 +20,15 @@ AMAX     = 0.3    # micron
 def make_rad(amin, amax, na, log=False):
     """
     Make a grid of dust grain radius values
-    
+
     | **INPUTS**
     | amin : scalar [micron] : Minimum grain size to use
     | amax : scalar [micron] : Maximum grain size to use
     | na   : integer         : Number of points in grid
-    
+
     | **RETURNS**
     | A numpy array of length na
-    
+
     >>> len(make_rad(0.1,1.0,10)) == 10
     """
     if log:
@@ -50,7 +50,7 @@ class Grain(object):
     | **FUNCTIONS**
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* scalar number density [cm^-3]
-    
+
     >>> Grain().ndens(0.0) == 0.0
     >>> Grain(rho=0.0).ndens() == np.inf
     """
@@ -62,16 +62,16 @@ class Grain(object):
         return md / ( gvol*self.rho )
 
 class Powerlaw(object):
-    """ 
+    """
     | **ATTRIBUTES**
     | p   : scalar for power law dn/da \propto a^-p
-    | rho : scalar grain density [g cm^-3] 
+    | rho : scalar grain density [g cm^-3]
     | a   : np.array of grain sizes [microns]
 
     | **FUNCTIONS**
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
-    
+
     >>> np.sum(Powerlaw().ndens(0.0)) == 0.0
     >>> np.all(np.isinf(Powerlaw(rho=0.0).ndens()))
     """
@@ -82,7 +82,7 @@ class Powerlaw(object):
         self.a    = make_rad(amin, amax, na, log=log)
         self.p    = p
         self.rho  = rho
-    
+
     def ndens(self, md=MDUST):
         adep  = np.power( self.a, -self.p )   # um^-p
         dmda  = adep * 4./3. * np.pi * self.rho * np.power( self.a*c.micron2cm, 3 ) # g um^-p
@@ -94,20 +94,20 @@ def Dustdist(amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, na=NA, log=F
     print("WARNING: dust.Dustdist is deprecated. Use Powerlaw")
     return Powerlaw(amin=amin, amax=amax, p=p, rho=rho, na=na, log=log)
 
-class Dustspectrum(object):  #radius (a), number density (nd), and mass density (md)
+class DustSpectrum(object):  #radius (a), number density (nd), and mass density (md)
     """
     | **ATTRIBUTES**
     | dist : A dust distribution that contains attributes a and rho and ndens function
     | md   : mass density of dust [units arbitrary, usually g cm^-2]
     | nd   : number density of dust [set by md units]
     | rho  : dust grain material density [g cm^-3]
-    
+
     >>> np.sum(Dustspectrum(md=0.0).nd) == 0
-    
+
     >>> test_grain = Dustspectrum()
     >>> test_grain.calc_from_dist(Grain())
     >>> np.abs(_integrate_dust_mass(test_grain)/MDUST - 1.0) < 0.01
-    
+
     >>> test_powlaw = Dustspectrum()
     >>> test_powlaw.calc_from_dist(Powerlaw())
     >>> np.abs(_integrate_dust_mass(test_powlaw)/MDUST - 1.0) < 0.01
@@ -117,19 +117,27 @@ class Dustspectrum(object):  #radius (a), number density (nd), and mass density 
         self.a   = a
         self.rho = rho
         self.nd  = nd
-    
+
     def calc_from_dist(self, dist, md=MDUST):
         self.md  = md
         self.a   = dist.a
         self.rho = dist.rho
         self.nd  = dist.ndens(md)
 
+    def integrate_dust_mass(self):
+        from scipy.integrate import trapz
+        mass = (4.*np.pi/3.) * self.rho * (c.micron2cm*self.a)**3
+        if np.size(self.a) == 1:
+            return mass * self.nd
+        else:
+            return trapz(mass * self.nd, self.a)
+
 #-----------------------------------------------------------------
 
 def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, rho=RHO_G, md=MDUST, **kwargs):
     """
     Returns a dust spectrum for a power law distribution of dust grains
-    
+
     | **INPUTS**
     | amin : [micron]
     | amax : [micron]
@@ -146,17 +154,7 @@ def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, rho=RHO_G, md=MDUST, **kwargs):
     result.calc_from_dist(ddist, md=md)
     return result
 
-def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
-    print("WARNING: make_dust_spectrum is deprecated. Use MRN_dist")
-    return MRN_dist(amin, amax, p, na=na, rho=rho, md=md)
-
-##------------------------------------------------------------------------
-## Functions for testing purposes
-
-def _integrate_dust_mass(dustspec):
-    from scipy.integrate import trapz
-    mass = (4.*np.pi/3.) * dustspec.rho * (c.micron2cm*dustspec.a)**3
-    if np.size(dustspec.a) == 1:
-        return mass * dustspec.nd
-    else:
-        return trapz(mass * dustspec.nd, dustspec.a)
+# Depreceated
+#def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
+#    print("WARNING: make_dust_spectrum is deprecated. Use MRN_dist")
+#    return MRN_dist(amin, amax, p, na=na, rho=rho, md=md)

@@ -1,7 +1,6 @@
 
 import os
 import numpy as np
-import constants as c
 from scipy.interpolate import interp1d
 
 
@@ -23,7 +22,7 @@ from scipy.interpolate import interp1d
 
 def find_cmfile( name ):
     file_not_found = True
-    if os.path.exists(name): 
+    if os.path.exists(name):
         return name
 
     path_list = os.getenv("PYTHONPATH").split(':')
@@ -39,7 +38,7 @@ def find_cmfile( name ):
 
 
 class CmDrude(object):
-    """ 
+    """
     | **ATTRIBUTES**
     | cmtype : 'Drude'
     | rho    : grain density [g cm^-3]
@@ -63,7 +62,7 @@ class CmDrude(object):
             return 0.0
 
 class CmGraphite(object):
-    """ 
+    """
     | **ATTRIBUTES**
     | cmtype : 'Graphite'
     | size   : 'big' or 'small'
@@ -82,23 +81,23 @@ class CmGraphite(object):
         self.cmtype = 'Graphite'
         self.size   = size
         self.orient = orient
-        
+
         D03file = find_cmfile('CM_D03.pysav') # look up file
         D03vals = c.restore(D03file) # read in index values
-        
-        if size == 'big':            
+
+        if size == 'big':
             if orient == 'perp':
                 lamvals = D03vals['Cpe_010_lam']
                 revals  = D03vals['Cpe_010_re']
                 imvals  = D03vals['Cpe_010_im']
-                
+
             if orient == 'para':
                 lamvals = D03vals['Cpa_010_lam']
                 revals  = D03vals['Cpa_010_re']
                 imvals  = D03vals['Cpa_010_im']
-                    
+
         if size == 'small':
-                        
+
             if orient == 'perp':
                 lamvals = D03vals['Cpe_001_lam']
                 revals  = D03vals['Cpe_001_re']
@@ -125,11 +124,11 @@ class CmSilicate(object):
 
         D03file = find_cmfile('CM_D03.pysav')
         D03vals = c.restore(D03file)      # look up file
-        
+
         lamvals = D03vals['Sil_lam']
         revals  = D03vals['Sil_re']
         imvals  = D03vals['Sil_im']
-        
+
         lamEvals = c.hc / c.micron2cm / lamvals # keV
         self.rp  = interp1d( lamEvals, revals )
         self.ip  = interp1d( lamEvals, imvals )
@@ -146,4 +145,3 @@ def getCM( E, model=CmDrude() ):
     | Complex index of refraction : scalar or np.array of dtype='complex'
     """
     return model.rp(E) + 1j * model.ip(E)
-

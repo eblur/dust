@@ -1,9 +1,7 @@
 import numpy as np
-import constants as c
 from astropy.io import ascii
 import os
-import dust
-import scipy.special as special # Needed for WD01 equations                                                         
+import scipy.special as special # Needed for WD01 equations
 MW_caseA_file = 'Table1.WD.dat'
 LMC_avg_file  = 'Table3_LMCavg.WD.dat'
 LMC_2_file    = 'Table3_LMC2.WD.dat'
@@ -11,14 +9,14 @@ SMC_file      = 'Table3_SMC.WD.dat'
 
 def find_wdfile( name ):
     file_not_found = True
-    
+
     path_list = os.getenv("PYTHONPATH").split(':')
-    
+
     for path in path_list:
         for root, dirs, files in os.walk(path+"/"):
             if name in files:
                 return os.path.join(root, name)
-    
+
     if file_not_found:
         print("ERROR: Cannot find WD01 Table file %s" % (name))
         return result
@@ -26,9 +24,9 @@ def find_wdfile( name ):
 
 def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
     """
-    get_dist_params( 
+    get_dist_params(
     R_V [float : 3.1, 4.0, or 5.5]
-    bc [float : 0,1,2,3...], 
+    bc [float : 0,1,2,3...],
     type [string : 'Graphite' or 'Silicate],
     gal [string : 'MW','LMC' or 'SMC'] )
     ------------------------------------------
@@ -62,7 +60,7 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
             if val == R_V:
                 i_RV.append(count_RV)
             count_RV += 1
-                
+
         if len(i_RV) == 0:
             print 'Error: R_V value not found'
             return
@@ -129,14 +127,14 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
     bc [float],
     rad [np.array : grain sizes (um)],
     type [string : 'Graphite' or 'Silicate'] )
-    gal [string : 'MW', 'LMC', or 'SMC'], 
+    gal [string : 'MW', 'LMC', or 'SMC'],
     -------------------------------------------
-    Returns a dust.Dustspectrum object containing a 
+    Returns a dust.Dustspectrum object containing a
     (grain sizes), nd (dn/da), and md (total mass density of dust)
-    
+
     >>> wd01_sil = make_WD01_Dustspectrum(type='Silicate')
     >>> (dust._integrate_dust_mass(wd01_sil)/wd01_sil.md) - 1.0 < 0.01
-    
+
     >>> wd01_gra = make_WD01_Dustspectrum(type='Graphite')
     >>> (dust._integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
     """
@@ -148,7 +146,7 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
     else:
         print 'Error: Dust type not recognized'
         return
-    
+
     ANGS2MICRON = 1.e-10 * 1.e6
     a    = rad  # Easier than changing variable names further down
     a_cm = rad * c.micron2cm
@@ -159,21 +157,21 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
 
     if type == 'Graphite':
 
-        mc      = 12. * 1.67e-24   # Mass of carbon atom in grams (12 m_p)                                                  
-        rho     = 2.24             # g cm^-3                                                                                
+        mc      = 12. * 1.67e-24   # Mass of carbon atom in grams (12 m_p)
+        rho     = 2.24             # g cm^-3
         sig     = 0.4
-        a_01    = 3.5*ANGS2MICRON      # 3.5 angstroms in units of microns                                                  
+        a_01    = 3.5*ANGS2MICRON      # 3.5 angstroms in units of microns
         a_01_cm = a_01 * c.micron2cm
         bc1     = 0.75 * bc * 1.e-5
         B_1     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_01_cm**3 * 0.4) \
             * bc1 * mc / (1 + special.erf( 3*0.4/np.sqrt(2) + np.log(a_01/3.5e-4)/(0.4*np.sqrt(2)) ) )
-        
-        a_02    = 30.0*ANGS2MICRON       # 30 angtroms in units of microns                                                  
+
+        a_02    = 30.0*ANGS2MICRON       # 30 angtroms in units of microns
         a_02_cm = a_02 * c.micron2cm
         bc2     = 0.25 * bc * 1.e-5
         B_2     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_02_cm**3 * 0.4) \
             * bc2 * mc / (1 + special.erf( 3*0.4/np.sqrt(2) + np.log(a_02/3.5e-4)/(0.4*np.sqrt(2)) ) )
-        
+
         D       = (B_1/a_cm) * np.exp( -0.5*( np.log(a/a_01)/sig )**2 ) + \
             (B_2/a_cm) * np.exp( -0.5*( np.log(a/a_02)/sig )**2 )
 
@@ -218,7 +216,7 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
 
     mg = 4.0/3.0*np.pi*a_cm**3 * rho_d  # mass of each dust grain
     Md = c.intz( a_cm, Dist_WD01 * mg )
-    
+
     result = dust.Dustspectrum()
     result.a   = a
     result.rho = rho_d

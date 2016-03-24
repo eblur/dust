@@ -1,8 +1,5 @@
 
 import numpy as np
-import constants as c
-import dust
-import cmindex as cmi
 import scatmodels as sms
 from scipy.interpolate import interp1d
 
@@ -12,7 +9,7 @@ from scipy.interpolate import interp1d
 #
 
 def evals( emin=1.0, emax=2.0, de=0.1 ):
-    """ 
+    """
     FUNCTION evals( emin=1.0, emax=2.0, de=0.1 )
     RETURNS : np.array
     Distribution of energies [keV]
@@ -37,7 +34,7 @@ class Scatmodel(object):
     | stype  : string : 'RGscat', 'Mie'
     | cmtype : 'Drude', 'Silicate', 'Graphite'
     """
-    def __init__( self, smodel=sms.RGscat(), cmodel=cmi.CmDrude() ):
+    def __init__( self, smodel=sms.RGscat(), cmodel=cmindex.CmDrude() ):
         self.smodel = smodel
         self.cmodel = cmodel
         self.stype  = smodel.stype
@@ -68,13 +65,13 @@ def makeScatmodel( model_name, material_name ):
         return
 
     if material_name == 'Drude':
-        cm = cmi.CmDrude()
+        cm = cmindex.CmDrude()
     elif material_name == 'Silicate':
-        cm = cmi.CmSilicate()
+        cm = cmindex.CmSilicate()
     elif material_name == 'Graphite':
-        cm = cmi.CmGraphite()
+        cm = cmindex.CmGraphite()
     elif material_name == 'SmallGraphite': # Small Graphite ~ 0.01 um
-        cm = cmi.CmGraphite( size='small' )
+        cm = cmindex.CmGraphite( size='small' )
     else:
         print 'Error: CM name not recognized'
         return
@@ -106,8 +103,8 @@ class Diffscat(object):
         scat = scatm.smodel
 
         if cm.cmtype == 'Graphite':
-            dsig_pe = scat.Diff( theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-            dsig_pa = scat.Diff( theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+            dsig_pe = scat.Diff( theta=theta, a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='perp') )
+            dsig_pa = scat.Diff( theta=theta, a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='para') )
             self.dsig = ( dsig_pa + 2.0 * dsig_pe ) / 3.0
         else:
             self.dsig   = scat.Diff( theta=theta, a=a, E=E, cm=cm )
@@ -135,8 +132,8 @@ class Sigmascat(object):
         cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
 
         if cm.cmtype == 'Graphite':
-            qsca_pe = scat.Qsca( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-            qsca_pa = scat.Qsca( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+            qsca_pe = scat.Qsca( a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='perp') )
+            qsca_pa = scat.Qsca( a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='para') )
             self.qsca = ( qsca_pa + 2.0*qsca_pe ) / 3.0
         else:
             self.qsca = scat.Qsca( a=a, E=E, cm=cm )
@@ -171,8 +168,8 @@ class Sigmaext(object):
         cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
 
         if cm.cmtype == 'Graphite':
-            qext_pe = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-            qext_pa = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
+            qext_pe = scat.Qext( a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='perp') )
+            qext_pa = scat.Qext( a=a, E=E, cm=cmindex.CmGraphite(size=cm.size, orient='para') )
             self.qext = ( qext_pa + 2.0*qext_pe ) / 3.0
         else:
             self.qext = scat.Qext( a=a, E=E, cm=cm )
@@ -182,7 +179,7 @@ class Sigmaext(object):
 class Kappascat(object):
     """
     Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
-    
+
     | **ATTRIBUTES**
     | scatm : Scatmodel
     | E     : scalar or np.array : keV
@@ -202,11 +199,11 @@ class Kappascat(object):
         qsca    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
         qsca_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
         qsca_pa = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-                                
+
         # Test for graphite case
         if cm.cmtype == 'Graphite':
-            cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
-            cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
+            cmGraphitePerp = cmindex.CmGraphite(size=cm.size, orient='perp')
+            cmGraphitePara = cmindex.CmGraphite(size=cm.size, orient='para')
 
             if np.size(dist.a) > 1:
                 for i in range( np.size(dist.a) ):
@@ -215,7 +212,7 @@ class Kappascat(object):
             else:
                 qsca_pe = scat.Qsca( E, a=dist.a, cm=cmGraphitePerp )
                 qsca_pa = scat.Qsca( E, a=dist.a, cm=cmGraphitePara )
-            
+
             qsca    = ( qsca_pa + 2.0 * qsca_pe ) / 3.0
 
         else:
@@ -240,7 +237,7 @@ class Kappaext(object):
     """
     Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size
     distribution
-    
+
     | **ATTRIBUTES**
     | scatm : Scatmodel
     | E     : scalar or np.array : keV
@@ -265,11 +262,11 @@ class Kappaext(object):
         qext    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
         qext_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
         qext_pa = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-                                
+
         # Test for graphite case
         if cm.cmtype == 'Graphite':
-            cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
-            cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
+            cmGraphitePerp = cmindex.CmGraphite(size=cm.size, orient='perp')
+            cmGraphitePara = cmindex.CmGraphite(size=cm.size, orient='para')
 
             if np.size(dist.a) > 1:
                 for i in range( np.size(dist.a) ):
@@ -278,7 +275,7 @@ class Kappaext(object):
             else:
                 qext_pe = scat.Qext( E, a=dist.a, cm=cmGraphitePerp )
                 qext_pa = scat.Qext( E, a=dist.a, cm=cmGraphitePara )
-            
+
             qext    = ( qext_pa + 2.0 * qext_pe ) / 3.0
 
         else:
@@ -299,7 +296,7 @@ class Kappaext(object):
         self.kappa = kappa
 
 
-                                                        
+
 
 #-------------- Objects that can be used for interpolation later -----------------
 
