@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-print 'importing...'
+print('importing...')
 import sigma_scat as ss
 import dust
 import constants as c
 
-print 'setting input...'
+print('setting input...')
 # column density
 NH   = 1.e21
 # dust-to-gas ratio
@@ -21,7 +21,7 @@ MD = dust_mass * 10.0 # for N_H = 1.e22
 # g cm^-3; see Draine book
 RHO_SIL, RHO_GRA, RHO_AVG = 3.8, 2.2, 3.0 
 
-print 'defining dust distributions...'
+print('defining dust distributions...')
 
 # dust radius range to compute (in um)
 # up to 0.25 um
@@ -35,16 +35,16 @@ MRN_sil   = dust.Dustdist( rad=MRN_RANGE, p=3.5, rho=RHO_SIL )
 MRN_gra   = dust.Dustdist( rad=MRN_RANGE, p=3.5, rho=RHO_GRA )
 MRN_avg   = dust.Dustdist( rad=MRN_RANGE, p=3.5, rho=RHO_AVG )
 
-print 'Defining Kappaext and Dustspectrum...'
+print('Defining Kappaext and Dustspectrum...')
 
-print '    Mie scattering with Drude approximation'
+print('    Mie scattering with Drude approximation')
 RGD_mrn = ss.Kappaext( E=ERANGE, dist=dust.Dustspectrum(rad=MRN_avg, md=dust_mass), scatm=ss.makeScatmodel('Mie','Drude') )
 
-print '    Mie scattering for the small grain MRN distribution'
+print('    Mie scattering for the small grain MRN distribution')
 Mie_mrn_sil = ss.Kappaext( E=ERANGE, dist=dust.Dustspectrum(rad=MRN_sil, md=dust_mass), scatm=ss.makeScatmodel('Mie','Silicate') )
 Mie_mrn_gra = ss.Kappaext( E=ERANGE, dist=dust.Dustspectrum(rad=MRN_gra, md=dust_mass), scatm=ss.makeScatmodel('Mie','Graphite') )
 
-print 'plotting...'
+print('plotting...')
 
 plt.plot( RGD_mrn.E, RGD_mrn.kappa * MD, '0.4', lw=2, label='Mie-Drude' )
 plt.plot( Mie_mrn_sil.E, Mie_mrn_sil.kappa * MD, 'g', lw=2, label='Mie-Silicate' )
@@ -64,16 +64,16 @@ np.savetxt('figure5a.txt', np.transpose([ERANGE, RGD_mrn.kappa, Mie_mrn_sil.kapp
 
 ################################################################################
 
-print 'Defining Kappascat and Dustspectrum...'
+print('Defining Kappascat and Dustspectrum...')
 
-print '    Rayleigh-Gans plus Drude approximation'
+print('    Rayleigh-Gans plus Drude approximation')
 RGD_mrn = ss.Kappascat( E=ERANGE, dist=dust.Dustspectrum(rad=MRN_avg, md=dust_mass), scatm=ss.makeScatmodel('RG','Drude') )
 
-print '    Mie scattering for the small grain MRN distribution'
+print('    Mie scattering for the small grain MRN distribution')
 Mie_mrn_sil = ss.Kappascat( E=ERANGE, dist=dust.Dustspectrum(rad=MRN_sil, md=dust_mass), scatm=ss.makeScatmodel('Mie','Silicate') )
 Mie_mrn_gra = ss.Kappascat( E=ERANGE, dist=dust.Dustspectrum(rad=MRN_gra, md=dust_mass), scatm=ss.makeScatmodel('Mie','Graphite') )
 
-print 'plotting...'
+print('plotting...')
 
 
 plt.plot( RGD_mrn.E, RGD_mrn.kappa * MD, '0.4', lw=2, label='RG-Drude' )

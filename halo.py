@@ -56,14 +56,14 @@ class Halo(object):
 
     def ecf( self, theta, nth=500 ):
         if self.htype == None:
-            print 'Error: Halo has not yet beein calculated.'
+            print('Error: Halo has not yet beein calculated.')
             return
         interpH = interp1d( self.alpha, self.intensity )
         tharray = np.linspace( min(self.alpha), theta, nth )
         try:
             return c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / self.taux
         except:
-            print 'Error: ECF calculation failed. Theta is likely out of bounds.'
+            print('Error: ECF calculation failed. Theta is likely out of bounds.')
             return
 
 #----------------- Uniform IGM case --------------------------------
@@ -138,7 +138,7 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
             intensity = np.append( intensity, c.intz( avals, halo.dist.nd * iatemp ) )
 
     else:
-        print '%% Must input type dust.Grain or dust.Dustdist'
+        print('%% Must input type dust.Grain or dust.Dustdist')
         intensity = np.zeros( np.size(zpvals) )
 
     #----- Finally, set the halo intensity --------
@@ -165,7 +165,7 @@ def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
     | cosm : cosmo.Cosmology
     """
     if zg >= zs:
-        print '%% STOP: zg must be < zs'
+        print('%% STOP: zg must be < zs')
 
     E0    = halo.energy
     alpha = halo.alpha
@@ -201,7 +201,7 @@ def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
             intensity = np.append( intensity, c.intz( avals, itemp ) )
 
     else:
-        print '%% Must input type dust.Grain or dust.Dustdist'
+        print('%% Must input type dust.Grain or dust.Dustdist')
         intensity = np.zeros( np.size(zpvals) )
 
     halo.intensity = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
