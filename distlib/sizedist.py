@@ -1,6 +1,6 @@
 
 import numpy as np
-import constants as c
+from .. import constants as c
 
 __all__ = ['Grain','Powerlaw','DustSpectrum','MRN_dist']
 
