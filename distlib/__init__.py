@@ -1,4 +1,4 @@
 
 from sizedist import *
 
-import WD01
+from WD01 import make_WD01_DustSpectrum
