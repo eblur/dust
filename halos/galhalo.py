@@ -8,6 +8,8 @@ from ..extinction import sigma_scat as ss
 from . import cosmology as cosmo
 from .halo import Halo
 
+ANGLES = np.logspace(0.0, 3.5, np.int(3.5/0.05))
+
 class GalHalo(object):
     """
     *An htype class for storing halo properties (see halo.py)*
@@ -24,17 +26,6 @@ class GalHalo(object):
         self.xg      = xg
         self.ismtype = ismtype
 
-def power_angles( lmin=0.0, lmax=3.5, dl=0.05 ):
-    """
-    FUNCTION power_angles( lmin=0.0, lmax=3.5, dl=0.05 ) : np.array [arcsec]
-    Create an array of angles [arcsec] that are logarithmically spaced.
-    -----------------------------------------
-    lmin : float : log10( amin )
-    lmax : float : log10( amax )
-    dl   : float : logarithmic spacing
-    """
-    return np.power( 10.0, np.arange(lmin,lmax,dl) )
-
 class Ihalo(object):
     """
     A self-similar halo object [i(theta)], azimuthally symmetric, interpolatable
@@ -49,7 +40,7 @@ class Ihalo(object):
     | **CALL**
     | ihalo( theta ) : [cm^2 arcsec^-2]
     """
-    def __init__( self, theta=power_angles(), \
+    def __init__( self, theta=ANGLES, \
                       scatm=ss.ScatModel(), \
                       rad=0.1, ener=1.0, nx=1000 ):
         # Theta automatically sampled in log space.
@@ -111,7 +102,7 @@ class Ihalo(object):
 '''
 # Deprecated
 def make_Ihalo_dict( rad=distlib.MRN_RAD, ener=1.0, \
-                         theta=power_angles(),
+                         theta=ANGLES,
                          scatm=ss.ScatModel(), nx=1000 ):
     """
     | **RETURNS**
