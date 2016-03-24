@@ -1,9 +1,5 @@
 
-import constants as c
-
-import sizedist.distclass as ddist
-
-
+#import constants as c
 #from cmlib import cmindex
 #from extinction import scatmodels
 #from extinction import sigma_scat

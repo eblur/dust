@@ -1,5 +1,6 @@
 
 import numpy as np
+import constants as c
 
 __all__ = ['Grain','Powerlaw','DustSpectrum','MRN_dist']
 
@@ -102,13 +103,13 @@ class DustSpectrum(object):  #radius (a), number density (nd), and mass density 
     | nd   : number density of dust [set by md units]
     | rho  : dust grain material density [g cm^-3]
 
-    >>> np.sum(Dustspectrum(md=0.0).nd) == 0
+    >>> np.sum(DustSpectrum(md=0.0).nd) == 0
 
-    >>> test_grain = Dustspectrum()
+    >>> test_grain = DustSpectrum()
     >>> test_grain.calc_from_dist(Grain())
     >>> np.abs(_integrate_dust_mass(test_grain)/MDUST - 1.0) < 0.01
 
-    >>> test_powlaw = Dustspectrum()
+    >>> test_powlaw = DustSpectrum()
     >>> test_powlaw.calc_from_dist(Powerlaw())
     >>> np.abs(_integrate_dust_mass(test_powlaw)/MDUST - 1.0) < 0.01
     """
@@ -147,10 +148,10 @@ def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, rho=RHO_G, md=MDUST, **kwargs):
     | md   : mass density [g cm^-2 or g cm^-3]
 
     | **RETURNS**
-    | dust.Dustspectrum object
+    | dust.DustSpectrum object
     """
     ddist  = Powerlaw(amin=amin, amax=amax, p=p, rho=rho, **kwargs)
-    result = Dustspectrum()
+    result = DustSpectrum()
     result.calc_from_dist(ddist, md=md)
     return result
 
