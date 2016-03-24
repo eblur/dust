@@ -27,7 +27,7 @@ class CosmHalo(object):
 
 #----------------- Uniform IGM case --------------------------------
 
-def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
+def uniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
     """
     Calculates the intensity of a scattering halo from intergalactic
     dust that is uniformly distributed along the line of sight.
@@ -46,14 +46,13 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
     scatm = halo.scatm
 
     halo.htype = CosmHalo( zs=zs, cosm=cosm, igmtype='Uniform' ) # Stores information about this halo calc
-    halo.dist  = distlib.Dustspectrum( rad=halo.rad, md=cosmo.Cosmdens(cosm=cosm).md )
 
-    Dtot   = cosmo.DChi( zs, cosm=cosm, nz=nz )
+    Dtot   = cosmo.dchi_fun( zs, cosm=cosm, nz=nz )
     zpvals = cosmo.zvalues( zs=zs-zs/nz, z0=0, nz=nz )
 
     DP    = np.array([])
     for zp in zpvals:
-        DP = np.append( DP, cosmo.DChi( zs, zp=zp, cosm=cosm ) )
+        DP = np.append( DP, cosmo.dchi_fun( zs, zp=zp, cosm=cosm ) )
 
     X     = DP/Dtot
 
@@ -64,50 +63,37 @@ def UniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
 
     ## Single grain case
 
-    if type( halo.rad ) == distlib.Grain:
-
+    if np.size(halo.dist.a) == 1:
         intensity = np.array([])
-
         f    = 0.0
         cnt  = 0.0
         na   = np.size(alpha)
         for al in alpha:
             cnt += 1
             thscat = al / X  # np.size(thscat) = nz
-            dsig   = ss.Diffscat( theta=thscat, a=halo.dist.a, E=Evals, scatm=scatm ).dsig
+            dsig   = ss.DiffScat( theta=thscat, a=halo.dist.a, E=Evals, scatm=scatm ).dsig
             itemp  = c_H0_cm/hfac * np.power( (1+zpvals)/X, 2 ) * halo.dist.nd * dsig
             intensity = np.append( intensity, c.intz( zpvals, itemp ) )
-
     ## Dust distribution case
-
-    elif type( halo.rad ) == distlib.Dustdist:
-
+    else:
         avals     = halo.dist.a
         intensity = np.array([])
-
         for al in alpha:
             thscat = al / X  # np.size(thscat) = nz
-
             iatemp    = np.array([])
             for aa in avals:
-                dsig  = ss.Diffscat( theta=thscat, a=aa, E=Evals, scatm=scatm ).dsig
+                dsig  = ss.DiffScat( theta=thscat, a=aa, E=Evals, scatm=scatm ).dsig
                 dtmp  = c_H0_cm/hfac * np.power( (1+zpvals)/X, 2 ) * dsig
                 iatemp = np.append( iatemp, c.intz( zpvals, dtmp ) )
-
             intensity = np.append( intensity, c.intz( avals, halo.dist.nd * iatemp ) )
 
-    else:
-        print '%% Must input type distlib.Grain or distlib.Dustdist'
-        intensity = np.zeros( np.size(zpvals) )
-
     #----- Finally, set the halo intensity --------
-
     halo.intensity  = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
-    halo.taux       = cosmo.CosmTauX( zs, E=halo.energy, dist=halo.rad, scatm=halo.scatm, cosm=halo.htype.cosm )
+    halo.taux       = cosmo.cosm_taux( zs, E=halo.energy, dist=halo.dist, scatm=halo.scatm, cosm=halo.htype.cosm )
 
 #----------------- Infinite Screen Case --------------------------
 
-def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
+def screenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
     """
     Calculates the intensity of a scattering halo from intergalactic
     dust that is situated in an infinitesimally thin screen somewhere
@@ -125,6 +111,7 @@ def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
     """
     if zg >= zs:
         print '%% STOP: zg must be < zs'
+        return
 
     E0    = halo.energy
     alpha = halo.alpha
@@ -132,36 +119,24 @@ def ScreenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
 
     # Store information about this halo calculation
     halo.htype = CosmHalo( zs=zs, zg=zg, cosm=cosm, igmtype='Screen' )
-    halo.dist  = distlib.Dustspectrum( rad=halo.rad, md=md )
 
-    X      = cosmo.DChi( zs, zp=zg, cosm=cosm ) / cosmo.DChi( zs, cosm=cosm )  # Single value
+    X      = cosmo.dchi_fun( zs, zp=zg, cosm=cosm ) / cosmo.dchi_fun( zs, cosm=cosm )  # Single value
     thscat = alpha / X                          # Scattering angle required
     Eg     = E0 * (1+zg)                        # Photon energy at the screen
 
     ## Single grain size case
-
-    if type( halo.rad ) == distlib.Grain:
-        dsig = ss.Diffscat( theta=thscat, a=halo.dist.a, E=Eg, scatm=scatm ).dsig
+    if np.size(halo.dist.a) == 1:
+        dsig = ss.DiffScat( theta=thscat, a=halo.dist.a, E=Eg, scatm=scatm ).dsig
         intensity = halo.dist.nd / np.power( X, 2 ) * dsig
-
     ## Distribution of grain sizes
-
-    elif type( halo.rad ) == distlib.Dustdist:
-
+    else:
         avals = halo.dist.a
-
         dsig  = np.zeros( shape=(np.size(avals), np.size(thscat)) )
         for i in range( np.size(avals) ):
-            dsig[i,:] = ss.Diffscat( theta=thscat, a=avals[i], E=Eg, scatm=scatm ).dsig
-
+            dsig[i,:] = ss.DiffScat( theta=thscat, a=avals[i], E=Eg, scatm=scatm ).dsig
         intensity = np.array([])
         for j in range( np.size(thscat) ):
             itemp = halo.dist.nd * dsig[:,j] / np.power(X,2)
             intensity = np.append( intensity, c.intz( avals, itemp ) )
-
-    else:
-        print '%% Must input type distlib.Grain or distlib.Dustdist'
-        intensity = np.zeros( np.size(zpvals) )
-
     halo.intensity = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
-    halo.taux      = cosmo.CosmTauScreen( zg, E=halo.energy, dist=halo.dist, scatm=halo.scatm )
+    halo.taux      = cosmo.cosm_taux_screen( zg, E=halo.energy, dist=halo.dist, scatm=halo.scatm )
