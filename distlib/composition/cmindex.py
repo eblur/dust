@@ -3,6 +3,7 @@ import os
 import numpy as np
 from scipy.interpolate import interp1d
 
+from ... import constants as c
 
 #------------- Index of Refraction object comes in handy --
 

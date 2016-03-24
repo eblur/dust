@@ -2,9 +2,12 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
+from .. import constants as c
 from . import scatmodels as sms
 from ..distlib.composition import cmindex as cmi
 from .. import distlib
+
+__all__ = ['ScatModel','DiffScat','SigmaExt','SigmaScat','KappaExt','KappaScat']
 
 #----------------------------------------------------------
 # evals( emin=1.0, emax=2.0, de=0.1 ) : np.array [keV]
@@ -29,7 +32,7 @@ def angles( thmin=5.0, thmax=100.0, dth=5.0 ):
 
 #-------------- Tie scattering mechanism to an index of refraction ------------------
 
-class Scatmodel(object):
+class ScatModel(object):
     """
     | **ATTRIBUTES**
     | smodel : scattering model object : RGscat(), Mie()
@@ -47,16 +50,16 @@ class Scatmodel(object):
         #                  'Silicate' (Astrosilicate)
         #                  --- Graphite and Silicate values come from Draine (2003)
 
-#-------------- Quickly make a common Scatmodel object ---------------------------
+#-------------- Quickly make a common ScatModel object ---------------------------
 
-def makeScatmodel( model_name, material_name ):
+def makeScatModel( model_name, material_name ):
     """
     | **INPUTS**
     | model_name    : string : 'RG' or 'Mie'
     | material_name : string : 'Drude', 'Silicate', 'Graphite', 'SmallGraphite'
 
     | **RETURNS**
-    | Scatmodel object
+    | ScatModel object
     """
 
     if model_name == 'RG':
@@ -79,24 +82,24 @@ def makeScatmodel( model_name, material_name ):
         print 'Error: CM name not recognized'
         return
 
-    return Scatmodel( sm, cm )
+    return ScatModel( sm, cm )
 
 
 #-------------- Various Types of Scattering Cross-sections -----------------------
 
-class Diffscat(object):
+class DiffScat(object):
     """
     A differential scattering cross-section [cm^2 ster^-1] integrated
     over dust grain size distribution
 
     | **ATTRIBUTES**
-    | scatm : Scatmodel
+    | scatm : ScatModel
     | theta : np.array : arcsec
     | E     : scalar or np.array : Note, must match number of theta values if size > 1
     | a     : scalar : um
     | dsig  : np.array : cm^2 ster^-1
     """
-    def __init__( self, scatm=Scatmodel(), theta=angles(), E=1.0, a=1.0 ):
+    def __init__( self, scatm=ScatModel(), theta=angles(), E=1.0, a=1.0 ):
         self.scatm  = scatm
         self.theta  = theta
         self.E      = E
@@ -112,19 +115,19 @@ class Diffscat(object):
         else:
             self.dsig   = scat.Diff( theta=theta, a=a, E=E, cm=cm )
 
-class Sigmascat(object):
+class SigmaScat(object):
     """
     Total scattering cross-section [cm^2] integrated over a dust grain
     size distribution
 
     | **ATTRIBUTES**
-    | scatm : Scatmodel
+    | scatm : ScatModel
     | E     : scalar or np.array : keV
     | a     : scalar : um
     | qsca  : scalar or np.array : unitless scattering efficiency
     | sigma : scalar or np.array : cm^2
     """
-    def __init__( self, scatm=Scatmodel(), E=1.0, a=1.0 ):
+    def __init__( self, scatm=ScatModel(), E=1.0, a=1.0 ):
         self.scatm  = scatm
         self.E      = E
         self.a      = a
@@ -143,53 +146,51 @@ class Sigmascat(object):
 
         self.sigma = self.qsca * cgeo
 
-class Sigmaext(object):
+class SigmaExt(object):
     """
     Total EXTINCTION cross-section [cm^2] integrated over a dust grain
     size distribution
 
     | **ATTRIBUTES**
-    | scatm : Scatmodel
+    | scatm : ScatModel
     | E     : scalar or np.array : keV
     | a     : scalar : um
     | qext  : scalar or np.array : unitless extinction efficiency
     | sigma : scalar or np.array : cm^2
     """
-    def __init__( self, scatm=Scatmodel(), E=1.0, a=1.0 ):
+    def __init__( self, scatm=ScatModel(), E=1.0, a=1.0 ):
         self.scatm  = scatm
         self.E      = E
         self.a      = a
 
-        if scatm.stype == 'RG':
-            print 'Rayleigh-Gans cross-section not currently supported for Kappaext'
+        if scatm.stype == 'RGscat':
+            print('Rayleigh-Gans cross-section not currently supported for KappaExt')
+            self.qext = None
             self.sigma = None
             return
 
         cm   = scatm.cmodel
         scat = scatm.smodel
-
         cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
-
         if cm.cmtype == 'Graphite':
             qext_pe = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
             qext_pa = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
             self.qext = ( qext_pa + 2.0*qext_pe ) / 3.0
         else:
             self.qext = scat.Qext( a=a, E=E, cm=cm )
-
         self.sigma = self.qext * cgeo
 
-class Kappascat(object):
+class KappaScat(object):
     """
     Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
 
     | **ATTRIBUTES**
-    | scatm : Scatmodel
+    | scatm : ScatModel
     | E     : scalar or np.array : keV
     | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    def __init__( self, E=1.0, scatm=Scatmodel(), dist=distlib.DustSpectrum() ):
+    def __init__( self, E=1.0, scatm=ScatModel(), dist=distlib.MRN_dist() ):
         self.scatm  = scatm
         self.E      = E
         self.dist   = dist
@@ -236,24 +237,24 @@ class Kappascat(object):
         self.kappa = kappa
 
 
-class Kappaext(object):
+class KappaExt(object):
     """
     Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size
     distribution
 
     | **ATTRIBUTES**
-    | scatm : Scatmodel
+    | scatm : ScatModel
     | E     : scalar or np.array : keV
     | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    def __init__( self, E=1.0, scatm=Scatmodel(), dist=distlib.DustSpectrum() ):
+    def __init__( self, E=1.0, scatm=ScatModel(), dist=distlib.MRN_dist() ):
         self.scatm  = scatm
         self.E      = E
         self.dist   = dist
 
-        if scatm.stype == 'RG':
-            print 'Rayleigh-Gans cross-section not currently supported for Kappaext'
+        if scatm.stype == 'RGscat':
+            print 'Rayleigh-Gans cross-section not currently supported for KappaExt'
             self.kappa = None
             return
 
@@ -302,12 +303,13 @@ class Kappaext(object):
 
 
 #-------------- Objects that can be used for interpolation later -----------------
-
+'''
+# Deprecated
 class KappaSpec( object ):
     """
     OBJECT Kappaspec( E=None, kappa=None, scatm=None, dspec=None )
     E     : np.array : keV
-    scatm : Scatmodel
+    scatm : ScatModel
     dspec : distlib.DustSpectrum
     kappa : scipy.interpolate.interp1d object with (E, kappa) as arguments
     """
@@ -321,10 +323,11 @@ class SigmaSpec( object ):
     """
     OBJECT Sigmaspec( E=None, sigma=None, scatm=None )
     E     : np.array : keV
-    scatm : Scatmodel
+    scatm : ScatModel
     sigma : scipy.interpolate.interp1d object with (E, sigma) as arguments
     """
     def __init__(self, E=None, sigma=None, scatm=None):
         self.E = E
         self.sigma = interp1d( E, sigma )
         self.scatm = scatm
+'''
