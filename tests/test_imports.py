@@ -4,10 +4,10 @@ def test_dust():
     import dust
 
 def test_distlib():
-    import distlib
+    import dust.distlib
 
 def test_extinction():
-    import extinction
+    import dust.extinction
 
 def test_halos():
-    import halos
+    import dust.halos

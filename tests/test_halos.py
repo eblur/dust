@@ -1,8 +1,8 @@
 """Test halos library imports and types."""
 
 import numpy as np
-from .halos import *
-from . import distlib
+from dust.halos import *
+from dust import distlib
 
 def test_Halo():
     halo = Halo(1.0)
