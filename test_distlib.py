@@ -16,3 +16,12 @@ def test_MRN_dist():
 
 def test_WD01_dist():
     assert type(distlib.make_WD01_DustSpectrum()) == distlib.DustSpectrum
+
+# Test both powerlaw and grain thingies
+def test_calc_from_dist():
+    pl = distlib.Powerlaw()
+    DSp = distlib.DustSpectrum()
+    DSp.calc_from_dist(pl, md=1.e-4)
+    gr = distlib.Grain()
+    DSg = distlib.DustSpectrum()
+    DSg.calc_from_dist(gr, md=1.e-4)

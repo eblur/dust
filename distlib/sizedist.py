@@ -86,7 +86,7 @@ class Powerlaw(object):
 
     def ndens(self, md=MDUST):
         adep  = np.power( self.a, -self.p )   # um^-p
-        dmda  = adep * 4./3. * np.pi * self.rho * np.power( self.a*c.micron2cm, 3 ) # g um^-p
+        dmda  = adep * 4./3. * np.pi * self.rho * np.power(self.a*c.micron2cm, 3) # g um^-p
         const = md / c.intz( self.a, dmda ) # cm^-? um^p-1
         return const * adep # cm^-? um^-1
 

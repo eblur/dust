@@ -14,7 +14,7 @@ from .. import distlib
 
 ## UPDATED June 11, 2013 : Make the halos calculation faster for halodicts?
 
-## UPDATED May 27, 2013  : Rewrote GammaInc function to be more robust
+## UPDATED May 27, 2013  : Rewrote gammainc_fun function to be more robust
 ## UPDATED April 4, 2013 : To treat halos in same way as DiscreteISM
 ## 							and UniformISM functions in galhalo.py
 ## CREATED April 3, 2013
@@ -30,19 +30,18 @@ from scipy.special import gammaincc
 from scipy.special import gamma
 from scipy.special import expi
 
-def GammaInc( a, z ):
-    if z.any() < 0:
-        print 'ERROR: z must be >= 0'
+def gammainc_fun( a, z ):
+    if np.any(z < 0):
+        print('ERROR: z must be >= 0')
         return
     if a == 0:
         return -expi(-z)
-
     elif a < 0:
-        return ( GammaInc(a+1,z) - np.power(z,a) * np.exp(-z) ) / a
+        return ( gammainc_fun(a+1,z) - np.power(z,a) * np.exp(-z) ) / a
     else:
         return gammaincc(a,z) * gamma(a)
 
-def set_htype( halo, xg=None, NH=1.0e20, d2g=0.009 ):
+def set_htype( halo, plaw=distlib.Powerlaw(), xg=None, NH=1.0e20, d2g=0.009 ):
     '''
     Sets galactic ISM htype values for Halo object
     --------------------------------------------------------------
@@ -57,16 +56,17 @@ def set_htype( halo, xg=None, NH=1.0e20, d2g=0.009 ):
     d2g : float : Dust-to-gas mass ratio
     '''
     if halo.htype != None:
-        print 'WARNING: Halo already has an htype. Overwriting now'
-
+        print('WARNING: Halo already has an htype. Overwriting now')
     if xg == None:
         halo.htype = GH.GalHalo( NH=NH, d2g=d2g, ismtype='Uniform' )
     else:
         halo.htype = GH.GalHalo( xg=xg, NH=NH, d2g=d2g, ismtype='Screen' )
-
-    md         = NH * GH.c.mp() * d2g
-    halo.dist  = distlib.Dustspectrum( rad=halo.rad, md=md )
-    halo.taux  = GH.ss.Kappascat( E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * halo.dist.md
+    md         = NH * GH.c.m_p * d2g
+    halo.plaw  = plaw
+    dspec      = distlib.DustSpectrum()
+    dspec.calc_from_dist(halo.plaw, md=md)
+    halo.dist  = dspec
+    halo.taux  = GH.ss.KappaScat(E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * halo.dist.md
     return
 
 #--------------------------------------------
@@ -78,7 +78,7 @@ def G_p( halo ):
     '''
     a0 = halo.dist.a[0]
     a1 = halo.dist.a[-1]
-    p  = halo.rad.p
+    p  = halo.plaw.p
     if p == 5:
         return np.log( a1/a0 )
     else:
@@ -90,7 +90,7 @@ def G_s( halo ):
     '''
     a0 = halo.dist.a[0]
     a1 = halo.dist.a[-1]
-    p  = halo.rad.p
+    p  = halo.plaw.p
 
     if type(halo) == Halo:
         energy, alpha = halo.energy, halo.alpha
@@ -100,8 +100,8 @@ def G_s( halo ):
     charsig0 = 1.04 * 60.0 / energy
     pfrac    = (7.0-p)/2.0
     const    = alpha**2/(2.0*charsig0**2*halo.htype.xg**2)
-    gamma1   = GammaInc( pfrac, const * a1**2 )
-    gamma0   = GammaInc( pfrac, const * a0**2 )
+    gamma1   = gammainc_fun( pfrac, const * a1**2 )
+    gamma0   = gammainc_fun( pfrac, const * a0**2 )
     return -0.5 * np.power( const, -pfrac ) * ( gamma1 - gamma0 )
 
 def screen_eq( halo, xg=0.5, verbose=False, **kwargs ):
@@ -136,13 +136,12 @@ def screen_eq( halo, xg=0.5, verbose=False, **kwargs ):
         hfrac  = np.tile( halo.taux.reshape(NE,1), NA ) # NE x NA
         energy, alpha = halo.superE, halo.superA # NE x NA
 
-    if type(halo.rad) == distlib.Grain:
+    if np.size(halo.dist.a) == 1:
         if verbose: print 'Using a dust grain'
-        charsig = 1.04 * 60. / halo.rad.a  / energy  #arcsec
+        charsig = 1.04 * 60. / halo.dist.a  / energy  #arcsec
         gterm  = np.exp( -alpha**2 / (2 * charsig**2 * xg**2) )
         result = hfrac * gterm / ( xg**2 * 2.0*np.pi*charsig**2 )
-
-    if type(halo.rad) == distlib.Dustdist:
+    else:
         if verbose: print 'Using a distribution of grain sizes'
         charsig0 = 1.04 * 60.0 / energy
         const = hfrac / ( 2.0*np.pi*charsig0**2 )
@@ -159,24 +158,24 @@ def G_u( halo ):
     Function used for evaluating halo from power law distribution of grain sizes
     (Uniform case)
     '''
-    a0 = halo.rad.a[0]
-    a1 = halo.rad.a[-1]
-    p  = halo.rad.p
+    a0 = halo.dist.a[0]
+    a1 = halo.dist.a[-1]
+    p  = halo.plaw.p
 
     if type(halo) == Halo:
         energy, alpha = halo.energy, halo.alpha
     if type(halo) == HaloDict:
         energy, alpha = halo.superE, halo.superA
 
-    power = 6.0 - halo.rad.p
+    power = 6.0 - p
     pfrac = (7.0-p) / 2.0
     charsig = 1.04 * 60.0 / energy
     const   = alpha / charsig / np.sqrt(2.0)
 
     A1 = np.power(a1,power) * ( 1 - erf(const*a1) )
     A0 = np.power(a0,power) * ( 1 - erf(const*a0) )
-    B1 = np.power(const,-power) * GammaInc( pfrac, const**2 * a1**2 ) / np.sqrt(np.pi)
-    B0 = np.power(const,-power) * GammaInc( pfrac, const**2 * a0**2 ) / np.sqrt(np.pi)
+    B1 = np.power(const,-power) * gammainc_fun( pfrac, const**2 * a1**2 ) / np.sqrt(np.pi)
+    B0 = np.power(const,-power) * gammainc_fun( pfrac, const**2 * a0**2 ) / np.sqrt(np.pi)
     return ( (A1-B1) - (A0-B0) ) / power
 
 def uniform_eq( halo, verbose=False, **kwargs ):
@@ -208,13 +207,12 @@ def uniform_eq( halo, verbose=False, **kwargs ):
         hfrac = np.tile( halo.taux.reshape(NE,1), NA ) # NE x NA
         energy, alpha = halo.superE, halo.superA # NE x NA
 
-    if type(halo.rad) == distlib.Grain:
+    if np.size(halo.dist.a) == 1:
         if verbose: print 'Using a dust grain'
-        charsig = 1.04 * 60. / halo.rad.a  / energy  #arcsec
+        charsig = 1.04 * 60. / halo.dist.a  / energy  #arcsec
         eterm  = 1 - erf( alpha / charsig / np.sqrt(2.) )
         result = hfrac * eterm * np.sqrt(np.pi/2.0) / (2.0*np.pi*charsig*alpha)
-
-    if type(halo.rad) == distlib.Dustdist:
+    else:
         if verbose: print 'Using a distribution of grain sizes'
         charsig = 1.04 * 60.0 / energy
         const = hfrac / ( alpha * charsig * np.sqrt(8.0*np.pi) )

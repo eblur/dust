@@ -8,7 +8,25 @@ def test_Halo():
     halo = Halo(1.0)
     assert type(halo) == Halo
     halo.energy
+    assert type(halo.dist) == distlib.DustSpectrum
 
+## Test the analytic halo module
+def test_gammainc():
+    assert analytic.gammainc_fun(0,-1) is None
+
+def test_analytic_uniform_funs():
+    halo = Halo(1.0)
+    analytic.set_htype(halo)
+    assert np.size(analytic.G_p(halo)) == 1
+    assert type(analytic.G_u(halo)) == np.ndarray
+    analytic.uniform_eq(halo)
+
+def test_analytic_screen_funs():
+    halo = Halo(1.0)
+    analytic.set_htype(halo, xg=0.5)
+    assert np.size(analytic.G_p(halo)) == 1
+    assert type(analytic.G_s(halo)) == np.ndarray
+    analytic.screen_eq(halo)
 
 ## Test the galhalo module
 def test_gh_types():
