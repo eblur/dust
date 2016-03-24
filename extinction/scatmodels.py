@@ -1,15 +1,16 @@
 
 import numpy as np
-
-from ..distlib.composition import cmindex as cmi
-
-## Needed for PSH model
-from parse_PAH import *
 from scipy.interpolate import interp1d
+
+from .. import constants as c
+from ..distlib.composition import cmindex as cmi
+from .parse_PAH import *
+
+__all__ = ['RGscat','Mie','PAH']
 
 """
 --------------------------------------------------------------
-    META
+    API
 --------------------------------------------------------------
  A dust scattering model should contain functions that take
  energy value, complex index of refraction object (see cmlib),
