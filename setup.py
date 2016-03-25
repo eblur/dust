@@ -76,7 +76,7 @@ package_info = get_package_info()
 
 # Add the project-global data
 package_info['package_data'].setdefault(PACKAGENAME, [])
-package_info['package_data'][PACKAGENAME].append('data/*')
+package_info['package_data'][PACKAGENAME].append('distlib/tables/*')
 
 # Define entry points for command-line scripts
 entry_points = {'console_scripts': []}
@@ -106,7 +106,7 @@ setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,
       scripts=scripts,
-      install_requires=['astropy','scipy'],
+      install_requires=['astropy','scipy','numpy'],
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
       license=LICENSE,

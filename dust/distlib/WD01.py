@@ -18,7 +18,7 @@ SMC_file      = 'Table3_SMC.WD.dat'
 
 def find_wdfile(name):
     data_path = os.path.join(os.path.dirname(__file__), 'tables/')
-    return data_path + name
+    return os.path.join(data_path, name)
 
 
 def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
