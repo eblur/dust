@@ -112,7 +112,7 @@ class HaloDict( object ):
     def total_halo( self, fluxes ):
         NE, NA = len(self.energy), len(self.alpha)
         if len(fluxes) != NE:
-            print 'Error: Number of flux bins must equal the number of halo energy bins'
+            print('Error: Number of flux bins must equal the number of halo energy bins')
             return
 
         superflux  = np.tile( fluxes.reshape(NE,1), NA )
@@ -128,7 +128,7 @@ class HaloDict( object ):
         tharray = np.linspace( min(self.alpha), theta, nth )
 
         if self.taux == None:
-            print 'ERROR: No taux is specified. Need to run halo calculation'
+            print('ERROR: No taux is specified. Need to run halo calculation')
             return result
 
         for i in range(NE):

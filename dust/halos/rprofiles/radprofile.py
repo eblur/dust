@@ -139,7 +139,7 @@ def get_profile( filename ):
 def add_profile( profile1, profile2=Profile(), weight1=1.0, weight2=1.0 ):
     result = Profile()
 #    if profile1.rleft != profile2.rleft or profile1.rright != profile2.rright:
-#        print 'Error: Profile bins need to match up'
+#        print('Error: Profile bins need to match up')
 #        return
     result.surbri = profile1.surbri * weight1 + profile2.surbri * weight2
     result.surbri_err = np.sqrt( profile1.surbri_err**2 * weight1**2 + profile2.surbri_err**2 * weight2**2 )

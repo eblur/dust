@@ -20,7 +20,7 @@ def parse_PAH( option, ignore='#', flag='>', verbose=False ):
 
     try : f = open( filename, 'r' )
     except:
-        print 'ERROR: file not found'
+        print('ERROR: file not found')
         return
 
     COLS = ['w(micron)', 'Q_ext', 'Q_abs', 'Q_sca', 'g=<cos>' ]
@@ -37,7 +37,7 @@ def parse_PAH( option, ignore='#', flag='>', verbose=False ):
             # Characters flagged with '>' earn a dictionary entry with grain size
             elif line[0] == flag :
                 gsize = np.float( line.split()[1] )
-                if verbose : print 'Reading data for grain size:', gsize
+                if verbose : print('Reading data for grain size:', gsize)
                 result[ gsize ] = {}
                 # Initialize dictionaries with lists
                 for i in range( len(COLS) ) : result[gsize][COLS[i]] = []
@@ -48,7 +48,7 @@ def parse_PAH( option, ignore='#', flag='>', verbose=False ):
                 for i in range( len(COLS) ) :
                     result[ gsize ][ COLS[i] ].append( np.float( row_vals[i] ) )
         except:
-            if verbose : print line
+            if verbose : print(line)
             end_of_file = True
 
     f.close()

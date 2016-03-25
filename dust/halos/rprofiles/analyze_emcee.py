@@ -89,7 +89,7 @@ def sum_interp( sb1, sb2 ):
     ## Takes interp objects and sums them to create another interp object
     ## Assumes same x values for both
     if sb1.x.all() != sb2.x.all():
-        print 'Error: Interp objects must have same x-axis values'
+        print('Error: Interp objects must have same x-axis values')
         return
     else:
         return interp1d( sb1.x, sb1.y + sb2.y )
@@ -184,13 +184,13 @@ def sample_halos( sample, isample, mscreen=False, **kwargs ):
         for i in isample:
             x1, x2, logNH1, logNH2, amax, p = sample[i]
             NH1, NH2 = np.power(10.0,logNH1), np.power(10.0,logNH2)
-            print 'x =', x1, x2, '\tNH =', NH1, NH2, '\tamax =', amax, '\tp =', p
+            print('x =', x1, x2, '\tNH =', NH1, NH2, '\tamax =', amax, '\tp =', p)
             result.append( multiscreen_halo( x1, x2, NH1, NH2, amax=amax, p=p, **kwargs ) )
     else:
         for i in isample:
             logNH, amax, p = sample[i]
             NH = np.power(10.0,logNH)
-            print 'NH =', NH, '\tamax =', amax, '\tp =', p
+            print('NH =', NH, '\tamax =', amax, '\tp =', p)
             result.append( uniform_halo( NH=NH, amax=amax, p=p, **kwargs ) )
     return result
 
@@ -251,7 +251,7 @@ def sample_extinction( sample, lam, isample, \
     result = []
     for i in isample:
         logNH, amax, p = sample[i]
-        print 'logNH =', logNH, '\tamax =', amax, '\tp =', p
+        print('logNH =', logNH, '\tamax =', amax, '\tp =', p)
         da    = (amax-AMIN)/np.float(NA)
         dist  = dust.Powerlaw(AMIN, amax, na=(amax-AMIN)/da, p=p)
         spec  = dust.Dustspectrum( rad=dist, md=MD[i] )

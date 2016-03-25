@@ -64,7 +64,7 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
             count_RV += 1
 
         if len(i_RV) == 0:
-            print 'Error: R_V value not found'
+            print('Error: R_V value not found')
             return
     else:
         i_RV = range( len(RV_col) )
@@ -83,7 +83,7 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
         count_bc += 1
 
     if i_bc == None:
-        print 'Error: bc value not found'
+        print('Error: bc value not found')
         return
 
     ## Now choose the relevant columns based on grain type
@@ -104,19 +104,20 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
         C     = table_info['col11'][i_bc]
 
     else:
-        print "Error: Grain type not recognized.  Must be 'Graphite' or 'Silicate'."
+        print("Error: Grain type not recognized.  Must be 'Graphite' or
+        'Silicate'.")
         return
 
     result = (alpha, beta, a_t, a_c, C)
 
     if verbose:
-        print 'R_V   = ', table_info['col1'][i_bc]
-        print 'bc    = ', table_info['col2'][i_bc]
-        print 'alpha = ', alpha
-        print 'beta  = ', beta
-        print 'a_t   = ', a_t
-        print 'a_c   = ', a_c
-        print 'C     = ', C
+        print('R_V   = ', table_info['col1'][i_bc])
+        print('bc    = ', table_info['col2'][i_bc])
+        print('alpha = ', alpha)
+        print('beta  = ', beta)
+        print('a_t   = ', a_t)
+        print('a_c   = ', a_c)
+        print('C     = ', C)
 
     return result
 
@@ -147,7 +148,7 @@ def make_WD01_DustSpectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
     elif type == 'Silicate':
         rho_d = 3.8
     else:
-        print 'Error: Dust type not recognized'
+        print('Error: Dust type not recognized')
         return
 
     ANGS2MICRON = 1.e-10 * 1.e6

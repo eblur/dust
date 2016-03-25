@@ -67,7 +67,7 @@ def makeScatModel( model_name, material_name ):
     elif model_name == 'Mie':
         sm = sms.Mie()
     else:
-        print 'Error: Model name not recognized'
+        print('Error: Model name not recognized')
         return
 
     if material_name == 'Drude':
@@ -79,7 +79,7 @@ def makeScatModel( model_name, material_name ):
     elif material_name == 'SmallGraphite': # Small Graphite ~ 0.01 um
         cm = cmi.CmGraphite( size='small' )
     else:
-        print 'Error: CM name not recognized'
+        print('Error: CM name not recognized')
         return
 
     return ScatModel( sm, cm )
@@ -163,9 +163,14 @@ class SigmaExt(object):
         self.E      = E
         self.a      = a
 
+<<<<<<< HEAD:dust/extinction/sigma_scat.py
         if scatm.stype == 'RGscat':
             print('Rayleigh-Gans cross-section not currently supported for KappaExt')
             self.qext = None
+=======
+        if scatm.stype == 'RG':
+            print('Rayleigh-Gans cross-section not currently supported for Kappaext')
+>>>>>>> fd66b848d281616449c994d2d92339256eecbda7:sigma_scat.py
             self.sigma = None
             return
 
@@ -253,8 +258,13 @@ class KappaExt(object):
         self.E      = E
         self.dist   = dist
 
+<<<<<<< HEAD:dust/extinction/sigma_scat.py
         if scatm.stype == 'RGscat':
             print 'Rayleigh-Gans cross-section not currently supported for KappaExt'
+=======
+        if scatm.stype == 'RG':
+            print('Rayleigh-Gans cross-section not currently supported for Kappaext')
+>>>>>>> fd66b848d281616449c994d2d92339256eecbda7:sigma_scat.py
             self.kappa = None
             return
 

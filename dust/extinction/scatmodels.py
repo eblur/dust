@@ -207,8 +207,13 @@ class Mie(object):
 #        nmxx   = 150000
 
 #        if (nmx > nmxx):
+<<<<<<< HEAD:dust/extinction/scatmodels.py
 #            print 'error: nmx > nmxx=', nmxx, ' for |m|x=', ymod
 
+=======
+#            print('error: nmx > nmxx=', nmxx, ' for |m|x=', ymod)
+        
+>>>>>>> fd66b848d281616449c994d2d92339256eecbda7:scatmodels.py
         # *** Logarithmic derivative D(J) calculated by downward recurrence
         # beginning with initial value (0.,0.) at J=NMX
 
