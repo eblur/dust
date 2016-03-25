@@ -104,8 +104,7 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
         C     = table_info['col11'][i_bc]
 
     else:
-        print("Error: Grain type not recognized.  Must be 'Graphite' or
-        'Silicate'.")
+        print("Error: Grain type not recognized.  Must be 'Graphite' or 'Silicate'.")
         return
 
     result = (alpha, beta, a_t, a_c, C)

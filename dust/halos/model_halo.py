@@ -178,15 +178,8 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
 
     ii = range( len(energy) )
     if elim != None:
-<<<<<<< HEAD:dust/halos/model_halo.py
         if v: print 'Limiting energy to values between', elim[0], 'and', elim[1], 'keV'
         ii = np.where( np.logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
-
-=======
-        if v: print('Limiting energy to values between', elim[0], 'and', elim[1], 'keV')
-        ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
-    
->>>>>>> fd66b848d281616449c994d2d92339256eecbda7:model_halo.py
     halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
     result = simulate_intensity( halo_dict, flux[ii] )
@@ -232,15 +225,8 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
 
     ii = range( len(energy) )
     if elim != None:
-<<<<<<< HEAD:dust/halos/model_halo.py
         if v: print 'Limiting energy to values between', elim[0], 'and', elim[1], 'keV'
         ii = np.where( np.logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
-
-=======
-        if v: print('Limiting energy to values between', elim[0], 'and', elim[1], 'keV')
-        ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
-    
->>>>>>> fd66b848d281616449c994d2d92339256eecbda7:model_halo.py
     halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
     result = simulate_intensity( halo_dict, flux[ii] )

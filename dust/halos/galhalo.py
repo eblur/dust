@@ -214,23 +214,10 @@ def uniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
                     print('Using path difference')
                     delta_x   = path_diff( al, xvals )
                     delta_tau = halo.taux * delta_x
-<<<<<<< HEAD:dust/halos/galhalo.py
                     print max( delta_x )
-=======
-                    print(max( delta_x ))
-
->>>>>>> fd66b848d281616449c994d2d92339256eecbda7:galhalo.py
                 dtemp  = np.power( xvals, -2.0 ) * dsig * np.exp( -delta_tau )
                 iatemp = np.append( iatemp, c.intz( xvals, dtemp ) )
             intensity = np.append( intensity, c.intz( avals, halo.dist.nd * iatemp ) )
-<<<<<<< HEAD:dust/halos/galhalo.py
-=======
-
-    else:
-        print('%% Must input type dust.Grain or dust.Dustdist')
-        intensity = np.zeros( np.size(xvals) )
-        
->>>>>>> fd66b848d281616449c994d2d92339256eecbda7:galhalo.py
     # Set the halo intensity
     halo.intensity  = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
     # halo.taux set at beginning of function so it could be called for later use
@@ -273,12 +260,5 @@ def screenISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
                 iatemp[j,:] = np.power(xg,-2.0) * dsig
             intensity.append( c.intz( avals, iatemp[:,i] * halo.dist.nd ) )
         intensity = np.array( intensity )
-<<<<<<< HEAD:dust/halos/galhalo.py
-=======
-    else:
-        print('%% Must input type dust.Grain or dust.Dustdist')
-        intensity = np.zeros( np.size(xvals) )
->>>>>>> fd66b848d281616449c994d2d92339256eecbda7:galhalo.py
-
     halo.intensity = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
     halo.taux      = ss.KappaScat( E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * md
