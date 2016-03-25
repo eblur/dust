@@ -44,10 +44,12 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
         print('Error: Galaxy type not recognized')
         return
 
+    table_info = 0.0
     try:
         table_info = ascii.read( table_filename )
     except:
         print('Error: File %s not found' % (table_filename))
+        return
 
     RV_col = table_info['col1'] # either a float or '--' (LMC/SMC case)
     bc_col = table_info['col2']
