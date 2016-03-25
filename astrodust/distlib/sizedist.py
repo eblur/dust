@@ -98,7 +98,7 @@ def Dustdist(amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, na=NA, log=F
     print("WARNING: dust.Dustdist is deprecated. Use Powerlaw")
     return Powerlaw(amin=amin, amax=amax, p=p, rho=rho, na=na, log=log)
 
-class DustSpectrum(object):  #radius (a), number density (nd), and mass density (md)
+class DustSpectrum(object):  # radius (a), number density (nd), and mass density (md)
     """
     | **ATTRIBUTES**
     | dist : A dust distribution that contains attributes a and rho and ndens function
