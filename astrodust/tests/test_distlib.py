@@ -1,6 +1,6 @@
 """Test the distlib."""
 
-from dust import distlib
+from astrodust import distlib
 
 def test_grain():
     assert type(distlib.Grain()) == distlib.Grain

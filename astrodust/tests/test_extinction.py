@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from dust.extinction import *
+from astrodust.extinction import *
 
 ## Test the scattering models
 

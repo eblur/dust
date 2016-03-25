@@ -1,13 +1,13 @@
 """See if everythign can import"""
 
 def test_dust():
-    import dust
+    import astrodust
 
 def test_distlib():
-    import dust.distlib
+    import astrodust.distlib
 
 def test_extinction():
-    import dust.extinction
+    import astrodust.extinction
 
 def test_halos():
-    import dust.halos
+    import astrodust.halos
