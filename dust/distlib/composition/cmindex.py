@@ -22,21 +22,9 @@ from ... import constants as c
 
 
 def find_cmfile( name ):
-    file_not_found = True
-    if os.path.exists(name):
-        return name
-
-    path_list = os.getenv("PYTHONPATH").split(':')
-
-    for path in path_list:
-        for root, dirs, files in os.walk(path+"/"):
-            if name in files:
-                return os.path.join(root, name)
-
-    if file_not_found:
-        print("ERROR: Cannot find DM03 file")
-        return
-
+    root_path = os.path.dirname(__file__).rstrip('composition')
+    data_path = root_path + 'tables/'
+    return data_path + name
 
 class CmDrude(object):
     """
