@@ -2,22 +2,23 @@
 import numpy as np
 from .. import constants as c
 
-__all__ = ['Grain','Powerlaw','DustSpectrum','MRN_dist']
+__all__ = ['Grain', 'Powerlaw', 'DustSpectrum', 'MRN_dist']
 
-## Some default values
-MDUST    = 1.5e-5 # g cm^-2 (dust mass column)
-RHO_G    = 3.0    # g cm^-3 (average grain material density)
+# Some default values
+MDUST    = 1.5e-5  # g cm^-2 (dust mass column)
+RHO_G    = 3.0     # g cm^-3 (average grain material density)
 
-NA       = 100    # default number for grain size dist resolution
-PDIST    = 3.5    # default slope for power law distribution
-AMICRON  = 1.0    # grain radius (1 micron)
+NA       = 100     # default number for grain size dist resolution
+PDIST    = 3.5     # default slope for power law distribution
+AMICRON  = 1.0     # grain radius (1 micron)
 
 # min and max grain radii for MRN distribution
-AMIN     = 0.005  # micron
-AMAX     = 0.3    # micron
+AMIN     = 0.005   # micron
+AMAX     = 0.3     # micron
 
-#---------------------------------------------------------------
+# ---------------------------------------------------------------
 # This is gratuitous but it's helpful for reading the code
+
 def make_rad(amin, amax, na, log=False):
     """
     Make a grid of dust grain radius values
@@ -33,14 +34,14 @@ def make_rad(amin, amax, na, log=False):
     >>> len(make_rad(0.1,1.0,10)) == 10
     """
     if log:
-        return np.logspace( np.log10(amin), np.log10(amax), na )
+        return np.logspace(np.log10(amin), np.log10(amax), na)
     else:
         return np.linspace(amin, amax, na)
 
 GREY_RAD = make_rad(0.1, 1.0, NA)
 MRN_RAD  = make_rad(AMIN, AMAX, NA)
 
-#-----------------------------------------------------
+# -----------------------------------------------------
 
 class Grain(object):
     """
@@ -58,9 +59,10 @@ class Grain(object):
     def __init__(self, rad=AMICRON, rho=RHO_G):
         self.a   = rad
         self.rho = rho
-    def ndens(self, md=MDUST ):
-        gvol = 4./3. * np.pi * np.power( self.a*c.micron2cm, 3 )
-        return md / ( gvol*self.rho )
+
+    def ndens(self, md=MDUST):
+        gvol = 4. / 3. * np.pi * np.power(self.a*c.micron2cm, 3)
+        return md / (gvol * self.rho)
 
 class Powerlaw(object):
     """
@@ -76,7 +78,7 @@ class Powerlaw(object):
     >>> np.sum(Powerlaw().ndens(0.0)) == 0.0
     >>> np.all(np.isinf(Powerlaw(rho=0.0).ndens()))
     """
-    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, \
+    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G,
                  na=NA, log=False):
         self.amin = amin
         self.amax = amax
@@ -85,10 +87,11 @@ class Powerlaw(object):
         self.rho  = rho
 
     def ndens(self, md=MDUST):
-        adep  = np.power( self.a, -self.p )   # um^-p
-        dmda  = adep * 4./3. * np.pi * self.rho * np.power(self.a*c.micron2cm, 3) # g um^-p
-        const = md / c.intz( self.a, dmda ) # cm^-? um^p-1
-        return const * adep # cm^-? um^-1
+        adep  = np.power(self.a, -self.p)   # um^-p
+        gdens = (4. / 3.) * np.pi * self.rho
+        dmda  = adep * gdens * np.power(self.a * c.micron2cm, 3)  # g um^-p
+        const = md / c.intz(self.a, dmda)  # cm^-? um^p-1
+        return const * adep  # cm^-? um^-1
 
 # For backwards compatibility
 def Dustdist(amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, na=NA, log=False):

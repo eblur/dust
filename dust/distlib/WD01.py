@@ -16,7 +16,7 @@ LMC_avg_file  = 'Table3_LMCavg.WD.dat'
 LMC_2_file    = 'Table3_LMC2.WD.dat'
 SMC_file      = 'Table3_SMC.WD.dat'
 
-def find_wdfile( name ):
+def find_wdfile(name):
     data_path = os.path.join(os.path.dirname(__file__), 'tables/')
     return data_path + name
 
