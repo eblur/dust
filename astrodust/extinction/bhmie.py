@@ -20,7 +20,12 @@ class BHmie(object):
         self.S2 = np.zeros(shape=(NA, NE, 1))
         self.X  = (2.0 * np.pi * self.a) / self.E
 
-def calculte(bhm, theta=np.array([0.0])):
+    def calculate(self, theta=np.array([0.0])):
+        self.theta = theta
+        _calculate(self, theta)
+
+def _calculate(bhm, theta):
+
     NA, NE = bhm.NA, bhm.NE
     NTH = np.size(theta)
     theta_rad = theta * c.arcs2rad
