@@ -135,6 +135,8 @@ def calculte(bhm):
         bhm.gsca  += ((en-1.0) * (en+1.0)/en) *
                      (an1.real * an.real + an1.imag * an.imag + bn1.real * bn.real + bn1.imag * bn.imag)
 
+        ## **** LAST TOUCHED HERE (April 4, 2016) -- LIA
+
         # *** Now calculate scattering intensity pattern
         #     First do angles from 0 to 90
 
