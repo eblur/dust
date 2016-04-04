@@ -4,6 +4,7 @@ i.e. store S1 and S2 values according to E, a, and n
 """
 
 import numpy as np
+from scipy.special import cbrt
 
 import constants as c
 import cmindex as cmi
@@ -16,13 +17,133 @@ class BHmie(object):
         self.cm = cm  # complex index of refraction
         self.NA = len(a)
         self.NE = len(E)
-        self.S1 = np.zeros(shape=(NA, NE, 1))
-        self.S2 = np.zeros(shape=(NA, NE, 1))
         self.X  = (2.0 * np.pi * self.a) / self.E
+        self.qsca = 0.0
+        self.qext = 0.0
+        self.gsca = 0.0
 
     def calculate(self, theta=np.array([0.0])):
+        NA, NE, NTH = self.NA, self.NE, len(theta)
         self.theta = theta
+        self.S1  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.S2  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.s1_ext   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.s2_ext   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.s1_back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.s2-back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.pi  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.pi0 = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.pi1 = np.zeros(shape=(1, NA, NE, NTH), dtype='complex') + 1.0
+        self.tau = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.an  = np.zeros(shape=(1, NA, NE), dtype='complex')
+        self.bn  = np.zeros(shape=(1, NA, NE), dtype='complex')
+        self.D   = _calc_D(bhm)  # nmx x NA x NE
+
         _calculate(self, theta)
+
+def _calc_D(bhm):
+    # *** Logarithmic derivative D(J) calculated by downward recurrence
+    # beginning with initial value (0.,0.) at J=NMX
+
+    xstop  = bhm.X + 4.0 * cbrt(bhm.X) + 2.0
+    test   = np.append(xstop, ymod)
+    nmx    = np.max(test) + 15
+    nmx    = np.int32(nmx)  # maximum number of iterations
+
+    d = np.zeros(shape=(nmx+1, bhm.NA, bhm.NE), dtype='complex')
+
+    for n in np.arange(nmx-1)+1:  # for n=1, nmx-1 do begin
+        en = nmx - n + 1
+        d[nmx-n, :, :]  = (en/y) - (1.0 / (d[nmx-n+1, :, :] + en/y))
+
+    return d
+
+def _calc_n(bhm, n):
+    en = n + 1
+    # for given N, PSI  = psi_n        CHI  = chi_n
+    #              PSI1 = psi_{n-1}    CHI1 = chi_{n-1}
+    #              PSI0 = psi_{n-2}    CHI0 = chi_{n-2}
+    # Calculate psi_n and chi_n
+    # *** Compute AN and BN:
+    #*** Store previous values of AN and BN for use
+    #    in computation of g=<cos(theta)>
+
+    # Set up for calculating Riccati-Bessel functions
+    # with real argument X, calculated by upward recursion
+    psi0 = np.cos(bhm.X)  # NA x NE
+    psi1 = np.sin(bhm.X)
+    chi0 = -np.sin(bhm.X)
+    chi1 = np.cos(bhm.X)
+    xi1  = psi1 - 1j * chi1
+
+    psi = (2.0*en-1.0) * psi1/bhm.X - psi0
+    chi = (2.0*en-1.0) * chi1/bhm.X - chi0
+    xi  = psi - 1j * chi
+
+    if n > 0:
+        an1 = self.an[:, :, n-1]
+        bn1 = self.bn[:, :, n-1]
+
+    # Calculate AN and BN terms
+    dslice = [n, :, :]  # NA x NE
+    an  = ((dslice / refrel + en/x) * psi - psi1) /
+          ((dslice/refrel + en/x) * xi - xi1)
+    bn  = ((refrel * dslice + en/x) * psi - psi1) /
+          ((refrel * dslice + en/x) * xi - xi1)
+
+    bhm.an = np.stack([bhm.an, an], 0)  # stack along axis 0
+    bhm.bn = np.stack([bhm.bn, bn], 0)
+
+    # Now calculate the S1 and S2 terms
+    fn_const = (2.0 * en + 1.0) / (en * (en + 1.0))
+    fn       = np.zeros(shape=(NA, NE)) + fn_const  # NA x NE
+
+    pi  = np.zeros(shape=(NA, NE, NTH), dtype='complex') + 1.0
+    pi0 = np.zeros(shape=(NA, NE, NTH), dtype='complex')
+
+    tau = en * amu * pi - (en + 1.0) * pi0
+
+    sign = np.ones(shape=(NA, NE, NTH))
+    sign[:, :, indg90] = -sign[:, :, indg90]
+
+    s1n = fn * (an * pi + sign * bn * tau)
+    s2n = fn * (an * tau + sign * bn * pi)
+
+    pi_ext = pi1_ext
+    tau_ext = en * 1.0 * pi_ext - (en + 1.0) * pi0_ext
+
+    s1_ext_n = fn * (an * pi_ext + bn * tau_ext)
+    s2_ext_n = fn * (bn * pi_ext + an * tau_ext)
+
+    s1_back_n = fn * (an * pi_ext - bn * tau_ext)
+    s2_back_n = fn * (bn * pi_ext - an * tau_ext)
+
+    # Stack everything onto the BHmie object along axis 0
+    bhm.S1 = np.stack([bhm.S1, s1n], 0)
+    bhm.S2 = np.stack([bhm.S2, s2n], 0)
+    bhm.s1_ext = np.stack([bhm.s1_ext, s1_ext_n], 0)
+    bhm.s2_ext = np.stack([bhm.s2_ext, s2_ext_n], 0)
+    bhm.s1_back = np.stack([bhm.s1_back, s1_back_n], 0)
+    bhm.s2_back = np.stack([bhm.s2_back, s2_back_n], 0)
+
+    ### *** LAST touched here (April 4, 2016)
+
+    psi0 = psi1
+    psi1 = psi
+    chi0 = chi1
+    chi1 = chi
+    xi1  = psi1 - 1j*chi1
+
+    # *** Compute pi_n for next value of n
+    #     For each angle J, compute pi_n+1
+    #     from PI = pi_n , PI0 = pi_n-1
+
+    pi1  = ((2.0 * en + 1.0) * amu * pi - (en + 1.0) * pi0) / en
+    pi0  = pi
+
+    pi1_ext = ((2.0 * en + 1.0) * 1.0 * pi_ext - (en + 1.0) * pi0_ext) / en
+    pi0_ext = pi_ext
+
 
 def _calculate(bhm, theta):
 
@@ -96,96 +217,32 @@ def _calculate(bhm, theta):
     tau_ext = 0.0
 
     for en in np.arange(np.max(nstop)) + 1:
-        # for given N, PSI  = psi_n        CHI  = chi_n
-        #              PSI1 = psi_{n-1}    CHI1 = chi_{n-1}
-        #              PSI0 = psi_{n-2}    CHI0 = chi_{n-2}
-        # Calculate psi_n and chi_n
-        # *** Compute AN and BN:
-
-        #*** Store previous values of AN and BN for use
-        #    in computation of g=<cos(theta)>
-
-        psi = (2.0*en-1.0) * psi1/x - psi0
-        chi = (2.0*en-1.0) * chi1/x - chi0
-        xi  = psi - 1j * chi
-
-        if en > 1:
-            an1 = an[:, :, en-1]
-            bn1 = bn[:, :, en-1]
-
-        # Calculate AN and BN terms
-        dslice = d[:, :, en]
-
-        aterm  = ((dslice / refrel + en/x) * psi - psi1) /
-                 ((dslice/refrel + en/x) * xi - xi1)
-        an[:, :, en] = aterm
-
-        bterm  = ((refrel * dslice + en/x) * psi - psi1) /
-                 ((refrel * dslice + en/x) * xi - xi1)
-        bn[:, :, en] = bterm
-
-        # *** Augment sums for Qsca and g=<cos(theta)>
-
-        # NOTE from LIA: In IDL version, bhmie casts double(an)
-        # and double(bn).  This disgards the imaginary part.  To
-        # avoid type casting errors, I use an.real and bn.real
-
-        # Because animag and bnimag were intended to isolate the
-        # real from imaginary parts, I replaced all instances of
-        # double( foo * complex(0.d0,-1.d0) ) with foo.imag
-
-        bhm.qsca  += (2.0*en +1.0) * (np.abs(aterm)**2 + np.abs(bterm)**2)
-        bhm.gsca  += ((2.0*en+1.0) / (en*(en+1.0))) * \
-                     (aterm.real * bterm.real + aterm.imag * bterm.imag)
-        bhm.gsca  += ((en-1.0) * (en+1.0)/en) * \
-                     (an1.real * an.real + an1.imag * an.imag + bn1.real * bn.real + bn1.imag * bn.imag)
-
-        # *** Now calculate scattering intensity pattern
-        #     First do angles from 0 to 90
-
-        # LIA : Altered the two loops below so that only the indices where ang
-        # < 90 are used.  Replaced (j) with [indl90]
-
-        fn_const = (2.0 * en + 1.0) / (en * (en + 1.0))
-        fn       = np.zeros(shape=(NA, NE)) + fn_const
-
-        indl90
-
-        pi  = pi1
-        tau = en * amu * pi - (en + 1.0) * pi0
-
-        sign = np.ones(shape=(NA, NE, NTH))
-        sign[:, :, indg90] = -sign[:, :, indg90]
-
-        s1 += fn * (an * pi + sign * bn * tau)
-        s2 += fn * (an * tau + sign * bn * pi)
-
-        pi_ext = pi1_ext
-        tau_ext = en * 1.0 * pi_ext - (en + 1.0) * pi0_ext
-
-        s1_ext = s1_ext + fn * (an * pi_ext + bn * tau_ext)
-        s2_ext = s2_ext + fn * (bn * pi_ext + an * tau_ext)
-
-        s1_back += fn * (an * pi_ext - bn * tau_ext)
-        s2_back += fn * (bn * pi_ext - an * tau_ext)
-
-        psi0 = psi1
-        psi1 = psi
-        chi0 = chi1
-        chi1 = chi
-        xi1  = psi1 - 1j*chi1
-
-        # *** Compute pi_n for next value of n
-        #     For each angle J, compute pi_n+1
-        #     from PI = pi_n , PI0 = pi_n-1
-
-        pi1  = ((2.0 * en + 1.0) * amu * pi - (en + 1.0) * pi0) / en
-        pi0  = pi
-
-        pi1_ext = ((2.0 * en + 1.0) * 1.0 * pi_ext - (en + 1.0) * pi0_ext) / en
-        pi0_ext = pi_ext
-
+        _calc_en(en)
     # ENDFOR
+
+    # *** Augment sums for Qsca and g=<cos(theta)>
+    # NOTE from LIA: In IDL version, bhmie casts double(an)
+    # and double(bn).  This disgards the imaginary part.  To
+    # avoid type casting errors, I use an.real and bn.real
+
+    # Because animag and bnimag were intended to isolate the
+    # real from imaginary parts, I replaced all instances of
+    # double( foo * complex(0.d0,-1.d0) ) with foo.imag
+
+    # note that s1, s2, s1_ext, s2_ext, and other things need to be summed
+
+    bhm.S1 = np.
+    bhm.qsca  += (2.0*en +1.0) * (np.abs(aterm)**2 + np.abs(bterm)**2)
+    bhm.gsca  += ((2.0*en+1.0) / (en*(en+1.0))) * \
+                 (aterm.real * bterm.real + aterm.imag * bterm.imag)
+    bhm.gsca  += ((en-1.0) * (en+1.0)/en) * \
+                 (an1.real * an.real + an1.imag * an.imag + bn1.real * bn.real + bn1.imag * bn.imag)
+
+    # *** Now calculate scattering intensity pattern
+    #     First do angles from 0 to 90
+
+    # LIA : Altered the two loops below so that only the indices where ang
+    # < 90 are used.  Replaced (j) with [indl90]
 
     # *** Have summed sufficient terms.
     #     Now compute QSCA,QEXT,QBACK,and GSCA
