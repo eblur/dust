@@ -1,26 +1,27 @@
 
 import numpy as np
-import constants as c
-import cmindex as cmi
-
-## Needed for PSH model
-from parse_PAH import *
 from scipy.interpolate import interp1d
+
+from .. import constants as c
+from ..distlib.composition import cmindex as cmi
+from .parse_PAH import *
+
+__all__ = ['RGscat','Mie','PAH']
 
 """
 --------------------------------------------------------------
-    META
+    API
 --------------------------------------------------------------
  A dust scattering model should contain functions that take
- energy value, complex index of refraction object (see cmindex.py),
+ energy value, complex index of refraction object (see cmlib),
  and grain sizes
 
  Qsca ( E  : scalar or np.array [keV]
-        cm : cmtype object from cmindex.py
+        cm : cmtype object from cmi.py
         a  : scalar [grain size, micron] ) :
  returns scalar or np.array [scattering efficiency, unitless]
 
- Diff ( cm : cmtype object from cmindex.py
+ Diff ( cm : cmtype object from cmi.py
         theta : scalar or np.array [angle, arcsec]
         a  : scalar [grain size, micron]
         E  : scalar or np.array [energy, keV]
@@ -30,12 +31,12 @@ from scipy.interpolate import interp1d
  Some (but not all) scattering models may also contain related extinction terms
 
  Qext ( E  : scalar or np.array [keV]
-        cm : cmtype object cmindex.py
+        cm : cmtype object cmi.py
         a  : scalar [grain size, micron] ) :
  returns scalar or np.array [extinction efficiency, unitless]
 
  Qabs ( E  : scalar or np.array [keV]
-        cm : cmtype object cmindex.py
+        cm : cmtype object cmi.py
         a  : scalar [grain size, micron] ) :
  returns scalar or np.array [absorption efficiency, unitless]
 
@@ -77,11 +78,11 @@ class RGscat(object):
     | stype : string : 'RGscat'
 
     | **FUNCTIONS**
-    | Qsca( E, a=1.0 [um], cm=cmi.CmDrude() [see cmindex.py] )
+    | Qsca( E, a=1.0 [um], cm=cmi.CmDrude() [see cmi.py] )
     |    *returns* scattering efficiency [unitless]
     | Char( a=1.0 [um], E=1.0 [keV] )
     |    *returns* characteristc scattering angle [arcsec keV um]
-    | Diff( cm=cmi.CmDrude() [see cmindex.py], theta=10.0 [arcsec], a=1.0 [um], E=1.0 [keV] )
+    | Diff( cm=cmi.CmDrude() [see cmi.py], theta=10.0 [arcsec], a=1.0 [um], E=1.0 [keV] )
     |    *returns* differential scattering cross-section [cm^2 ster^-1]
     """
 
@@ -206,8 +207,7 @@ class Mie(object):
 #        nmxx   = 150000
 
 #        if (nmx > nmxx):
-#            print 'error: nmx > nmxx=', nmxx, ' for |m|x=', ymod
-
+#            print('error: nmx > nmxx=', nmxx, ' for |m|x=', ymod)
         # *** Logarithmic derivative D(J) calculated by downward recurrence
         # beginning with initial value (0.,0.) at J=NMX
 
@@ -253,8 +253,7 @@ class Mie(object):
             #              PSI1 = psi_{n-1}    CHI1 = chi_{n-1}
             #              PSI0 = psi_{n-2}    CHI0 = chi_{n-2}
             # Calculate psi_n and chi_n
-            # *** Compute AN and BN:                                                                     
-
+            # *** Compute AN and BN:
             #*** Store previous values of AN and BN for use
             #    in computation of g=<cos(theta)>
             if n > 1:

@@ -1,34 +1,31 @@
+"""
+Contains helper functions for producing a DustSpectrum object for the
+Weingartner & Draine (2001) dust grain size distributions.
+"""
+
 import numpy as np
-import constants as c
 from astropy.io import ascii
 import os
-import dust
-import scipy.special as special # Needed for WD01 equations                                                         
+import scipy.special as special # Needed for WD01 equations
+
+from .. import constants as c
+from . import sizedist
+
 MW_caseA_file = 'Table1.WD.dat'
 LMC_avg_file  = 'Table3_LMCavg.WD.dat'
 LMC_2_file    = 'Table3_LMC2.WD.dat'
 SMC_file      = 'Table3_SMC.WD.dat'
 
-def find_wdfile( name ):
-    file_not_found = True
-    
-    path_list = os.getenv("PYTHONPATH").split(':')
-    
-    for path in path_list:
-        for root, dirs, files in os.walk(path+"/"):
-            if name in files:
-                return os.path.join(root, name)
-    
-    if file_not_found:
-        print("ERROR: Cannot find WD01 Table file %s" % (name))
-        return result
+def find_wdfile(name):
+    data_path = os.path.join(os.path.dirname(__file__), 'tables/')
+    return os.path.join(data_path, name)
 
 
 def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
     """
-    get_dist_params( 
+    get_dist_params(
     R_V [float : 3.1, 4.0, or 5.5]
-    bc [float : 0,1,2,3...], 
+    bc [float : 0,1,2,3...],
     type [string : 'Graphite' or 'Silicate],
     gal [string : 'MW','LMC' or 'SMC'] )
     ------------------------------------------
@@ -44,10 +41,15 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
     elif gal == 'LMC':
         table_filename = find_wdfile( LMC_avg_file )
     else:
-        print 'Error: Galaxy type not recognized'
+        print('Error: Galaxy type not recognized')
         return
 
-    table_info = ascii.read( table_filename )
+    table_info = 0.0
+    try:
+        table_info = ascii.read( table_filename )
+    except:
+        print('Error: File %s not found' % (table_filename))
+        return
 
     RV_col = table_info['col1'] # either a float or '--' (LMC/SMC case)
     bc_col = table_info['col2']
@@ -62,9 +64,9 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
             if val == R_V:
                 i_RV.append(count_RV)
             count_RV += 1
-                
+
         if len(i_RV) == 0:
-            print 'Error: R_V value not found'
+            print('Error: R_V value not found')
             return
     else:
         i_RV = range( len(RV_col) )
@@ -83,7 +85,7 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
         count_bc += 1
 
     if i_bc == None:
-        print 'Error: bc value not found'
+        print('Error: bc value not found')
         return
 
     ## Now choose the relevant columns based on grain type
@@ -104,41 +106,42 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
         C     = table_info['col11'][i_bc]
 
     else:
-        print "Error: Grain type not recognized.  Must be 'Graphite' or 'Silicate'."
+        print("Error: Grain type not recognized.  Must be 'Graphite' or 'Silicate'.")
         return
 
     result = (alpha, beta, a_t, a_c, C)
 
     if verbose:
-        print 'R_V   = ', table_info['col1'][i_bc]
-        print 'bc    = ', table_info['col2'][i_bc]
-        print 'alpha = ', alpha
-        print 'beta  = ', beta
-        print 'a_t   = ', a_t
-        print 'a_c   = ', a_c
-        print 'C     = ', C
+        print('R_V   = ', table_info['col1'][i_bc])
+        print('bc    = ', table_info['col2'][i_bc])
+        print('alpha = ', alpha)
+        print('beta  = ', beta)
+        print('a_t   = ', a_t)
+        print('a_c   = ', a_c)
+        print('C     = ', C)
 
     return result
 
 DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(1.0), 50)
 
-def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', gal='MW', verbose=True ):
+def make_WD01_DustSpectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
+    type='Graphite', gal='MW', verbose=True ):
     """
-    make_WD01_Dustspectrum(
+    make_WD01_DustSpectrum(
     R_V [float],
     bc [float],
     rad [np.array : grain sizes (um)],
     type [string : 'Graphite' or 'Silicate'] )
-    gal [string : 'MW', 'LMC', or 'SMC'], 
+    gal [string : 'MW', 'LMC', or 'SMC'],
     -------------------------------------------
-    Returns a dust.Dustspectrum object containing a 
+    Returns a sizedist.DustSpectrum object containing a
     (grain sizes), nd (dn/da), and md (total mass density of dust)
-    
-    >>> wd01_sil = make_WD01_Dustspectrum(type='Silicate')
-    >>> (dust._integrate_dust_mass(wd01_sil)/wd01_sil.md) - 1.0 < 0.01
-    
-    >>> wd01_gra = make_WD01_Dustspectrum(type='Graphite')
-    >>> (dust._integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
+
+    >>> wd01_sil = make_WD01_DustSpectrum(type='Silicate')
+    >>> (wd01_sil.integrate_dust_mass(wd01_sil)/wd01_sil.md) - 1.0 < 0.01
+
+    >>> wd01_gra = make_WD01_DustSpectrum(type='Graphite')
+    >>> (wd01_gra.integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
     """
 
     if type == 'Graphite':
@@ -146,9 +149,9 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
     elif type == 'Silicate':
         rho_d = 3.8
     else:
-        print 'Error: Dust type not recognized'
+        print('Error: Dust type not recognized')
         return
-    
+
     ANGS2MICRON = 1.e-10 * 1.e6
     a    = rad  # Easier than changing variable names further down
     a_cm = rad * c.micron2cm
@@ -159,21 +162,21 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
 
     if type == 'Graphite':
 
-        mc      = 12. * 1.67e-24   # Mass of carbon atom in grams (12 m_p)                                                  
-        rho     = 2.24             # g cm^-3                                                                                
+        mc      = 12. * 1.67e-24   # Mass of carbon atom in grams (12 m_p)
+        rho     = 2.24             # g cm^-3
         sig     = 0.4
-        a_01    = 3.5*ANGS2MICRON      # 3.5 angstroms in units of microns                                                  
+        a_01    = 3.5*ANGS2MICRON      # 3.5 angstroms in units of microns
         a_01_cm = a_01 * c.micron2cm
         bc1     = 0.75 * bc * 1.e-5
         B_1     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_01_cm**3 * 0.4) \
             * bc1 * mc / (1 + special.erf( 3*0.4/np.sqrt(2) + np.log(a_01/3.5e-4)/(0.4*np.sqrt(2)) ) )
-        
-        a_02    = 30.0*ANGS2MICRON       # 30 angtroms in units of microns                                                  
+
+        a_02    = 30.0*ANGS2MICRON       # 30 angtroms in units of microns
         a_02_cm = a_02 * c.micron2cm
         bc2     = 0.25 * bc * 1.e-5
         B_2     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_02_cm**3 * 0.4) \
             * bc2 * mc / (1 + special.erf( 3*0.4/np.sqrt(2) + np.log(a_02/3.5e-4)/(0.4*np.sqrt(2)) ) )
-        
+
         D       = (B_1/a_cm) * np.exp( -0.5*( np.log(a/a_01)/sig )**2 ) + \
             (B_2/a_cm) * np.exp( -0.5*( np.log(a/a_02)/sig )**2 )
 
@@ -218,8 +221,8 @@ def make_WD01_Dustspectrum( R_V=3.1, bc=0.0, rad=DEFAULT_RAD, type='Graphite', g
 
     mg = 4.0/3.0*np.pi*a_cm**3 * rho_d  # mass of each dust grain
     Md = c.intz( a_cm, Dist_WD01 * mg )
-    
-    result = dust.Dustspectrum()
+
+    result = sizedist.DustSpectrum()
     result.a   = a
     result.rho = rho_d
     result.nd  = Dist_WD01 * c.micron2cm  # cm^-3 per um per n_H

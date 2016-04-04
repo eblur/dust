@@ -1,18 +1,16 @@
 #! /Library/Frameworks/EPD64.framework/Versions/Current/bin/python
 
 import numpy as np
-
-import galhalo as GH
-import halodict as HD
-import analytic as AH
-
 from scipy.interpolate import interp1d
-from scipy import logical_and
+
+from . import galhalo as GH
+from . import halodict as HD
+from . import analytic as AH
 
 ## December 11, 2014 : Remove dependence on AEFF, which came from PIMMS
 ##    Instead of simulating counts/pix^2, using raw flux/arcsec^2
 
-## UPDATED June 11, 2013 : I want to make halo_lib 
+## UPDATED June 11, 2013 : I want to make halo_lib
 ## independent of asciidata, radprofile, and aeff
 ## CAVEAT : Path to effective area data file needs to be specified
 
@@ -38,9 +36,9 @@ NH   = 3.6e22
 ## MAGIC NUMBERS are in ALLCAPS
 NA     = 50
 da     = ( np.log10(AMAX) - np.log10(AMIN) ) / NA
-grains = GH.dust.Powerlaw(AMIN, AMAX, p=P, na=NA, log=True)
+grains = GH.distlib.Powerlaw(AMIN, AMAX, p=P, na=NA, log=True)
 
-SCATM  = GH.ss.Scatmodel()
+SCATM  = GH.ss.ScatModel()
 ALPHA  = np.logspace(0.0, 3.0, 30)
 
 #---------------------------------------------------------------------
@@ -51,7 +49,7 @@ def screen( halodict, xg=0.5, NH=NH, d2g=0.009, verbose=False ):
 
     | **MODIFIES**
     | halodict.intensity, halodict.htype
-    
+
     | **INPUTS**
     | halodict : halodict.HaloDict object
     | xg       : float [0-1] : position of screen where 0 = point source, 1 = observer
@@ -59,10 +57,10 @@ def screen( halodict, xg=0.5, NH=NH, d2g=0.009, verbose=False ):
     | d2g      : float : Dust-to-gas mass ratio
     | verbose  : boolean : If true, print halo energy at each calculation step
     """
-    print 'Numerically integrating halo model for a dust screen at x =', xg
+    print('Numerically integrating halo model for a dust screen at x =', xg)
     AH.set_htype( halodict, xg=xg, NH=NH, d2g=d2g )
     for i in range( halodict.len ):
-        if verbose: print 'Calculating halo energy :', halodict.energy[i], ' keV'
+        if verbose: print('Calculating halo energy :', halodict.energy[i], 'keV')
         halo_temp = GH.Halo( halodict.energy[i], alpha=halodict.alpha, \
             scatm=halodict.scatm, rad=halodict.rad )
         GH.DiscreteISM( halo_temp, xg=xg, NH=NH, d2g=d2g )
@@ -73,20 +71,20 @@ def uniform( halodict, NH=NH, d2g=0.009, verbose=False ):
     """
     Performs numerical integration with uniform dust distribution
         calculation with each halo in halodict
-    
+
     | **MODIFIES**
     | halodict.intensity, halodict.htype
-    
+
     | **INPUTS**
     | halodict : halodict.HaloDict object
     | NH       : float [cm^-2] : Hydrogen column
     | d2g      : float : Dust-to-gas mass ratio
     | verbose  : boolean : If true, print halo energy at each calculation step
     """
-    print 'Numerically integrating halo model for uniform ISM'
+    print('Numerically integrating halo model for uniform ISM')
     AH.set_htype( halodict, NH=NH, d2g=d2g )
     for i in range( halodict.len ):
-        if verbose: print 'Calculating halo energy:', halodict.energy[i], ' keV'
+        if verbose: print('Calculating halo energy:', halodict.energy[i], 'keV')
         halo_temp = GH.Halo( halodict.energy[i], alpha=halodict.alpha, \
             scatm=halodict.scatm, rad=halodict.rad )
         GH.UniformISM( halo_temp, NH=NH, d2g=d2g )
@@ -100,7 +98,7 @@ def uniform( halodict, NH=NH, d2g=0.009, verbose=False ):
 def totalhalo( halodict, spectrum ):
     """
     Alters halodict by running halodict.HaloDict.total_halo( corrflux )
-    
+
     | **MODIFIES**
     | halodict.total
 
@@ -120,8 +118,8 @@ def totalhalo( halodict, spectrum ):
 
 def simulate_intensity( halodict, spectrum ):
     '''
-    Take a halo dictionary with an evaluated profile, 
-    and simulate a surface brightness profile with it. 
+    Take a halo dictionary with an evaluated profile,
+    and simulate a surface brightness profile with it.
     The arcsec to pixel conversion is based on Chandra.
 
     | **INPUTS**
@@ -133,13 +131,13 @@ def simulate_intensity( halodict, spectrum ):
     '''
     arcsec2pix = 0.5  #arcsec/pix (Chandra)
     result = 0.0
-    
+
     corr_flux = spectrum * np.exp( halodict.taux )
-    
+
     NE, NA = halodict.len, halodict.hsize
     halo_flux = np.tile( corr_flux.reshape(NE,1), NA ) * halodict.intensity
     # flux/arcsec^2
-    
+
     result = np.sum( halo_flux, 0 )
     return interp1d( halodict.alpha, result ) # arcsec, flux/arcsec^2
 
@@ -161,32 +159,31 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     | dict     : boolean (False) : if True, returns halodict instead of interp object
     | xg       : float [0-1] : Position of screen where 0 = point source, 1 = observer
     | alpha    : np.array [arcsec] : Angles for halo intensity values
-    | scatm    : ss.Scatmodel()
+    | scatm    : ss.ScatModel()
     | elim     : tuple containing energy limits [keV]
     | na       : number of bins to use for grain size distribution
 
     | **RETURNS**
-    | if dict == False : 
+    | if dict == False :
     |     scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
     | if dict == True :
     |     HaloDict object with full benefits of information
     '''
     energy, flux = HD.get_spectrum( specfile )
     if a1 == None:
-        dust_dist = GH.dust.Grain( rad=a0, rho=rho )
+        dust_dist = GH.distlib.Grain( rad=a0, rho=rho )
     else:
         dth = (a1-a0)/na
-        dust_dist = GH.dust.Powerlaw(a0, a1, na=(a1-a0)/dth, p=p, rho=rho )
-    
+        dust_dist = GH.distlib.Powerlaw(a0, a1, na=(a1-a0)/dth, p=p, rho=rho )
+
     ii = range( len(energy) )
     if elim != None:
         if v: print 'Limiting energy to values between', elim[0], 'and', elim[1], 'keV'
-        ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
-    
+        ii = np.where( np.logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
     halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
     AH.screen_eq( halo_dict, xg=xg, NH=NH, d2g=d2g )
     result = simulate_intensity( halo_dict, flux[ii] )
-    
+
     if return_dict : return halo_dict
     else : return result
 
@@ -196,7 +193,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     '''
     Simulate a surface brightness profile from spectrum file
     for a uniform distribution of dust, using 2-4 free parameters
-    
+
     | **INPUTS**
     | specfile : string : Name of spectrum file
     | a0       : float [um] : Minimum (or single) grain size to use
@@ -209,32 +206,30 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     | alpha    : np.array [arcsec] : Angles for halo intensity values
     | aeff     : intper1d object : x = energy [keV], y = effective area [cm^2]
     | exposure : float [sec] : Observation exposure time
-    | scatm    : ss.Scatmodel()
+    | scatm    : ss.ScatModel()
     | elim     : tuple containing energy limits [keV]
     | na       : number of bins to use for grain size distribution
-    
+
     | **RETURNS**
-    | if dict == False : 
+    | if dict == False :
     |     scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
     | if dict == True :
     |     HaloDict object with full benefits of information
     '''
     energy, flux = HD.get_spectrum( specfile )
     if a1 == None:
-        dust_dist = GH.dust.Grain( rad=a0, rho=rho )
+        dust_dist = GH.distlib.Grain( rad=a0, rho=rho )
     else:
         dth = (a1-a0)/na
-        dust_dist = GH.dust.Powerlaw(a0, a1, na=(a1-a0)/dth, p=p, rho=rho )
-    
+        dust_dist = GH.distlib.Powerlaw(a0, a1, na=(a1-a0)/dth, p=p, rho=rho )
+
     ii = range( len(energy) )
     if elim != None:
         if v: print 'Limiting energy to values between', elim[0], 'and', elim[1], 'keV'
-        ii = np.where( logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
-    
+        ii = np.where( np.logical_and( energy>=elim[0], energy<=elim[1] ) )[0]
     halo_dict = HD.HaloDict( energy[ii], rad=dust_dist, scatm=scatm, alpha=alpha )
     AH.uniform_eq( halo_dict, NH=NH, d2g=d2g )
     result = simulate_intensity( halo_dict, flux[ii] )
-    
+
     if return_dict : return halo_dict
     else : return result
-
