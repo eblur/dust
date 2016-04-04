@@ -31,7 +31,7 @@ class BHmie(object):
         self.s2_ext   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.s1_back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.s2-back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
-        self.pi   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.pi   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex') + 1.0
         self.psi  = np.zeros(shape=(1, NA, NE))
         self.chi  = np.zeros(shape=(1, NA, NE))
         self.xi   = np.zeros(shape=(1, NA, NE), dtype='complex')
@@ -64,28 +64,28 @@ def _calc_n(bhm, n):
     # for given N, PSI  = psi_n        CHI  = chi_n
     #              PSI1 = psi_{n-1}    CHI1 = chi_{n-1}
     #              PSI0 = psi_{n-2}    CHI0 = chi_{n-2}
-    # Calculate psi_n and chi_n
-    # *** Compute AN and BN:
-    #*** Store previous values of AN and BN for use
-    #    in computation of g=<cos(theta)>
-
-    # Set up for calculating Riccati-Bessel functions
-    # with real argument X, calculated by upward recursion
+    #              PI = pi_n ,         PI0 = pi_n-1
     if n == 0:
         psi0 = np.cos(bhm.X)  # NA x NE
         psi1 = np.sin(bhm.X)
         chi0 = -np.sin(bhm.X)
         chi1 = np.cos(bhm.X)
+        pi0  = np.zeros(shape=(NA, NE, NTH), dtype='complex')
+        pi   = bhm.pi[n, :, :]
     if n == 1:
         psi0 = np.sin(bhm.X)
         psi1 = bhm.psi[n-1, :, :]
         chi0 = np.cos(bhm.X)
         chi1 = bhm.chi[n-1, :, :]
+        pi0  = bhm.pi[n-1, :, :, :]
+        pi   = ((2.0*n+1.0)*amu*pi0) / n
     else:
-        psi1 = bhm.psi[n-1, :, :]
         psi0 = bhm.psi[n-2, :, :]
-        chi1 = bhm.chi[n-1, :, :]
+        psi1 = bhm.psi[n-1, :, :]
         chi0 = bhm.chi[n-2, :, :]
+        chi1 = bhm.chi[n-1, :, :]
+        pi0  = bhm.pi[n-1, :, :, :]
+        pi   = ((2.0*n+1.0)*amu*pi0-(n+1.0)*bhm.pi[n-2, :, :]) / n
 
     psi = (2.0*en-1.0) * psi1/bhm.X - psi0
     chi = (2.0*en-1.0) * chi1/bhm.X - chi0
@@ -111,11 +111,6 @@ def _calc_n(bhm, n):
     fn_const = (2.0 * en + 1.0) / (en * (en + 1.0))
     fn       = np.zeros(shape=(NA, NE)) + fn_const  # NA x NE
 
-    ### *** CHECK ON THIS (LOCATION) - April 4, 2016
-
-    pi  = np.zeros(shape=(NA, NE, NTH), dtype='complex') + 1.0
-    pi0 = np.zeros(shape=(NA, NE, NTH), dtype='complex')
-
     tau = en * amu * pi - (en + 1.0) * pi0
 
     sign = np.ones(shape=(NA, NE, NTH))
@@ -136,10 +131,6 @@ def _calc_n(bhm, n):
     # *** Compute pi_n for next value of n
     #     For each angle J, compute pi_n+1
     #     from PI = pi_n , PI0 = pi_n-1
-
-    pi1  = ((2.0 * en + 1.0) * amu * pi - (en + 1.0) * pi0) / en
-    pi0  = pi
-
     pi1_ext = ((2.0 * en + 1.0) * 1.0 * pi_ext - (en + 1.0) * pi0_ext) / en
     pi0_ext = pi_ext
 
@@ -167,12 +158,6 @@ def _calculate(bhm, theta):
     indl90    = theta_rad < np.pi/2.0
     indg90    = theta_rad >= np.pi/2.0
 
-    s1    = np.zeros(shape(NA, NE, NTH), dtype='complex')
-    s2    = np.zeros(shape(NA, NE, NTH), dtype='complex')
-    pi    = np.zeros(shape(NA, NE, NTH), dtype='complex')
-    pi0   = np.zeros(shape(NA, NE, NTH), dtype='complex')
-    pi1   = np.zeros(shape(NA, NE, NTH), dtype='complex') + 1.0
-    tau   = np.zeros(shape(NA, NE, NTH), dtype='complex')
     amu   = np.abs(np.cos(theta_rad))
 
     #refrel = cm.rp(E) + 1j*cm.ip(E)
@@ -229,6 +214,9 @@ def _calculate(bhm, theta):
     pi1_ext = 1.0
     tau_ext = 0.0
 
+    # Set up for calculating Riccati-Bessel functions
+    # with real argument X, calculated by upward recursion
+    #
     for en in np.arange(np.max(nstop)) + 1:
         _calc_en(en)
     # ENDFOR
