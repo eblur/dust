@@ -20,18 +20,21 @@ class BHmie(object):
         self.S2 = np.zeros(shape=(NA, NE, 1))
         self.X  = (2.0 * np.pi * self.a) / self.E
 
-def calculte(bhm):
-    indl90 = np.array([])  # Empty arrays indicate that there are no theta values set
-    indg90 = np.array([])  # Do not have to check if theta != None throughout calculation
-    s1     = np.array([])
-    s2     = np.array([])
-    pi     = np.array([])
-    pi0    = np.array([])
-    pi1    = np.array([])
-    tau    = np.array([])
-    amu    = np.array([])
-
+def calculte(bhm, theta=np.array([0.0])):
     NA, NE = bhm.NA, bhm.NE
+    NTH = np.size(theta)
+    theta_rad = theta * c.arcs2rad
+
+    indl90    = theta_rad < np.pi/2.0
+    indg90    = theta_rad >= np.pi/2.0
+
+    s1    = np.zeros(shape(NA, NE, NTH), dtype='complex')
+    s2    = np.zeros(shape(NA, NE, NTH), dtype='complex')
+    pi    = np.zeros(shape(NA, NE, NTH), dtype='complex')
+    pi0   = np.zeros(shape(NA, NE, NTH), dtype='complex')
+    pi1   = np.zeros(shape(NA, NE, NTH), dtype='complex') + 1.0
+    tau   = np.zeros(shape(NA, NE, NTH), dtype='complex')
+    amu   = np.abs(np.cos(theta_rad))
 
     #refrel = cm.rp(E) + 1j*cm.ip(E)
     refrel  = bhm.cm.rp(bhm.E) + 1j*bhm.cm.ip(bhm.E)
@@ -41,7 +44,6 @@ def calculte(bhm):
     y      = x * refrel
     ymod   = np.abs(y)
     nx     = np.size(x)
-
 
     # *** Series expansion terminated after NSTOP terms
     # Logarithmic derivatives calculated from NMX on down
@@ -67,8 +69,8 @@ def calculte(bhm):
     an = np.zeros(shape=(NE, NA, nmx+1), dtype='complex')
     bn = np.zeros(shape=(NE, NA, nmx+1), dtype='complex')
 
-    ## Set up for calculating Riccati-Bessel functions
-    ## with real argument X, calculated by upward recursion
+    # Set up for calculating Riccati-Bessel functions
+    # with real argument X, calculated by upward recursion
     psi0 = np.cos(x)
     psi1 = np.sin(x)
     chi0 = -np.sin(x)
@@ -87,8 +89,6 @@ def calculte(bhm):
     pi0_ext = 0.0
     pi1_ext = 1.0
     tau_ext = 0.0
-
-    p = -1.0
 
     for en in np.arange(np.max(nstop)) + 1:
         # for given N, PSI  = psi_n        CHI  = chi_n
@@ -130,12 +130,10 @@ def calculte(bhm):
         # double( foo * complex(0.d0,-1.d0) ) with foo.imag
 
         bhm.qsca  += (2.0*en +1.0) * (np.abs(aterm)**2 + np.abs(bterm)**2)
-        bhm.gsca  += ((2.0*en+1.0) / (en*(en+1.0))) *
+        bhm.gsca  += ((2.0*en+1.0) / (en*(en+1.0))) * \
                      (aterm.real * bterm.real + aterm.imag * bterm.imag)
-        bhm.gsca  += ((en-1.0) * (en+1.0)/en) *
+        bhm.gsca  += ((en-1.0) * (en+1.0)/en) * \
                      (an1.real * an.real + an1.imag * an.imag + bn1.real * bn.real + bn1.imag * bn.imag)
-
-        ## **** LAST TOUCHED HERE (April 4, 2016) -- LIA
 
         # *** Now calculate scattering intensity pattern
         #     First do angles from 0 to 90
@@ -143,53 +141,28 @@ def calculte(bhm):
         # LIA : Altered the two loops below so that only the indices where ang
         # < 90 are used.  Replaced (j) with [indl90]
 
-        # Note also: If theta is specified, and np.size(E) > 1,
-        # the number of E values must match the number of theta
-        # values.  Cosmological halo functions will utilize this
-        # Diff this way.
+        fn_const = (2.0 * en + 1.0) / (en * (en + 1.0))
+        fn       = np.zeros(shape=(NA, NE)) + fn_const
+
+        indl90
 
         pi  = pi1
         tau = en * amu * pi - (en + 1.0) * pi0
 
-        if np.size(indl90) != 0:
-            antmp = an
-            bntmp = bn
-            if nx > 1:
-                antmp = an[indl90]
-                bntmp = bn[indl90]  # For case where multiple E and theta are specified
+        sign = np.ones(shape=(NA, NE, NTH))
+        sign[:, :, indg90] = -sign[:, :, indg90]
 
-            s1[indl90]  = s1[indl90] + fn* (antmp*pi[indl90]+bntmp*tau[indl90])
-            s2[indl90]  = s2[indl90] + fn* (antmp*tau[indl90]+bntmp*pi[indl90])
-        # ENDIF
+        s1 += fn * (an * pi + sign * bn * tau)
+        s2 += fn * (an * tau + sign * bn * pi)
 
         pi_ext = pi1_ext
-        tau_ext = en*1.0*pi_ext - (en+1.0)*pi0_ext
+        tau_ext = en * 1.0 * pi_ext - (en + 1.0) * pi0_ext
 
-        s1_ext = s1_ext + fn* (an*pi_ext+bn*tau_ext)
-        s2_ext = s2_ext + fn* (bn*pi_ext+an*tau_ext)
+        s1_ext = s1_ext + fn * (an * pi_ext + bn * tau_ext)
+        s2_ext = s2_ext + fn * (bn * pi_ext + an * tau_ext)
 
-        # *** Now do angles greater than 90 using PI and TAU from
-        #     angles less than 90.
-        #     P=1 for N=1,3,...; P=-1 for N=2,4,...
-
-        p = -p
-
-        # LIA : Previous code used tau(j) from the previous loop.  How do I
-        # get around this?
-
-        if np.size(indg90) != 0:
-            antmp = an
-            bntmp = bn
-            if nx > 1:
-                antmp = an[indg90]
-                bntmp = bn[indg90]  # For case where multiple E and theta are specified
-
-            s1[indg90]  = s1[indg90] + fn*p* (antmp*pi[indg90]-bntmp*tau[indg90])
-            s2[indg90]  = s2[indg90] + fn*p* (bntmp*pi[indg90]-antmp*tau[indg90])
-        # ENDIF
-
-        s1_back = s1_back + fn*p* (an*pi_ext-bn*tau_ext)
-        s2_back = s2_back + fn*p* (bn*pi_ext-an*tau_ext)
+        s1_back += fn * (an * pi_ext - bn * tau_ext)
+        s2_back += fn * (bn * pi_ext - an * tau_ext)
 
         psi0 = psi1
         psi1 = psi
@@ -201,21 +174,18 @@ def calculte(bhm):
         #     For each angle J, compute pi_n+1
         #     from PI = pi_n , PI0 = pi_n-1
 
-        pi1  = ( (2.0*en+1.0)*amu*pi- (en+1.0)*pi0 ) / en
+        pi1  = ((2.0 * en + 1.0) * amu * pi - (en + 1.0) * pi0) / en
         pi0  = pi
 
-        pi1_ext = ( (2.0*en+1.0)*1.0*pi_ext - (en+1.0)*pi0_ext ) / en
+        pi1_ext = ((2.0 * en + 1.0) * 1.0 * pi_ext - (en + 1.0) * pi0_ext) / en
         pi0_ext = pi_ext
 
     # ENDFOR
 
-# *** Have summed sufficient terms.
-#     Now compute QSCA,QEXT,QBACK,and GSCA
-gsca = 2.0 * gsca / qsca
-qsca = ( 2.0 / np.power(x,2) ) * qsca
+    # *** Have summed sufficient terms.
+    #     Now compute QSCA,QEXT,QBACK,and GSCA
+    gsca = 2.0 * gsca / qsca
+    qsca = (2.0 / x**2) * qsca
 
-# LIA : Changed qext to use s1(theta=0) instead of s1(1).  Why did the
-# original code use s1(1)?
-
-qext = ( 4.0 / np.power(x,2) ) * s1_ext.real
-qback = np.power( np.abs(s1_back)/x, 2) / np.pi
+    qext = (4.0 / x**2) * s1_ext.real
+    qback = (np.abs(s1_back)/x)**2 / np.pi
