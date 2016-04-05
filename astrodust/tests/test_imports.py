@@ -11,3 +11,6 @@ def test_extinction():
 
 def test_halos():
     import astrodust.halos
+
+def test_bhmie():
+    import astrodust.extinction.bhmie

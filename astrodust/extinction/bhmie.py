@@ -6,8 +6,8 @@ i.e. store S1 and S2 values according to E, a, and n
 import numpy as np
 from scipy.special import cbrt
 
-import constants as c
-import cmindex as cmi
+from astrodust import constants as c
+from astrodust.distlib.composition import cmindex as cmi
 
 class BHmie(object):
     def __init__(self, a, E, cm):
@@ -30,7 +30,7 @@ class BHmie(object):
         self.s1_ext   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.s2_ext   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.s1_back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
-        self.s2-back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.s2_back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.pi       = np.zeros(shape=(1, NA, NE, NTH), dtype='complex') + 1.0
         self.pi_ext   = np.ones(1)
         self.psi      = np.zeros(shape=(1, NA, NE))
@@ -110,9 +110,9 @@ def _calc_n(bhm, n):
 
     # Calculate AN and BN terms
     dslice = bhm.D[n, :, :]  # NA x NE
-    an  = ((dslice / refrel + en/x) * psi - psi1) /
+    an  = ((dslice / refrel + en/x) * psi - psi1) / \
           ((dslice/refrel + en/x) * xi - xi1)
-    bn  = ((refrel * dslice + en/x) * psi - psi1) /
+    bn  = ((refrel * dslice + en/x) * psi - psi1) / \
           ((refrel * dslice + en/x) * xi - xi1)
 
     bhm.an = np.stack([bhm.an, an], 0)  # stack along axis 0
