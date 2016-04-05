@@ -61,6 +61,14 @@ def _calc_D(bhm, y, NMX):
 
 def _calc_n(bhm, n):
     en = n + 1
+    NA, NE, NTH = bhm.NA, bhm.NE, len(bhm.theta)
+
+    theta_rad   = bhm.theta * c.arcs2rad
+    amu         = np.abs(np.cos(theta_rad))
+    indg90      = theta_rad >= np.pi/2.0
+
+    refrel      = bhm.cm.rp(bhm.E) + 1j*bhm.cm.ip(bhm.E)
+
     # for given N, PSI  = psi_n        CHI  = chi_n
     #              PSI1 = psi_{n-1}    CHI1 = chi_{n-1}
     #              PSI0 = psi_{n-2}    CHI0 = chi_{n-2}
@@ -105,10 +113,10 @@ def _calc_n(bhm, n):
 
     # Calculate AN and BN terms
     dslice = bhm.D[n, :, :]  # NA x NE
-    an  = ((dslice / refrel + en/x) * psi - psi1) / \
-          ((dslice/refrel + en/x) * xi - xi1)
-    bn  = ((refrel * dslice + en/x) * psi - psi1) / \
-          ((refrel * dslice + en/x) * xi - xi1)
+    an  = ((dslice/refrel + en/bhm.X) * psi - psi1) / \
+          ((dslice/refrel + en/bhm.X) * xi - xi1)
+    bn  = ((refrel * dslice + en/bhm.X) * psi - psi1) / \
+          ((refrel * dslice + en/bhm.X) * xi - xi1)
 
     bhm.an = np.stack([bhm.an, an], 0)  # stack along axis 0
     bhm.bn = np.stack([bhm.bn, bn], 0)
@@ -165,13 +173,7 @@ def _calc_n(bhm, n):
 def _calculate(bhm, theta):
 
     NA, NE = bhm.NA, bhm.NE
-    NTH = np.size(theta)
-    theta_rad = theta * c.arcs2rad
-
-    indl90    = theta_rad < np.pi/2.0
-    indg90    = theta_rad >= np.pi/2.0
-
-    amu   = np.abs(np.cos(theta_rad))
+    theta_rad = bhm.theta * c.arcs2rad
 
     #refrel = cm.rp(E) + 1j*cm.ip(E)
     refrel  = bhm.cm.rp(bhm.E) + 1j*bhm.cm.ip(bhm.E)
@@ -180,7 +182,6 @@ def _calculate(bhm, theta):
     x      = bhm.X
     y      = x * refrel
     ymod   = np.abs(y)
-    nx     = np.size(x)
 
     # *** Series expansion terminated after NSTOP terms
     # Logarithmic derivatives calculated from NMX on down
