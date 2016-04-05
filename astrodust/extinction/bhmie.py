@@ -40,7 +40,9 @@ class BHmie(object):
         self.an  = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.bn  = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.D   = _calc_D(bhm)  # nmx x NA x NE
-
+        self.qsca = 0.0
+        self.gsca = 0.0
+        self.tau_ext = 0.0
         _calculate(self, theta)
 
 def _calc_D(bhm):
@@ -184,47 +186,11 @@ def _calculate(bhm, theta):
 
     nstop  = xstop  # Why are we doing this?
 
-    # *** Logarithmic derivative D(J) calculated by downward recurrence
-    # beginning with initial value (0.,0.) at J=NMX
-
-    d = np.zeros(shape=(NA, NE, nmx+1), dtype='complex')
-    # Original code set size to nmxx.
-    # I see that the array only needs to be slightly larger than nmx
-
-    for n in np.arange(nmx-1)+1:  # for n=1, nmx-1 do begin
-        en = nmx - n + 1
-        d[:, :, nmx-n]  = (en/y) - (1.0 / (d[:, :, nmx-n+1] + en/y))
-
-    an = np.zeros(shape=(NE, NA, nmx+1), dtype='complex')
-    bn = np.zeros(shape=(NE, NA, nmx+1), dtype='complex')
-
-    # Set up for calculating Riccati-Bessel functions
-    # with real argument X, calculated by upward recursion
-    psi0 = np.cos(x)
-    psi1 = np.sin(x)
-    chi0 = -np.sin(x)
-    chi1 = np.cos(x)
-    xi1  = psi1 - 1j * chi1
-
-    qsca = 0.0
-    gsca = 0.0
-
-    s1_ext = 0.0
-    s2_ext = 0.0
-    s1_back = 0.0
-    s2_back = 0.0
-
-    pi_ext  = 0.0
-    pi0_ext = 0.0
-    pi1_ext = 1.0
-    tau_ext = 0.0
-
     # Set up for calculating Riccati-Bessel functions
     # with real argument X, calculated by upward recursion
     #
     for n in np.arange(np.max(nstop)) + 1:
         _calc_n(n)
-    # ENDFOR
 
     # *** Augment sums for Qsca and g=<cos(theta)>
     # NOTE from LIA: In IDL version, bhmie casts double(an)
@@ -238,11 +204,19 @@ def _calculate(bhm, theta):
     #### *** LAST TOUCHED April 4, 2015
     # note that s1, s2, s1_ext, s2_ext, and other things need to be summed
 
+    NIND     = bhm.S1.shape[0]
+    inds     = np.tile(np.arange(NIND), (NA, NE, 1)).T  # n x NA x NE
+    a2_b2    = np.abs(bhm.an)**2 + np.abs(bhm.bn)**2
+    mult     = (2.0 * inds + 1.0)
+    bhm.qsca = np.sum(mult * a2_b2, 0)
+
+    '''
     bhm.qsca  += (2.0*en +1.0) * (np.abs(an)**2 + np.abs(bn)**2)
     bhm.gsca  += ((2.0*en+1.0) / (en*(en+1.0))) * \
                  (an.real * bn.real + an.imag * bn.imag)
     bhm.gsca  += ((en-1.0) * (en+1.0)/en) * \
                  (an1.real * an.real + an1.imag * an.imag + bn1.real * bn.real + bn1.imag * bn.imag)
+    '''
 
     # *** Now calculate scattering intensity pattern
     #     First do angles from 0 to 90
