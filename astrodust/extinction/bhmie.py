@@ -15,8 +15,8 @@ class BHmie(object):
         self.a  = np.tile(a, (NE, 1))
         self.E  = np.tile(E, (NA, 1)).T
         self.cm = cm  # complex index of refraction
-        self.NA = len(a)
-        self.NE = len(E)
+        self.NA = np.size(a)
+        self.NE = np.size(E)
         self.X  = (2.0 * np.pi * self.a) / self.E
         self.qsca = 0.0
         self.qext = 0.0
@@ -50,13 +50,10 @@ class BHmie(object):
 def _calc_D(bhm, y, NMX):
     # *** Logarithmic derivative D(J) calculated by downward recurrence
     # beginning with initial value (0.,0.) at J=NMX
-
     d = np.zeros(shape=(NMX+1, bhm.NA, bhm.NE), dtype='complex')
-
     for n in np.arange(NMX-1)+1:  # for n=1, nmx-1 do begin
         en = NMX - n + 1
         d[NMX-n, :, :]  = (en/y) - (1.0 / (d[NMX-n+1, :, :] + en/y))
-
     return d
 
 def _calc_n(bhm, n):
@@ -173,12 +170,8 @@ def _calc_n(bhm, n):
 def _calculate(bhm, theta):
 
     NA, NE = bhm.NA, bhm.NE
-    theta_rad = bhm.theta * c.arcs2rad
-
-    #refrel = cm.rp(E) + 1j*cm.ip(E)
     refrel  = bhm.cm.rp(bhm.E) + 1j*bhm.cm.ip(bhm.E)
 
-    #x      = ( 2.0 * np.pi * a*c.micron2cm ) / ( c.hc/E  )
     x      = bhm.X
     y      = x * refrel
     ymod   = np.abs(y)
