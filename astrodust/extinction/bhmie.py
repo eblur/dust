@@ -31,10 +31,11 @@ class BHmie(object):
         self.s2_ext   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.s1_back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.s2-back  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
-        self.pi   = np.zeros(shape=(1, NA, NE, NTH), dtype='complex') + 1.0
-        self.psi  = np.zeros(shape=(1, NA, NE))
-        self.chi  = np.zeros(shape=(1, NA, NE))
-        self.xi   = np.zeros(shape=(1, NA, NE), dtype='complex')
+        self.pi       = np.zeros(shape=(1, NA, NE, NTH), dtype='complex') + 1.0
+        self.pi_ext   = np.ones(1)
+        self.psi      = np.zeros(shape=(1, NA, NE))
+        self.chi      = np.zeros(shape=(1, NA, NE))
+        self.xi       = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.tau = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.an  = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.bn  = np.zeros(shape=(1, NA, NE), dtype='complex')
@@ -72,6 +73,8 @@ def _calc_n(bhm, n):
         chi1 = np.cos(bhm.X)
         pi0  = np.zeros(shape=(NA, NE, NTH), dtype='complex')
         pi   = bhm.pi[n, :, :]
+        pi_ext  = bhm.pi_ext[0]
+        pi0_ext = 0.0
     if n == 1:
         psi0 = np.sin(bhm.X)
         psi1 = bhm.psi[n-1, :, :]
@@ -79,6 +82,8 @@ def _calc_n(bhm, n):
         chi1 = bhm.chi[n-1, :, :]
         pi0  = bhm.pi[n-1, :, :, :]
         pi   = ((2.0*n+1.0)*amu*pi0) / n
+        pi_ext  = bhm.pi_ext[n]
+        pi0_ext = bhm.pi_ext[n-1]
     else:
         psi0 = bhm.psi[n-2, :, :]
         psi1 = bhm.psi[n-1, :, :]
@@ -86,6 +91,8 @@ def _calc_n(bhm, n):
         chi1 = bhm.chi[n-1, :, :]
         pi0  = bhm.pi[n-1, :, :, :]
         pi   = ((2.0*n+1.0)*amu*pi0-(n+1.0)*bhm.pi[n-2, :, :]) / n
+        pi_ext  = bhm.pi_ext[n]
+        pi0_ext = bhm.pi_ext[n-1]
 
     psi = (2.0*en-1.0) * psi1/bhm.X - psi0
     chi = (2.0*en-1.0) * chi1/bhm.X - chi0
@@ -119,7 +126,6 @@ def _calc_n(bhm, n):
     s1n = fn * (an * pi + sign * bn * tau)
     s2n = fn * (an * tau + sign * bn * pi)
 
-    pi_ext = pi1_ext
     tau_ext = en * 1.0 * pi_ext - (en + 1.0) * pi0_ext
 
     s1_ext_n = fn * (an * pi_ext + bn * tau_ext)
@@ -128,11 +134,6 @@ def _calc_n(bhm, n):
     s1_back_n = fn * (an * pi_ext - bn * tau_ext)
     s2_back_n = fn * (bn * pi_ext - an * tau_ext)
 
-    # *** Compute pi_n for next value of n
-    #     For each angle J, compute pi_n+1
-    #     from PI = pi_n , PI0 = pi_n-1
-    pi1_ext = ((2.0 * en + 1.0) * 1.0 * pi_ext - (en + 1.0) * pi0_ext) / en
-    pi0_ext = pi_ext
 
     # Stack everything onto the BHmie object along axis 0
     bhm.S1 = np.stack([bhm.S1, s1n], 0)
@@ -147,6 +148,10 @@ def _calc_n(bhm, n):
     bhm.chi = np.stack([bhm.chi, chi], 0)
     bhm.xi  = np.stack([bhm.xi, xi], 0)
     bhm.tau = np.stack([bhm.tau, tau], 0)
+
+    bhm.pi_ext = np.append(bhm.pi_ext,
+                           ((2.0 * en + 1.0) * 1.0 * pi_ext - (en + 1.0) * pi0_ext) / en)
+
     return
 
 def _calculate(bhm, theta):
@@ -217,8 +222,8 @@ def _calculate(bhm, theta):
     # Set up for calculating Riccati-Bessel functions
     # with real argument X, calculated by upward recursion
     #
-    for en in np.arange(np.max(nstop)) + 1:
-        _calc_en(en)
+    for n in np.arange(np.max(nstop)) + 1:
+        _calc_n(n)
     # ENDFOR
 
     # *** Augment sums for Qsca and g=<cos(theta)>
@@ -233,9 +238,9 @@ def _calculate(bhm, theta):
     #### *** LAST TOUCHED April 4, 2015
     # note that s1, s2, s1_ext, s2_ext, and other things need to be summed
 
-    bhm.qsca  += (2.0*en +1.0) * (np.abs(aterm)**2 + np.abs(bterm)**2)
+    bhm.qsca  += (2.0*en +1.0) * (np.abs(an)**2 + np.abs(bn)**2)
     bhm.gsca  += ((2.0*en+1.0) / (en*(en+1.0))) * \
-                 (aterm.real * bterm.real + aterm.imag * bterm.imag)
+                 (an.real * bn.real + an.imag * bn.imag)
     bhm.gsca  += ((en-1.0) * (en+1.0)/en) * \
                  (an1.real * an.real + an1.imag * an.imag + bn1.real * bn.real + bn1.imag * bn.imag)
 
