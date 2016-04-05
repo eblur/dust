@@ -41,7 +41,9 @@ class BHmie(object):
         self.bn  = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.D   = _calc_D(bhm)  # nmx x NA x NE
         self.qsca = 0.0
+        self.qext = 0.0
         self.gsca = 0.0
+        self.gsca_terms = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.tau_ext = 0.0
         _calculate(self, theta)
 
@@ -122,6 +124,7 @@ def _calc_n(bhm, n):
 
     tau = en * amu * pi - (en + 1.0) * pi0
 
+    # Deal with angles > 90 degrees
     sign = np.ones(shape=(NA, NE, NTH))
     sign[:, :, indg90] = -sign[:, :, indg90]
 
@@ -154,6 +157,14 @@ def _calc_n(bhm, n):
     bhm.pi_ext = np.append(bhm.pi_ext,
                            ((2.0 * en + 1.0) * 1.0 * pi_ext - (en + 1.0) * pi0_ext) / en)
 
+    # This sum is ridiculous so I'm going to do it here
+    gsca = ((2.0 * en + 1.0) / (en * (en+1.0))) * \
+           (an.real * bn.real + an.imag * bn.imag)
+    if n > 0:
+        gsca += ((en-1.0) * (en+1.0) / en) * \
+                (an1.real * an.real + an1.imag * an.imag + \
+                 bn1.real * bn.real + bn1.imag * bn.imag)
+    bhm.gsca_term = np.stack([bhm.gsca_term, gsca], 0)
     return
 
 def _calculate(bhm, theta):
@@ -205,29 +216,14 @@ def _calculate(bhm, theta):
     # note that s1, s2, s1_ext, s2_ext, and other things need to be summed
 
     NIND     = bhm.S1.shape[0]
-    inds     = np.tile(np.arange(NIND), (NA, NE, 1)).T  # n x NA x NE
-    a2_b2    = np.abs(bhm.an)**2 + np.abs(bhm.bn)**2
-    mult     = (2.0 * inds + 1.0)
-    bhm.qsca = np.sum(mult * a2_b2, 0)
+    EN       = np.tile(np.arange(NIND)+1, (NA, NE, 1)).T  # n x NA x NE
+    a2_b2    = (2.0 * EN + 1.0) * (np.abs(bhm.an)**2 + np.abs(bhm.bn)**2)
+    bhm.qsca = (2.0 / x**2) * np.sum(a2_b2, 0)
 
-    '''
-    bhm.qsca  += (2.0*en +1.0) * (np.abs(an)**2 + np.abs(bn)**2)
-    bhm.gsca  += ((2.0*en+1.0) / (en*(en+1.0))) * \
-                 (an.real * bn.real + an.imag * bn.imag)
-    bhm.gsca  += ((en-1.0) * (en+1.0)/en) * \
-                 (an1.real * an.real + an1.imag * an.imag + bn1.real * bn.real + bn1.imag * bn.imag)
-    '''
+    bhm.gsca  = 2.0 * np.sum(bhm.gsca_terms, 0) / bhm.qsca
 
-    # *** Now calculate scattering intensity pattern
-    #     First do angles from 0 to 90
+    bhm.qext  = (4.0 / x**2) * np.sum(bhm.s1_ext.real, 0)
 
-    # LIA : Altered the two loops below so that only the indices where ang
-    # < 90 are used.  Replaced (j) with [indl90]
-
-    # *** Have summed sufficient terms.
-    #     Now compute QSCA,QEXT,QBACK,and GSCA
-    gsca = 2.0 * gsca / qsca
-    qsca = (2.0 / x**2) * qsca
-
-    qext = (4.0 / x**2) * s1_ext.real
-    qback = (np.abs(s1_back)/x)**2 / np.pi
+    backterm  = np.sum(np.abs(bhm.s1_back), 0)
+    bhm.qback = (backterm/bhm.X)**2 / np.pi
+    return
