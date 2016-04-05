@@ -39,7 +39,7 @@ class BHmie(object):
         self.tau = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.an  = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.bn  = np.zeros(shape=(1, NA, NE), dtype='complex')
-        self.D   = _calc_D(bhm)  # nmx x NA x NE
+        self.D     = 0.0  # will be nmx x NA x NE
         self.qsca  = 0.0
         self.qext  = 0.0
         self.qback = 0.0
@@ -47,20 +47,15 @@ class BHmie(object):
         self.gsca_terms = np.zeros(shape=(1, NA, NE), dtype='complex')
         _calculate(self, theta)
 
-def _calc_D(bhm):
+def _calc_D(bhm, y, NMX):
     # *** Logarithmic derivative D(J) calculated by downward recurrence
     # beginning with initial value (0.,0.) at J=NMX
 
-    xstop  = bhm.X + 4.0 * cbrt(bhm.X) + 2.0
-    test   = np.append(xstop, ymod)
-    nmx    = np.max(test) + 15
-    nmx    = np.int32(nmx)  # maximum number of iterations
+    d = np.zeros(shape=(NMX+1, bhm.NA, bhm.NE), dtype='complex')
 
-    d = np.zeros(shape=(nmx+1, bhm.NA, bhm.NE), dtype='complex')
-
-    for n in np.arange(nmx-1)+1:  # for n=1, nmx-1 do begin
-        en = nmx - n + 1
-        d[nmx-n, :, :]  = (en/y) - (1.0 / (d[nmx-n+1, :, :] + en/y))
+    for n in np.arange(NMX-1)+1:  # for n=1, nmx-1 do begin
+        en = NMX - n + 1
+        d[NMX-n, :, :]  = (en/y) - (1.0 / (d[NMX-n+1, :, :] + en/y))
 
     return d
 
@@ -200,6 +195,7 @@ def _calculate(bhm, theta):
     # Set up for calculating Riccati-Bessel functions
     # with real argument X, calculated by upward recursion
     #
+    bhm.D = _calc_D(bhm, y, nmx)
     for n in np.arange(np.max(nstop)) + 1:
         _calc_n(n)
 
