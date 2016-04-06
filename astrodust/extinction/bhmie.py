@@ -13,6 +13,10 @@ class BHmie(object):
         NA, NE = np.size(a), np.size(E)
         self.a  = np.tile(a, (NE, 1)).T
         self.E  = np.tile(E, (NA, 1))
+        # a quick check
+        assert np.sum(self.a[:,0] - a) == 0
+        assert np.sum(self.E[0,:] - E) == 0
+
         self.cm = cm  # complex index of refraction
         self.NA = NA
         self.NE = NE
@@ -66,9 +70,13 @@ def _calc_n(bhm, n):
     NA, NE, NTH = bhm.NA, bhm.NE, len(bhm.theta)
 
     theta_rad   = bhm.theta * c.arcs2rad
-    amu         = np.abs(np.cos(theta_rad))
-    amu_tiled   = np.tile(amu.reshape((1, 1, NTH)), (NA, NE, 1))
     indg90      = theta_rad >= np.pi/2.0
+
+    amu         = np.abs(np.cos(theta_rad))
+    amu_tiled  = np.repeat(np.repeat(amu.reshape((1,1,NTH)), NA, axis=0),
+                           NE, axis=1)
+    # a quick test
+    assert np.sum(amu_tiled[0,0,:] - amu) == 0
 
     refrel      = bhm.cm.rp(bhm.E) + 1j*bhm.cm.ip(bhm.E)
 
@@ -134,8 +142,12 @@ def _calc_n(bhm, n):
     sign = np.ones(shape=(NA, NE, NTH))
     sign[:, :, indg90] = -sign[:, :, indg90]
 
-    an_tiled = np.tile(an.reshape(NA, NE, 1), (1, 1, NTH))
-    bn_tiled = np.tile(bn.reshape(NA, NE, 1), (1, 1, NTH))
+    an_tiled = np.repeat(an.reshape(NA, NE, 1), NTH, axis=2)
+    bn_tiled = np.repeat(bn.reshape(NA, NE, 1), NTH, axis=2)
+    # make sure its doing what I want
+    assert np.sum(an_tiled[:,:,0] - an) == 0
+    assert np.sum(bn_tiled[:,:,0] - bn) == 0
+
     s1n = fn * (an_tiled * pi + sign * bn_tiled * tau)
     s2n = fn * (an_tiled * tau + sign * bn_tiled * pi)
 
@@ -146,7 +158,6 @@ def _calc_n(bhm, n):
 
     s1_back_n = fn * (an * pi_ext - bn * tau_ext)
     s2_back_n = fn * (bn * pi_ext - an * tau_ext)
-
 
     # The following are just additive so we don't need to stor
     bhm.S1      += s1n
@@ -203,8 +214,12 @@ def _calculate(bhm, theta):
     for n in np.arange(np.max(nstop)):
         _calc_n(bhm, n)
 
-    NIND     = bhm.an.shape[0]
-    EN       = np.tile(np.arange(NIND)+1, (NE, NA, 1)).T  # n x NA x NE
+    NN   = bhm.an.shape[0]
+    inds = np.arange(bhm.an.shape[0]) + 1.0
+    EN   = np.repeat(np.repeat(inds.reshape(NN,1,1), NA, axis=1), NE, axis=2)
+    assert np.sum(EN[:,0,0] - inds) == 0
+    assert np.sum(EN[0,:,:] - 1.0) == 0  # make sure that the first layer is all ones
+
     a2_b2    = (2.0 * EN + 1.0) * (np.abs(bhm.an)**2 + np.abs(bhm.bn)**2)
     bhm.Qsca = (2.0 / x**2) * np.sum(a2_b2, 0)
 
