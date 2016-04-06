@@ -24,14 +24,17 @@ class BHmie(object):
 
     def calculate(self, theta=np.array([0.0])):
         NA, NE, NTH = self.NA, self.NE, np.size(theta)
+        # Angular stuff
         self.theta = theta
         self.NTH   = NTH
-        self.S1       = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
-        self.S2       = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
-        self.s1_ext   = np.zeros(shape=(1, NA, NE), dtype='complex')
-        self.s2_ext   = np.zeros(shape=(1, NA, NE), dtype='complex')
-        self.s1_back  = np.zeros(shape=(1, NA, NE), dtype='complex')
-        self.s2_back  = np.zeros(shape=(1, NA, NE), dtype='complex')
+        # Additive stuff
+        self.S1      = np.zeros(shape=(NA, NE, NTH), dtype='complex')
+        self.S2      = np.zeros(shape=(NA, NE, NTH), dtype='complex')
+        self.s1_ext  = np.zeros(shape=(NA, NE), dtype='complex')
+        self.s2_ext  = np.zeros(shape=(NA, NE), dtype='complex')
+        self.s1_back = np.zeros(shape=(NA, NE), dtype='complex')
+        self.s2_back = np.zeros(shape=(NA, NE), dtype='complex')
+        # Stuff that needs to be referenced to calculate new terms
         self.pi       = np.zeros(shape=(1, NA, NE, NTH), dtype='complex') + 1.0
         self.tau      = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.pi_ext   = np.array([1.0])
@@ -40,13 +43,15 @@ class BHmie(object):
         self.xi       = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.an       = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.bn       = np.zeros(shape=(1, NA, NE), dtype='complex')
+        self.gsca_terms = np.zeros(shape=(1, NA, NE), dtype='complex')
+        # Scalars
         self.D     = 0.0  # will be nmx x NA x NE
         self.qsca  = 0.0
         self.qext  = 0.0
         self.qback = 0.0
         self.gsca  = 0.0
-        self.gsca_terms = np.zeros(shape=(1, NA, NE), dtype='complex')
         _calculate(self, theta)
+        #self.diff = _calc_diff(self)
 
 def _calc_D(bhm, y, NMX):
     # *** Logarithmic derivative D(J) calculated by downward recurrence
@@ -144,14 +149,16 @@ def _calc_n(bhm, n):
     s2_back_n = fn * (bn * pi_ext - an * tau_ext)
 
 
-    # Stack everything onto the BHmie object along axis 0
-    bhm.S1 = np.concatenate([bhm.S1, s1n.reshape(1,NA,NE,NTH)], 0)
-    bhm.S2 = np.concatenate([bhm.S2, s2n.reshape(1,NA,NE,NTH)], 0)
-    bhm.s1_ext = np.concatenate([bhm.s1_ext, s1_ext_n.reshape(1,NA,NE)], 0)
-    bhm.s2_ext = np.concatenate([bhm.s2_ext, s2_ext_n.reshape(1,NA,NE)], 0)
-    bhm.s1_back = np.concatenate([bhm.s1_back, s1_back_n.reshape(1,NA,NE)], 0)
-    bhm.s2_back = np.concatenate([bhm.s2_back, s2_back_n.reshape(1,NA,NE)], 0)
+    # The following are just additive so we don't need to stor
+    bhm.S1      += s1n
+    bhm.S2      += s2n
+    bhm.s1_ext  += s1_ext_n
+    bhm.s2_ext  += s2_ext_n
+    bhm.s1_back += s1_back_n
+    bhm.s2_back += s2_back_n
 
+    # Stack these terms onto the BHmie object along axis 0,
+    # because they need to be referenced later
     bhm.pi  = np.concatenate([bhm.pi, pi.reshape(1,NA,NE,NTH)], 0)
     bhm.tau = np.concatenate([bhm.tau, tau.reshape(1,NA,NE,NTH)], 0)
     bhm.psi = np.concatenate([bhm.psi, psi.reshape(1,NA,NE)], 0)
@@ -197,15 +204,28 @@ def _calculate(bhm, theta):
     for n in np.arange(np.max(nstop)):
         _calc_n(bhm, n)
 
-    NIND     = bhm.S1.shape[0]
+    NIND     = bhm.an.shape[0]
     EN       = np.tile(np.arange(NIND)+1, (NE, NA, 1)).T  # n x NA x NE
     a2_b2    = (2.0 * EN + 1.0) * (np.abs(bhm.an)**2 + np.abs(bhm.bn)**2)
     bhm.qsca = (2.0 / x**2) * np.sum(a2_b2, 0)
 
     bhm.gsca  = 2.0 * np.sum(bhm.gsca_terms, 0) / bhm.qsca
 
-    bhm.qext  = (4.0 / x**2) * np.sum(bhm.s1_ext.real, 0)
+    bhm.qext  = (4.0 / x**2) * bhm.s1_ext.real
 
-    backterm  = np.sum(np.abs(bhm.s1_back), 0)
-    bhm.qback = (backterm/x)**2 / np.pi
+    bhm.qback = (np.abs(bhm.s1_back) / x)**2 / np.pi
     return
+
+'''def _calc_diff(bhm):
+    """
+    Calculate differential scattering cross section for given angles
+    Returns in units of steridian^-1
+    """
+    theta_rad = bhm.theta * c.arcs2rad
+    bad_theta = theta_rad > np.pi  # Set to 0 values where theta > !pi
+
+    bhm.S1[:, :, :, bad_theta] = 0.0
+    bhm.S2[:, :, :, bad_theta] = 0.0
+    a2_b2 = (np.abs(bhm.an)**2 + np.abs(bhm.bn)**2)
+    return 0.5 * np.sum(a2_b2, 0) / (np.pi * x*x)
+    return dQ * cgeo'''
