@@ -17,8 +17,8 @@ class BHmie(object):
         self.NA = NA
         self.NE = NE
         self.X  = (2.0 * np.pi * self.a) / self.E
-        self.qsca = 0.0
-        self.qext = 0.0
+        self.Qsca = 0.0
+        self.Qext = 0.0
         self.gsca = 0.0
 
     def calculate(self, theta=np.array([0.0])):
@@ -45,12 +45,12 @@ class BHmie(object):
         self.gsca_terms = np.zeros(shape=(1, NA, NE), dtype='complex')
         # Scalars
         self.D     = 0.0  # will be nmx x NA x NE
-        self.qsca  = 0.0
-        self.qext  = 0.0
-        self.qback = 0.0
+        self.Qsca  = 0.0
+        self.Qext  = 0.0
+        self.Qback = 0.0
         self.gsca  = 0.0
         _calculate(self, theta)
-        self.diff = _calc_diff(self)
+        self.Diff = _calc_diff(self)
 
 def _calc_D(bhm, y, NMX):
     # *** Logarithmic derivative D(J) calculated by downward recurrence
@@ -206,26 +206,32 @@ def _calculate(bhm, theta):
     NIND     = bhm.an.shape[0]
     EN       = np.tile(np.arange(NIND)+1, (NE, NA, 1)).T  # n x NA x NE
     a2_b2    = (2.0 * EN + 1.0) * (np.abs(bhm.an)**2 + np.abs(bhm.bn)**2)
-    bhm.qsca = (2.0 / x**2) * np.sum(a2_b2, 0)
+    bhm.Qsca = (2.0 / x**2) * np.sum(a2_b2, 0)
 
-    bhm.gsca  = 2.0 * np.sum(bhm.gsca_terms, 0) / bhm.qsca
+    bhm.gsca  = 2.0 * np.sum(bhm.gsca_terms, 0) / bhm.Qsca
 
-    bhm.qext  = (4.0 / x**2) * bhm.s1_ext.real
+    bhm.Qext  = (4.0 / x**2) * bhm.s1_ext.real
 
-    bhm.qback = (np.abs(bhm.s1_back) / x)**2 / np.pi
+    bhm.Qback = (np.abs(bhm.s1_back) / x)**2 / np.pi
     return
 
 def _calc_diff(bhm):
     """
     Calculate differential scattering cross section for given angles
-    Returns in units of steridian^-1
+    Returns in units of cm^2 steridian^-1
     """
     NA, NE, NTH = bhm.NA, bhm.NE, bhm.NTH
     x_tile = np.repeat(bhm.X.reshape(NA, NE, 1), NTH, axis=2)
     s1_s2  = np.abs(bhm.S1)**2 + np.abs(bhm.S2)**2
 
+    # Geometric cross section, in cm^2
+    cgeo = np.pi * (bhm.a * c.micron2cm)**2  # NA x NE
+    cgeo_tile = np.repeat(cgeo.reshape(NA, NE, 1), NTH, axis=2)
+
     # for debugging
     if bhm.NTH > 1:
         assert np.sum(x_tile[:,:,0] - x_tile[:,:,1]) == 0
+        assert np.sum(cgeo_tile[:,:,0] - cgeo_tile[:,:,1]) == 0
 
-    return (0.5 * s1_s2) / (np.pi * x_tile**2)
+    dQ = (0.5 * s1_s2) / (np.pi * x_tile**2)
+    return dQ * cgeo_tile
