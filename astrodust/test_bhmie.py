@@ -21,7 +21,7 @@ def test_bhmie_instance(vals):
 @pytest.mark.parametrize('vals',[[A1, E1],[A1,ELIST],[ALIST,E1],[ALIST,ELIST]])
 def test_BHmie_calculate(vals):
     a, e = vals
-    #print("NA = %d, NE = %d, NTH = 1" % (np.size(a), np.size(e)))
+    print("NA = %d, NE = %d, NTH = 1" % (np.size(a), np.size(e)))
     bhobj = BHmie(a, e, cmi.CmSilicate())
     bhobj.calculate()
     assert bhobj.qsca.shape == bhobj.X.shape
@@ -30,7 +30,10 @@ def test_BHmie_calculate(vals):
 @pytest.mark.parametrize('vals',[[A1, E1],[A1,ELIST],[ALIST,E1],[ALIST,ELIST]])
 def test_BHmie_calculate_theta(vals):
     a, e  = vals
+    print("NA = %d, NE = %d, NTH = %d" %
+          (np.size(a), np.size(e), np.size(THLIST)))
     bhobj = BHmie(a, e, cmi.CmSilicate())
     bhobj.calculate(THLIST)
     assert bhobj.qsca.shape == bhobj.X.shape
     assert bhobj.S1.shape == (bhobj.NA, bhobj.NE, bhobj.NTH)
+    assert bhobj.diff.shape == (bhobj.NA, bhobj.NE, bhobj.NTH)

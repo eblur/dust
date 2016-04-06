@@ -7,7 +7,6 @@ import numpy as np
 from scipy.special import cbrt
 
 from astrodust import constants as c
-from astrodust.distlib.composition import cmindex as cmi
 
 class BHmie(object):
     def __init__(self, a, E, cm):
@@ -51,7 +50,7 @@ class BHmie(object):
         self.qback = 0.0
         self.gsca  = 0.0
         _calculate(self, theta)
-        #self.diff = _calc_diff(self)
+        self.diff = _calc_diff(self)
 
 def _calc_D(bhm, y, NMX):
     # *** Logarithmic derivative D(J) calculated by downward recurrence
@@ -216,16 +215,17 @@ def _calculate(bhm, theta):
     bhm.qback = (np.abs(bhm.s1_back) / x)**2 / np.pi
     return
 
-'''def _calc_diff(bhm):
+def _calc_diff(bhm):
     """
     Calculate differential scattering cross section for given angles
     Returns in units of steridian^-1
     """
-    theta_rad = bhm.theta * c.arcs2rad
-    bad_theta = theta_rad > np.pi  # Set to 0 values where theta > !pi
+    NA, NE, NTH = bhm.NA, bhm.NE, bhm.NTH
+    x_tile = np.repeat(bhm.X.reshape(NA, NE, 1), NTH, axis=2)
+    s1_s2  = np.abs(bhm.S1)**2 + np.abs(bhm.S2)**2
 
-    bhm.S1[:, :, :, bad_theta] = 0.0
-    bhm.S2[:, :, :, bad_theta] = 0.0
-    a2_b2 = (np.abs(bhm.an)**2 + np.abs(bhm.bn)**2)
-    return 0.5 * np.sum(a2_b2, 0) / (np.pi * x*x)
-    return dQ * cgeo'''
+    # for debugging
+    if bhm.NTH > 1:
+        assert np.sum(x_tile[:,:,0] - x_tile[:,:,1]) == 0
+
+    return (0.5 * s1_s2) / (np.pi * x_tile**2)
