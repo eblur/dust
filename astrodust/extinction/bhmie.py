@@ -8,6 +8,8 @@ from scipy.special import cbrt
 
 from astrodust import constants as c
 
+__all__ = ['BHmie']
+
 class BHmie(object):
     def __init__(self, a, E, cm):
         NA, NE = np.size(a), np.size(E)
