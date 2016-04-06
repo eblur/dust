@@ -17,6 +17,6 @@ def test_bhmie_instance(vals):
     bhobj = BHmie(a, e, cmi.CmSilicate())
     assert bhobj.E.shape == bhobj.a.shape
 
-'''def test_one_grainsize():
+def test_one_grainsize():
     bhobj = BHmie(A1, ELIST, cmi.CmSilicate())
-    bhobj.calculate()'''
+    bhobj.calculate(theta=np.linspace(0.0, 20.0, 5))
