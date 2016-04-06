@@ -17,6 +17,10 @@ def test_bhmie_instance(vals):
     bhobj = BHmie(a, e, cmi.CmSilicate())
     assert bhobj.E.shape == bhobj.a.shape
 
-def test_one_grainsize():
-    bhobj = BHmie(A1, ELIST, cmi.CmSilicate())
-    bhobj.calculate(theta=np.linspace(0.0, 20.0, 5))
+@pytest.mark.parametrize('vals',[[A1, E1],[A1,ELIST],[ALIST,E1],[ALIST,ELIST]])
+def test_BHmie_calculate(vals):
+    a, e = vals
+    print("NA = %d, NE = %d, NTH = 1" % (np.size(a), np.size(e)))
+    bhobj = BHmie(a, e, cmi.CmSilicate())
+    bhobj.calculate()
+    assert bhobj.qsca.shape == bhobj.X.shape

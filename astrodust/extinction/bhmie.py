@@ -1,6 +1,6 @@
 """
-bhmie.py -- Compute Mie scattering with Bohren & Huffman (1983) algorithm, with caching
-i.e. store S1 and S2 values according to E, a, and n
+bhmie.py -- Compute Mie scattering with Bohren & Huffman (1983) algorithm,
+  with some caching (store S1 and S2 values according to E, a, and n)
 """
 
 import numpy as np
@@ -23,10 +23,11 @@ class BHmie(object):
         self.gsca = 0.0
 
     def calculate(self, theta=np.array([0.0])):
-        NA, NE, NTH = self.NA, self.NE, len(theta)
+        NA, NE, NTH = self.NA, self.NE, np.size(theta)
         self.theta = theta
-        self.S1  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
-        self.S2  = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.NTH   = NTH
+        self.S1       = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
+        self.S2       = np.zeros(shape=(1, NA, NE, NTH), dtype='complex')
         self.s1_ext   = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.s2_ext   = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.s1_back  = np.zeros(shape=(1, NA, NE), dtype='complex')
@@ -37,8 +38,8 @@ class BHmie(object):
         self.psi      = np.zeros(shape=(1, NA, NE))
         self.chi      = np.zeros(shape=(1, NA, NE))
         self.xi       = np.zeros(shape=(1, NA, NE), dtype='complex')
-        self.an  = np.zeros(shape=(1, NA, NE), dtype='complex')
-        self.bn  = np.zeros(shape=(1, NA, NE), dtype='complex')
+        self.an       = np.zeros(shape=(1, NA, NE), dtype='complex')
+        self.bn       = np.zeros(shape=(1, NA, NE), dtype='complex')
         self.D     = 0.0  # will be nmx x NA x NE
         self.qsca  = 0.0
         self.qext  = 0.0
@@ -197,7 +198,7 @@ def _calculate(bhm, theta):
         _calc_n(bhm, n)
 
     NIND     = bhm.S1.shape[0]
-    EN       = np.tile(np.arange(NIND)+1, (NA, NE, 1)).T  # n x NA x NE
+    EN       = np.tile(np.arange(NIND)+1, (NE, NA, 1)).T  # n x NA x NE
     a2_b2    = (2.0 * EN + 1.0) * (np.abs(bhm.an)**2 + np.abs(bhm.bn)**2)
     bhm.qsca = (2.0 / x**2) * np.sum(a2_b2, 0)
 
