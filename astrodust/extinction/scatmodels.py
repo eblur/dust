@@ -202,6 +202,7 @@ class Mie(object):
         test   = np.append( xstop, ymod )
         nmx    = np.max( test ) + 15
         nmx    = np.int32(nmx)
+        print("nmx = ", nmx)
 
         nstop  = xstop
 #        nmxx   = 150000
@@ -245,6 +246,10 @@ class Mie(object):
 
         p    = -1.0
 
+        anmaster = np.zeros((1,nx))
+        bnmaster = np.zeros((1,nx))
+        chimaster = np.zeros((1,nx))
+
         for n in np.arange( np.max(nstop) )+1:  # for n=1, nstop do begin
             en = n
             fn = (2.0*en+1.0)/ (en* (en+1.0))
@@ -287,6 +292,8 @@ class Mie(object):
                 bn = ( refrel*d[0,n] + en / x ) * psi - psi1
                 bn = bn / ( ( refrel*d[0,n] + en/x ) * xi - xi1 )
 
+            anmaster = np.concatenate([anmaster, an.reshape(1, nx)])
+            bnmaster = np.concatenate([bnmaster, bn.reshape(1, nx)])
 
             # *** Augment sums for Qsca and g=<cos(theta)>
 
@@ -360,6 +367,8 @@ class Mie(object):
             s1_back = s1_back + fn*p* (an*pi_ext-bn*tau_ext)
             s2_back = s2_back + fn*p* (bn*pi_ext-an*tau_ext)
 
+            chimaster = np.concatenate([chimaster, chi.reshape(1, nx)], axis=0)
+
             psi0 = psi1
             psi1 = psi
             chi0 = chi1
@@ -388,6 +397,17 @@ class Mie(object):
 
         qext = ( 4.0 / np.power(x,2) ) * s1_ext.real
         qback = np.power( np.abs(s1_back)/x, 2) / np.pi
+
+        self.s1 = s1
+        self.s2 = s2
+        self.pi = pi
+        self.tau = tau
+        self.an  = anmaster
+        self.bn  = bnmaster
+        self.pi_ext = pi_ext
+        self.s1_ext = s1_ext
+        self.d   = d
+        self.chi = chimaster
 
         if getQ == 'sca':
             return qsca
