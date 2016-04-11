@@ -139,17 +139,19 @@ def _calc_n(bhm, n, nstop):
     tau = en * amu_tiled * pi - (en + 1.0) * pi0
 
     # Deal with angles > 90 degrees
-    sign = np.ones(shape=(NA, NE, NTH))
-    sign[:, :, indg90] = -sign[:, :, indg90]
+    sign1 = np.ones(shape=(NA,NE,NTH))
+    sign1[:, :, indg90] *= np.power(-1.0, en % 2)  # +1 for even terms, -1 for odd terms
+    sign2 = np.ones(shape=(NA, NE, NTH))
+    sign2[:, :, indg90] = -sign2[:, :, indg90]  # -1 for angles > 90 degrees
 
     an_tiled = np.repeat(an.reshape(NA, NE, 1), NTH, axis=2)
     bn_tiled = np.repeat(bn.reshape(NA, NE, 1), NTH, axis=2)
     # make sure its doing what I want
-    #assert np.sum(an_tiled[:,:,0] - an) == 0
-    #assert np.sum(bn_tiled[:,:,0] - bn) == 0
+    assert np.sum(an_tiled[:,:,0] - an) == 0
+    assert np.sum(bn_tiled[:,:,0] - bn) == 0
 
-    s1n = fn * (an_tiled * pi + sign * bn_tiled * tau)
-    s2n = fn * (an_tiled * tau + sign * bn_tiled * pi)
+    s1n = fn * sign1 * (an_tiled * pi + sign2 * bn_tiled * tau)
+    s2n = fn * sign1 * (an_tiled * tau + sign2 * bn_tiled * pi)
 
     tau_ext = en * 1.0 * pi_ext - (en + 1.0) * pi0_ext
 
@@ -159,7 +161,7 @@ def _calc_n(bhm, n, nstop):
     s1_back_n = fn * (an * pi_ext - bn * tau_ext)
     s2_back_n = fn * (bn * pi_ext - an * tau_ext)
 
-    # The following are just additive so we don't need to stor
+    # The following are just additive so we don't need to store
     bhm.S1      += s1n
     bhm.S2      += s2n
     bhm.s1_ext  += s1_ext_n
@@ -169,15 +171,6 @@ def _calc_n(bhm, n, nstop):
 
     # Stack these terms onto the BHmie object along axis 0,
     # because they need to be referenced later
-    '''if n == 0:
-        bhm.an  = an.reshape(1, NA, NE)
-        bhm.bn  = bn.reshape(1, NA, NE)
-        bhm.pi  = pi.reshape(1, NA, NE, NTH)
-        bhm.tau = tau.reshape(1, NA, NE, NTH)
-        bhm.psi = psi.reshape(1, NA, NE)
-        bhm.chi = chi.reshape(1, NA, NE)
-        bhm.xi  = xi.reshape(1, NA, NE)
-    else:'''
     bhm.an  = np.concatenate([bhm.an, an.reshape(1, NA, NE)], 0)  # stack along axis 0
     bhm.bn  = np.concatenate([bhm.bn, bn.reshape(1, NA, NE)], 0)
     bhm.pi  = np.concatenate([bhm.pi, pi.reshape(1,NA,NE,NTH)], 0)
