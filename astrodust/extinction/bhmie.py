@@ -127,7 +127,7 @@ def _calc_n(bhm, n, nstop):
     an = np.zeros(shape=bhm.X.shape, dtype='complex')
     bn = np.zeros(shape=bhm.X.shape, dtype='complex')
 
-    dslice = bhm.D[n, :, :]  # NA x NE
+    dslice = bhm.D[en, :, :]  # NA x NE
     an[ig]  = ((dslice[ig]/refrel[ig] + en/bhm.X[ig]) * psi[ig] - psi1[ig]) / \
               ((dslice[ig]/refrel[ig] + en/bhm.X[ig]) * xi[ig] - xi1[ig])
     bn[ig]  = ((refrel[ig] * dslice[ig] + en/bhm.X[ig]) * psi[ig] - psi1[ig]) / \
