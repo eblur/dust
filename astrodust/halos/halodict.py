@@ -72,9 +72,13 @@ class HaloDict( object ):
 
     ## Issues with comparing flouts, try round
     ## http://stackoverflow.com/questions/23721230/float-values-as-dictionary-key
-    def __getitem__( self, key, n=2 ):
-        i = self.index[round(key,n)]
-        return self.intensity[i,:]
+    def __getitem__(self, key, n=2):
+        if isinstance(key, slice):
+            halos_of_interest = (self.energy >= key.start) & (self.energy <= key.step)
+            return sum(self.intensity[halos_of_interest,:], axis=0)
+        else:
+            i = self.index[round(key,n)]
+            return self.intensity[i,:]
 
     ## http://stackoverflow.com/questions/19151/build-a-basic-python-iterator
     def __iter__( self ):
@@ -87,10 +91,10 @@ class HaloDict( object ):
             self.count += 1
             return self.intensity[count,:]
 
-    def __getslice__( self, i, j ):
+'''    def __getslice__( self, i, j ):
         slice  = np.where( np.logical_and( self.energy>=i, self.energy<j ) )[0]
         return sum( self.intensity[slice,:], 0 )
-
+'''
     @property
     def len( self ):
         return len( self.energy )
