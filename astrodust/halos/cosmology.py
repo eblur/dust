@@ -17,35 +17,24 @@ def zvalues( zs=4.0, z0=0.0, nz=100 ):
 class Cosmology(object):
     def __init__( self, h0=c.h0, m=c.omega_m, l=c.omega_l, d=c.omega_d ):
         """
-        Cosmology object
-        ------------------------------
-        INPUTS (same as stored values)
-        ------------------------------
-        h0 : [km/s/Mpc] (default: constants.h0)
-        m  : cosmic mass density (default: constants.omega_m)
-        l  : lambda mass density (default: constants.omega_l)
-        d  : cosmic dust density (default: constants.omega_d )
+        | Cosmology object stores relevant cosmological parameters
+        |
+        | **ATTRIBUTES**
+        | h0 : [km/s/Mpc] : Hubble's constant
+        | m  : cosmic mass density in units of the critical density
+        | l  : lambda mass density in units of the critical density
+        | d  : cosmic dust density in units of the critical density
         """
         self.h0 = h0
         self.m  = m
         self.l  = l
         self.d  = d
 
-class Cosmdens(object):  # h0, omega, mass density (md)
-    def __init__(self, cosm=Cosmology() ):
+def cosmdens(cosm):
         """
-        Stores h0 and omega information from cosm
-        ------------------------------
-        INPUTS
-        ------------------------------
-        cosm : Cosmology
-        ------------------------------
-        STORED VALUES
-        h0, d, md
+        Returns the co-moving number density of dust grains for a given Cosmology
         """
-        self.h0    = cosm.h0
-        self.omega = cosm.d
-        self.md    = cosm.d * c.rho_crit * np.power( cosm.h0/c.h0, 2 )
+        return cosm.d * c.rho_crit * np.power(cosm.h0/c.h0, 2)
 
 #-----------------------------------------------------
 
@@ -62,8 +51,7 @@ def cosmdustspectrum( amin=0.1, amax=1.0, na=100., p=4.0, rho=3.0, cosm=Cosmolog
     RETURNS : distlib.DustSpectrum
     """
     result = distlib.DustSpectrum()
-    result.calc_from_dist(distlib.Powerlaw(amin, amax, na=na, p=p, rho=rho), \
-        md = Cosmdens( cosm=cosm ).md )
+    result.calc_from_dist(distlib.Powerlaw(amin, amax, na=na, p=p, rho=rho), md=cosmdens(cosm))
     return result
 
 def dchi_fun( z, zp=0.0, cosm=Cosmology(), nz=100 ):
@@ -91,7 +79,7 @@ def da_fun( theta, z, cosm=Cosmology(), nz=100 ):
     return theta * c.arcs2rad * dchi / (1+z)
 
 
-def cosm_taux(z, E=1.0, dist=distlib.MRN_dist(md=Cosmdens().md),
+def cosm_taux(z, E=1.0, dist=distlib.MRN_dist(md=cosmdens(Cosmology())),
               scatm=ss.ScatModel(), cosm=Cosmology(), nz=100):
     """
     FUNCTION cosm_taux( z, E=1.0, dist=distlib.Powerlaw(), scatm=ss.ScatModel(), cosm=Cosmology(), nz=100
@@ -130,7 +118,7 @@ def cosm_taux(z, E=1.0, dist=distlib.MRN_dist(md=Cosmdens().md),
     return result
 
 
-def cosm_taux_screen( zg, E=1.0, dist=distlib.MRN_dist(md=Cosmdens().md), scatm=ss.ScatModel() ):
+def cosm_taux_screen( zg, E=1.0, dist=distlib.MRN_dist(md=cosmdens(Cosmology())), scatm=ss.ScatModel()):
     """
     FUNCTION CosmTauScreen( zg, E=1.0, dist=distlib.DustSpectrum(), scatm=ss.ScatModel() )
     ---------------------------------
