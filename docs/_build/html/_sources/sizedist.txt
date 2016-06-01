@@ -1,6 +1,5 @@
-
-astrodust.distlib
-=================
+sizedist
+========
 
 Classes
 -------
@@ -12,4 +11,4 @@ Classes
 Functions
 ---------
 
-.. autofunction:: astrodust.sizedist.MRN_dist
+.. autofunction:: astrodust.distlib.sizedist.MRN_dist

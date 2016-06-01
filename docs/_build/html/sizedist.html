@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>astrodust.distlib &mdash; eblur/dust 1.0 documentation</title>
+  <title>sizedist &mdash; eblur/dust 1.0 documentation</title>
   
 
   
@@ -30,7 +30,10 @@
   
 
   
-    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/> 
+    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/>
+        <link rel="up" title="astrodust.distlib" href="distlib.html"/>
+        <link rel="next" title="composition" href="composition.html"/>
+        <link rel="prev" title="astrodust.distlib" href="distlib.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -79,7 +82,17 @@
           
             
             
-                <ul class="simple">
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="distlib.html">astrodust.distlib</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">sizedist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="composition.html">composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="composition.html#cmindex">cmindex</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -110,11 +123,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>astrodust.distlib</li>
+          <li><a href="distlib.html">astrodust.distlib</a> &raquo;</li>
+      
+    <li>sizedist</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/dust.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/sizedist.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -124,8 +139,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="astrodust-distlib">
-<h1>astrodust.distlib<a class="headerlink" href="#astrodust-distlib" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sizedist">
+<h1>sizedist<a class="headerlink" href="#sizedist" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -135,8 +150,7 @@
 <div class="line"><strong>ATTRIBUTES</strong></div>
 <div class="line">a   : scalar [micron]</div>
 <div class="line">rho : scalar grain density [g cm^-3]</div>
-</div>
-<div class="line-block">
+<div class="line"><br /></div>
 <div class="line"><strong>FUNCTIONS</strong></div>
 <div class="line">ndens ( md : mass density [g cm^-2 or g cm^-3] )</div>
 <div class="line-block">
@@ -199,6 +213,25 @@
 </div>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="astrodust.distlib.sizedist.MRN_dist">
+<code class="descclassname">astrodust.distlib.sizedist.</code><code class="descname">MRN_dist</code><span class="sig-paren">(</span><em>amin=0.005</em>, <em>amax=0.3</em>, <em>p=3.5</em>, <em>rho=3.0</em>, <em>md=1.5e-05</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.distlib.sizedist.MRN_dist" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Returns a dust spectrum for a power law distribution of dust grains</div>
+<div class="line"><br /></div>
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">amin : [micron]</div>
+<div class="line">amax : [micron]</div>
+<div class="line">p    : scalar for dust power law dn/da propto a^-p</div>
+<div class="line">rho  : grain density [g cm^-3]</div>
+<div class="line">md   : mass density [g cm^-2 or g cm^-3]</div>
+<div class="line"><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs : See distlib.sizedist.Powerlaw keywords</div>
+<div class="line"><br /></div>
+<div class="line"><strong>RETURNS</strong></div>
+<div class="line">dust.DustSpectrum object</div>
+</div>
+</dd></dl>
+
 </div>
 </div>
 
@@ -206,6 +239,15 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="composition.html" class="btn btn-neutral float-right" title="composition" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="distlib.html" class="btn btn-neutral" title="astrodust.distlib" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
