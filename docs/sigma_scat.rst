@@ -1,4 +1,3 @@
-
 sigma_scat
 ==========
 
@@ -10,20 +9,20 @@ distribution (:doc:`dust`).
 Classes
 -------
 
-The **Scatmodel** object specifies what type of scattering physics will
+The **ScatModel** object specifies what type of scattering physics will
 be used both through the complex index of refraction and the
 scattering physics algorithm.
 
-.. autoclass:: sigma_scat.Scatmodel
+.. autoclass:: astrodust.extinction.sigma_scat.ScatModel
 
-The remaining object classes contain cross-sections that are
+The remaining classes contain cross-sections that are
 integrated over a particular dust grain size distribution.
 
-.. autoclass:: sigma_scat.Diffscat
-.. autoclass:: sigma_scat.Sigmascat
-.. autoclass:: sigma_scat.Sigmaext
-.. autoclass:: sigma_scat.Kappascat
-.. autoclass:: sigma_scat.Kappaext
+.. autoclass:: astrodust.extinction.sigma_scat.DiffScat
+.. autoclass:: astrodust.extinction.sigma_scat.SigmaScat
+.. autoclass:: astrodust.extinction.sigma_scat.SigmaExt
+.. autoclass:: astrodust.extinction.sigma_scat.KappaScat
+.. autoclass:: astrodust.extinction.sigma_scat.KappaExt
 
 Functions
 ---------
@@ -32,9 +31,4 @@ The *makeScatmodel* function is a short-cut for creating a **Scatmodel**
 object based on two input strings (which become the *stype* and
 *cmtype*).
 
-.. autofunction:: sigma_scat.makeScatmodel
-
-
-
-
-
+.. autofunction:: astrodust.extinction.sigma_scat.makeScatModel

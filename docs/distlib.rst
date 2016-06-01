@@ -1,20 +1,9 @@
 
-dust 
-====
+astrodust.distlib
+=================
 
-Classes
--------
+.. toctree::
+   :maxdepth: 1
 
-.. autoclass:: dust.Grain
-.. autoclass:: dust.Dustdist
-.. autoclass:: dust.Dustspectrum
-
-Functions
----------
-
-.. autofunction:: dust.MRN_dist
-
-
-
-
-
+   sizedist
+   composition

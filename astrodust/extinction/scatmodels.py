@@ -73,10 +73,10 @@ class RGscat(object):
     | RAYLEIGH-GANS scattering model.
     | *see* Mauche & Gorenstein (1986), ApJ 302, 371
     | *see* Smith & Dwek (1998), ApJ, 503, 831
-
+    |
     | **ATTRIBUTES**
     | stype : string : 'RGscat'
-
+    |
     | **FUNCTIONS**
     | Qsca( E, a=1.0 [um], cm=cmi.CmDrude() [see cmi.py] )
     |    *returns* scattering efficiency [unitless]
@@ -133,10 +133,10 @@ class Mie(object):
     """
     | Mie scattering algorithms of Bohren & Hoffman
     | See their book: *Absorption and Scattering of Light by Small Particles*
-
+    |
     | **ATTRIBUTES**
     | stype : string : 'Mie'
-
+    |
     | **FUNCTIONS**
     | getQs( a=1.0 [um], E=1.0 [keV], cm=cmi.CmDrude(), getQ='sca' ['ext','back','gsca','diff'], theta=None [arcsec] )
     |     *returns* Efficiency factors depending on getQ [unitless or ster^-1]
@@ -433,7 +433,7 @@ class PAH( object ):
     | **ATTRIBUTES**
     | type  : string : 'ion' or 'neu'
     | stype : string : 'PAH' + type
-
+    |
     | **FUNCTIONS**
     | Qsca( E, a=0.01 [um], cm=None )
     |     *returns* scattering efficiency [unitless]

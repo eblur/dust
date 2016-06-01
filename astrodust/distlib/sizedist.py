@@ -6,7 +6,7 @@ __all__ = ['Grain', 'Powerlaw', 'DustSpectrum', 'MRN_dist']
 
 # Some default values
 MDUST    = 1.5e-5  # g cm^-2 (dust mass column)
-RHO_G    = 3.0     # g cm^-3 (average grain material density)
+RHO      = 3.0     # g cm^-3 (average grain material density)
 
 NA       = 100     # default number for grain size dist resolution
 PDIST    = 3.5     # default slope for power law distribution
@@ -21,13 +21,13 @@ AMAX     = 0.3     # micron
 
 def make_rad(amin, amax, na, log=False):
     """
-    Make a grid of dust grain radius values
-
+    | Make a grid of dust grain radius values
+    |
     | **INPUTS**
     | amin : scalar [micron] : Minimum grain size to use
     | amax : scalar [micron] : Maximum grain size to use
     | na   : integer         : Number of points in grid
-
+    |
     | **RETURNS**
     | A numpy array of length na
 
@@ -48,7 +48,7 @@ class Grain(object):
     | **ATTRIBUTES**
     | a   : scalar [micron]
     | rho : scalar grain density [g cm^-3]
-
+    |
     | **FUNCTIONS**
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* scalar number density [cm^-3]
@@ -56,7 +56,7 @@ class Grain(object):
     >>> Grain().ndens(0.0) == 0.0
     >>> Grain(rho=0.0).ndens() == np.inf
     """
-    def __init__(self, rad=AMICRON, rho=RHO_G):
+    def __init__(self, rad=AMICRON, rho=RHO):
         self.a   = rad
         self.rho = rho
 
@@ -78,7 +78,7 @@ class Powerlaw(object):
     >>> np.sum(Powerlaw().ndens(0.0)) == 0.0
     >>> np.all(np.isinf(Powerlaw(rho=0.0).ndens()))
     """
-    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G,
+    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO,
                  na=NA, log=False):
         self.amin = amin
         self.amax = amax
@@ -94,7 +94,7 @@ class Powerlaw(object):
         return const * adep  # cm^-? um^-1
 
 # For backwards compatibility
-def Dustdist(amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO_G, na=NA, log=False):
+def Dustdist(amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO, na=NA, log=False):
     print("WARNING: dust.Dustdist is deprecated. Use Powerlaw")
     return Powerlaw(amin=amin, amax=amax, p=p, rho=rho, na=na, log=log)
 
@@ -138,18 +138,18 @@ class DustSpectrum(object):  # radius (a), number density (nd), and mass density
 
 #-----------------------------------------------------------------
 
-def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, rho=RHO_G, md=MDUST, **kwargs):
+def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, rho=RHO, md=MDUST, **kwargs):
     """
-    Returns a dust spectrum for a power law distribution of dust grains
-
+    | Returns a dust spectrum for a power law distribution of dust grains
+    |
     | **INPUTS**
     | amin : [micron]
     | amax : [micron]
-    | na   : int
     | p    : scalar for dust power law dn/da \propto a^-p
     | rho  : grain density [g cm^-3]
     | md   : mass density [g cm^-2 or g cm^-3]
-
+    | **kwargs : See distlib.sizedist.Powerlaw keywords
+    |
     | **RETURNS**
     | dust.DustSpectrum object
     """

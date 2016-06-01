@@ -30,7 +30,10 @@
   
 
   
-    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/> 
+    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/>
+        <link rel="up" title="astrodust.extinction" href="extinction.html"/>
+        <link rel="next" title="scatmodels" href="scatmodels.html"/>
+        <link rel="prev" title="astrodust.extinction" href="extinction.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -79,8 +82,17 @@
           
             
             
-                <ul>
+                <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="distlib.html">astrodust.distlib</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="extinction.html">astrodust.extinction</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">sigma_scat</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="scatmodels.html">scatmodels</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -111,6 +123,8 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
+          <li><a href="extinction.html">astrodust.extinction</a> &raquo;</li>
+      
     <li>sigma_scat</li>
       <li class="wy-breadcrumbs-aside">
         
@@ -127,23 +141,125 @@
             
   <div class="section" id="sigma-scat">
 <h1>sigma_scat<a class="headerlink" href="#sigma-scat" title="Permalink to this headline">¶</a></h1>
-<p>This module combines the complex index of refraction (<a class="reference internal" href="cmindex.html"><em>cmindex</em></a>)
+<p>This module combines the complex index of refraction (<code class="xref doc docutils literal"><span class="pre">cmindex</span></code>)
 and scattering algorithm (<a class="reference internal" href="scatmodels.html"><em>scatmodels</em></a>) to calculate the total or
 differential cross-sections for a particular dust grain size
 distribution (<code class="xref doc docutils literal"><span class="pre">dust</span></code>).</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<p>The <strong>Scatmodel</strong> object specifies what type of scattering physics will
+<p>The <strong>ScatModel</strong> object specifies what type of scattering physics will
 be used both through the complex index of refraction and the
 scattering physics algorithm.</p>
-<p>The remaining object classes contain cross-sections that are
+<dl class="class">
+<dt id="astrodust.extinction.sigma_scat.ScatModel">
+<em class="property">class </em><code class="descclassname">astrodust.extinction.sigma_scat.</code><code class="descname">ScatModel</code><span class="sig-paren">(</span><em>smodel=&lt;astrodust.extinction.scatmodels.RGscat object&gt;</em>, <em>cmodel=&lt;astrodust.distlib.composition.cmindex.CmDrude object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.extinction.sigma_scat.ScatModel" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">smodel : scattering model object : RGscat(), Mie()</div>
+<div class="line">cmodel : cmindex object : CmDrude(), CmGraphite(), CmSilicate()</div>
+<div class="line">stype  : string : &#8216;RGscat&#8217;, &#8216;Mie&#8217;</div>
+<div class="line">cmtype : &#8216;Drude&#8217;, &#8216;Silicate&#8217;, &#8216;Graphite&#8217;</div>
+</div>
+</dd></dl>
+
+<p>The remaining classes contain cross-sections that are
 integrated over a particular dust grain size distribution.</p>
+<dl class="class">
+<dt id="astrodust.extinction.sigma_scat.DiffScat">
+<em class="property">class </em><code class="descclassname">astrodust.extinction.sigma_scat.</code><code class="descname">DiffScat</code><span class="sig-paren">(</span><em>scatm=&lt;astrodust.extinction.sigma_scat.ScatModel object&gt;</em>, <em>theta=array([   5.</em>, <em>10.</em>, <em>15.</em>, <em>20.</em>, <em>25.</em>, <em>30.</em>, <em>35.</em>, <em>40.</em>, <em>45.</em>, <em>50.</em>, <em>55.</em>, <em>60.</em>, <em>65.</em>, <em>70.</em>, <em>75.</em>, <em>80.</em>, <em>85.</em>, <em>90.</em>, <em>95.</em>, <em>100.])</em>, <em>E=1.0</em>, <em>a=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.extinction.sigma_scat.DiffScat" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">A differential scattering cross-section [cm^2 ster^-1] integrated</div>
+<div class="line">over dust grain size distribution</div>
+<div class="line"><br /></div>
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">scatm : ScatModel</div>
+<div class="line">theta : np.array : arcsec</div>
+<div class="line">E     : scalar or np.array : Note, must match number of theta values if size &gt; 1</div>
+<div class="line">a     : scalar : um</div>
+<div class="line">dsig  : np.array : cm^2 ster^-1</div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="astrodust.extinction.sigma_scat.SigmaScat">
+<em class="property">class </em><code class="descclassname">astrodust.extinction.sigma_scat.</code><code class="descname">SigmaScat</code><span class="sig-paren">(</span><em>scatm=&lt;astrodust.extinction.sigma_scat.ScatModel object&gt;</em>, <em>E=1.0</em>, <em>a=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.extinction.sigma_scat.SigmaScat" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Total scattering cross-section [cm^2] integrated over a dust grain</div>
+<div class="line">size distribution</div>
+<div class="line"><br /></div>
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">scatm : ScatModel</div>
+<div class="line">E     : scalar or np.array : keV</div>
+<div class="line">a     : scalar : um</div>
+<div class="line">qsca  : scalar or np.array : unitless scattering efficiency</div>
+<div class="line">sigma : scalar or np.array : cm^2</div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="astrodust.extinction.sigma_scat.SigmaExt">
+<em class="property">class </em><code class="descclassname">astrodust.extinction.sigma_scat.</code><code class="descname">SigmaExt</code><span class="sig-paren">(</span><em>scatm=&lt;astrodust.extinction.sigma_scat.ScatModel object&gt;</em>, <em>E=1.0</em>, <em>a=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.extinction.sigma_scat.SigmaExt" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Total EXTINCTION cross-section [cm^2] integrated over a dust grain</div>
+<div class="line">size distribution</div>
+<div class="line"><br /></div>
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">scatm : ScatModel</div>
+<div class="line">E     : scalar or np.array : keV</div>
+<div class="line">a     : scalar : um</div>
+<div class="line">qext  : scalar or np.array : unitless extinction efficiency</div>
+<div class="line">sigma : scalar or np.array : cm^2</div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="astrodust.extinction.sigma_scat.KappaScat">
+<em class="property">class </em><code class="descclassname">astrodust.extinction.sigma_scat.</code><code class="descname">KappaScat</code><span class="sig-paren">(</span><em>E=1.0</em>, <em>scatm=&lt;astrodust.extinction.sigma_scat.ScatModel object&gt;</em>, <em>dist=&lt;astrodust.distlib.sizedist.DustSpectrum object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.extinction.sigma_scat.KappaScat" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.</div>
+<div class="line"><br /></div>
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">scatm : ScatModel</div>
+<div class="line">E     : scalar or np.array : keV</div>
+<div class="line">dist  : distlib.DustSpectrum</div>
+<div class="line">kappa : scalar or np.array : cm^2 g^-1, typically</div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="astrodust.extinction.sigma_scat.KappaExt">
+<em class="property">class </em><code class="descclassname">astrodust.extinction.sigma_scat.</code><code class="descname">KappaExt</code><span class="sig-paren">(</span><em>E=1.0</em>, <em>scatm=&lt;astrodust.extinction.sigma_scat.ScatModel object&gt;</em>, <em>dist=&lt;astrodust.distlib.sizedist.DustSpectrum object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.extinction.sigma_scat.KappaExt" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size</div>
+<div class="line">distribution</div>
+<div class="line"><br /></div>
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">scatm : ScatModel</div>
+<div class="line">E     : scalar or np.array : keV</div>
+<div class="line">dist  : distlib.DustSpectrum</div>
+<div class="line">kappa : scalar or np.array : cm^2 g^-1, typically</div>
+</div>
+</dd></dl>
+
 </div>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <p>The <em>makeScatmodel</em> function is a short-cut for creating a <strong>Scatmodel</strong>
 object based on two input strings (which become the <em>stype</em> and
 <em>cmtype</em>).</p>
+<dl class="function">
+<dt id="astrodust.extinction.sigma_scat.makeScatModel">
+<code class="descclassname">astrodust.extinction.sigma_scat.</code><code class="descname">makeScatModel</code><span class="sig-paren">(</span><em>model_name</em>, <em>material_name</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.extinction.sigma_scat.makeScatModel" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">model_name    : string : &#8216;RG&#8217; or &#8216;Mie&#8217;</div>
+<div class="line">material_name : string : &#8216;Drude&#8217;, &#8216;Silicate&#8217;, &#8216;Graphite&#8217;, &#8216;SmallGraphite&#8217;</div>
+<div class="line"><br /></div>
+<div class="line"><strong>RETURNS</strong></div>
+<div class="line">ScatModel object</div>
+</div>
+</dd></dl>
+
 </div>
 </div>
 
@@ -151,6 +267,15 @@ object based on two input strings (which become the <em>stype</em> and
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="scatmodels.html" class="btn btn-neutral float-right" title="scatmodels" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="extinction.html" class="btn btn-neutral" title="astrodust.extinction" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

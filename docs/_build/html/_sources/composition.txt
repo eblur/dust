@@ -1,4 +1,3 @@
-
 composition.cmindex
 ===================
 
@@ -18,8 +17,8 @@ API for CmIndex classes
 
 .. automodule:: cmindex
 
-Classes
--------
+Class Library
+-------------
 
 .. autoclass:: astrodust.distlib.composition.cmindex.CmDrude
 .. autoclass:: astrodust.distlib.composition.cmindex.CmGraphite

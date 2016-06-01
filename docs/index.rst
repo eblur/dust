@@ -72,12 +72,20 @@ I recommend using `Anaconda <https://www.continuum.io/downloads>`_ to manage pyt
 Modules
 -------
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
 
    distlib
+       sizedist
+       composition
    extinction
+       sigma_scat
+       scatmodels
    halos
+       halo
+       galhalo
+       cosmology
+       analytic
 
 ..
   License

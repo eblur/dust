@@ -57,7 +57,7 @@ def makeScatModel( model_name, material_name ):
     | **INPUTS**
     | model_name    : string : 'RG' or 'Mie'
     | material_name : string : 'Drude', 'Silicate', 'Graphite', 'SmallGraphite'
-
+    |
     | **RETURNS**
     | ScatModel object
     """
@@ -89,9 +89,9 @@ def makeScatModel( model_name, material_name ):
 
 class DiffScat(object):
     """
-    A differential scattering cross-section [cm^2 ster^-1] integrated
-    over dust grain size distribution
-
+    | A differential scattering cross-section [cm^2 ster^-1] integrated
+    | over dust grain size distribution
+    |
     | **ATTRIBUTES**
     | scatm : ScatModel
     | theta : np.array : arcsec
@@ -117,9 +117,9 @@ class DiffScat(object):
 
 class SigmaScat(object):
     """
-    Total scattering cross-section [cm^2] integrated over a dust grain
-    size distribution
-
+    | Total scattering cross-section [cm^2] integrated over a dust grain
+    | size distribution
+    |
     | **ATTRIBUTES**
     | scatm : ScatModel
     | E     : scalar or np.array : keV
@@ -148,9 +148,9 @@ class SigmaScat(object):
 
 class SigmaExt(object):
     """
-    Total EXTINCTION cross-section [cm^2] integrated over a dust grain
-    size distribution
-
+    | Total EXTINCTION cross-section [cm^2] integrated over a dust grain
+    | size distribution
+    |
     | **ATTRIBUTES**
     | scatm : ScatModel
     | E     : scalar or np.array : keV
@@ -182,8 +182,8 @@ class SigmaExt(object):
 
 class KappaScat(object):
     """
-    Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
-
+    | Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
+    |
     | **ATTRIBUTES**
     | scatm : ScatModel
     | E     : scalar or np.array : keV
@@ -239,9 +239,9 @@ class KappaScat(object):
 
 class KappaExt(object):
     """
-    Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size
-    distribution
-
+    | Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size
+    | distribution
+    |
     | **ATTRIBUTES**
     | scatm : ScatModel
     | E     : scalar or np.array : keV

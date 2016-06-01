@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>model_halo &mdash; eblur/dust 1.0 documentation</title>
+  <title>astrodust.extinction &mdash; eblur/dust 1.0 documentation</title>
   
 
   
@@ -30,7 +30,9 @@
   
 
   
-    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/> 
+    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/>
+        <link rel="next" title="sigma_scat" href="sigma_scat.html"/>
+        <link rel="prev" title="composition.cmindex" href="composition.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -79,9 +81,13 @@
           
             
             
-                <ul>
+                <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="distlib.html">astrodust.distlib</a></li>
-<li class="toctree-l1"><a class="reference internal" href="extinction.html">astrodust.extinction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">astrodust.extinction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sigma_scat.html">sigma_scat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scatmodels.html">scatmodels</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -112,11 +118,11 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>model_halo</li>
+    <li>astrodust.extinction</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/model_halo.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/extinction.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -126,19 +132,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="model-halo">
-<h1>model_halo<a class="headerlink" href="#model-halo" title="Permalink to this headline">¶</a></h1>
-<p>This module is for modeling scattering halos for Galactic sources (see
-<a class="reference internal" href="galhalo.html"><em>galhalo</em></a>) from a dust grain size distribution (<code class="xref doc docutils literal"><span class="pre">dust</span></code>) and
-apparent flux spectrum of a point source.  It uses <strong>HaloDict</strong>
-objects from the <a class="reference internal" href="halodict.html"><em>halodict</em></a> module.</p>
-<div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<p>The following two functions are helpers for integrating up the total
-intensity from a <strong>HaloDict</strong> object.</p>
-<p>The following functions take inputs that will allow us to simulate a
-scattering halo intensity profile from a set of basic starting
-parameters.</p>
+  <div class="section" id="astrodust-extinction">
+<h1>astrodust.extinction<a class="headerlink" href="#astrodust-extinction" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sigma_scat.html">sigma_scat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scatmodels.html">scatmodels</a></li>
+</ul>
 </div>
 </div>
 
@@ -146,6 +146,15 @@ parameters.</p>
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sigma_scat.html" class="btn btn-neutral float-right" title="sigma_scat" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="composition.html" class="btn btn-neutral" title="composition.cmindex" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

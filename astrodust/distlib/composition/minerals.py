@@ -41,14 +41,14 @@ class Mineral(object):
     """
     def __init__(self, comp):
         self.composition = comp
-        
+
     @property
     def weight_amu(self):
         result = 0.0
         for atom in self.composition.keys():
             result += self.composition[atom] * amu[atom]
         return result
-    
+
     @property
     def weight_g(self):
         return self.weight_amu * amu_g
@@ -66,8 +66,8 @@ def calc_mass_conversion( elem, mineral ):
 
 def calc_element_column( NH, fmineral, atom, mineral, d2g=0.009 ):
     """
-    Calculate the column density of an element for a particular NH value, 
-    assuming a dust-to-gas ratio (d2g) and 
+    Calculate the column density of an element for a particular NH value,
+    assuming a dust-to-gas ratio (d2g) and
     the fraction of dust in that particular mineral species (fmineral)
     --------------------------------------------------------------------
     calc_element_column( NH, fmineral, atom, mineral, d2g=0.009 )
@@ -79,7 +79,7 @@ def calc_element_column( NH, fmineral, atom, mineral, d2g=0.009 ):
 
 def get_ISM_abund(elem, abund_table=wilms):
     """
-    get_ISM_abund( elem, abund_table ) 
+    get_ISM_abund( elem, abund_table )
     ----
     Given an abundance table, calculate the number per H atom of a
     given element in any ISM form
