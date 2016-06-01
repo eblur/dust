@@ -29,7 +29,7 @@ custom objects of the approporiate class.  Provided dust models
 include:
 
 * A power law distribution of dust grain sizes
-* `Weingartner & Draine (2001) <http://adsabs.harvard.edu/abs/2001ApJ...548..296W>`_ 
+* `Weingartner & Draine (2001) <http://adsabs.harvard.edu/abs/2001ApJ...548..296W>`_
   grain size distributions for Milky Way dust
 * Optical constants (complex index of refraction) for 0.1 um sized
   `graphite and astrosilicate grains <https://www.astro.princeton.edu/~draine/dust/dust.diel.html>`_
@@ -39,11 +39,11 @@ include:
   * `Smith & Dwek (1998) <http://adsabs.harvard.edu/abs/1998ApJ...503..831S>`_
   * `Mauche & Gorenstein (1986) <http://adsabs.harvard.edu/abs/1986ApJ...302..371M>`_
 
-* Mie scattering physics using the algorithms of 
+* Mie scattering physics using the algorithms of
   `Bohren & Huffman (1986) <http://adsabs.harvard.edu/abs/1983asls.book.....B>`_
 
   * Converted from `fortran and IDL
-    <http://www.met.tamu.edu/class/atmo689-lc/bhmie.pro>`_ 
+    <http://www.met.tamu.edu/class/atmo689-lc/bhmie.pro>`_
     to python
 
 
@@ -54,42 +54,49 @@ As of yet there is no static install version.  I recommend cloning the
 github repo into a directory in your python path.::
 
     cd /path/to/python/libraries/
-    git clone git@github.com:eblur/dust.git .
+    git clone https://github.com/eblur/dust.git dust
 
+Then be sure to add to your python path:
+
+    export PYTHONPATH=$PYTHONPATH:/path/to/eblur/dust/
+
+
+Dependencies
+------------
+
+I recommend using `Anaconda <https://www.continuum.io/downloads>`_ to manage python distributions and packages
+* `Python 2.7 <https://www.python.org/download/releases/2.7/>`_: *eblur/dust* is not yet fully Python 3 compatible
+* `numpy <http://www.numpy.org/>`_ and `scipy <https://www.scipy.org/>`_
+* `Astropy <http://www.astropy.org/>`_
 
 Modules
 -------
 .. toctree::
    :maxdepth: 1
-   
-   dust
-   cmindex
-   scatmodels
-   sigma_scat
-   halo
-   galhalo
-   analytic
-   halodict
-   model_halo
+
+
+   distlib
+   extinction
+   halos
 
 ..
   License
   -------
-  
+
   Copyright (c) 2014, Lia Corrales
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
-  
+
   1. Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  
+
   2. Redistributions in binary form must reproduce the above copyright
   notice, this list of conditions and the following disclaimer in the
   documentation and/or other materials provided with the distribution.
-  
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
   IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
   TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -109,5 +116,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-

@@ -30,8 +30,7 @@
   
 
   
-    <link rel="top" title="eblur/dust 1.0 documentation" href="#"/>
-        <link rel="next" title="dust" href="dust.html"/> 
+    <link rel="top" title="eblur/dust 1.0 documentation" href="#"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -80,16 +79,7 @@
           
             
             
-                <ul>
-<li class="toctree-l1"><a class="reference internal" href="dust.html">dust</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cmindex.html">cmindex</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scatmodels.html">scatmodels</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sigma_scat.html">sigma_scat</a></li>
-<li class="toctree-l1"><a class="reference internal" href="halo.html">halo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="galhalo.html">galhalo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="analytic.html">analytic</a></li>
-<li class="toctree-l1"><a class="reference internal" href="halodict.html">halodict</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_halo.html">model_halo</a></li>
+                <ul class="simple">
 </ul>
 
             
@@ -175,23 +165,24 @@ to python</li>
 <p>As of yet there is no static install version.  I recommend cloning the
 github repo into a directory in your python path.:</p>
 <div class="highlight-python"><div class="highlight"><pre>cd /path/to/python/libraries/
-git clone git@github.com:eblur/dust.git .
+git clone https://github.com/eblur/dust.git dust
 </pre></div>
 </div>
+<p>Then be sure to add to your python path:</p>
+<blockquote>
+<div>export PYTHONPATH=$PYTHONPATH:/path/to/eblur/dust/</div></blockquote>
+</div>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>I recommend using <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> to manage python distributions and packages
+* <a class="reference external" href="https://www.python.org/download/releases/2.7/">Python 2.7</a>: <em>eblur/dust</em> is not yet fully Python 3 compatible
+* <a class="reference external" href="http://www.numpy.org/">numpy</a> and <a class="reference external" href="https://www.scipy.org/">scipy</a>
+* <a class="reference external" href="http://www.astropy.org/">Astropy</a></p>
 </div>
 <div class="section" id="modules">
 <h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="dust.html">dust</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cmindex.html">cmindex</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scatmodels.html">scatmodels</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sigma_scat.html">sigma_scat</a></li>
-<li class="toctree-l1"><a class="reference internal" href="halo.html">halo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="galhalo.html">galhalo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="analytic.html">analytic</a></li>
-<li class="toctree-l1"><a class="reference internal" href="halodict.html">halodict</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_halo.html">model_halo</a></li>
+<ul class="simple">
 </ul>
 </div>
 </div>
@@ -209,13 +200,6 @@ git clone git@github.com:eblur/dust.git .
            </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="dust.html" class="btn btn-neutral float-right" title="dust" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-    </div>
   
 
   <hr/>
