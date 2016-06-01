@@ -83,6 +83,7 @@
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="distlib.html">astrodust.distlib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extinction.html">astrodust.extinction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="halos.html">astrodust.halos</a></li>
 </ul>
 
             
@@ -172,29 +173,63 @@ git clone https://github.com/eblur/dust.git dust
 </pre></div>
 </div>
 <p>Then be sure to add to your python path:</p>
-<blockquote>
-<div>export PYTHONPATH=$PYTHONPATH:/path/to/eblur/dust/</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre>export PYTHONPATH=$PYTHONPATH:/path/to/python/libraries/dust/
+</pre></div>
+</div>
 </div>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<p>I recommend using <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> to manage python distributions and packages
-* <a class="reference external" href="https://www.python.org/download/releases/2.7/">Python 2.7</a>: <em>eblur/dust</em> is not yet fully Python 3 compatible
-* <a class="reference external" href="http://www.numpy.org/">numpy</a> and <a class="reference external" href="https://www.scipy.org/">scipy</a>
-* <a class="reference external" href="http://www.astropy.org/">Astropy</a></p>
+<p>I recommend using <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> to manage python distributions and packages</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.python.org/download/releases/2.7/">Python 2.7</a> ()*eblur/dust* is not yet fully Python 3 compatible)</li>
+<li><a class="reference external" href="http://www.numpy.org/">numpy</a> and <a class="reference external" href="https://www.scipy.org/">scipy</a></li>
+<li><a class="reference external" href="http://www.astropy.org/">Astropy</a></li>
+</ul>
 </div>
 <div class="section" id="modules">
 <h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="distlib.html">astrodust.distlib</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sizedist.html">sizedist</a></li>
-<li class="toctree-l2"><a class="reference internal" href="composition.html">composition.cmindex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sizedist.html">sizedist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sizedist.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sizedist.html#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="composition.html">composition.cmindex</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="composition.html#api-for-cmindex-classes">API for CmIndex classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="composition.html#class-library">Class Library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="composition.html#functions">Functions</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="composition.html#composition-minerals">composition.minerals</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extinction.html">astrodust.extinction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sigma_scat.html">sigma_scat</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scatmodels.html">scatmodels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigma_scat.html">sigma_scat</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sigma_scat.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sigma_scat.html#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="scatmodels.html">scatmodels</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="scatmodels.html#api-for-scattering-classes">API for Scattering classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scatmodels.html#class-library">Class Library</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="halos.html">astrodust.halos</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="halos.html#halo-class">Halo class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halos.html#halo-types-htype">Halo types (<em>htype</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halos.html#sub-modules">Sub-modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="galhalo.html">galhalo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cosmhalo.html">cosmhalo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cosmology.html">cosmology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="halodict.html">halodict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="analytic.html">analytic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="model_halo.html">model_halo</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

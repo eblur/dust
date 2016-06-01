@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cosmology &mdash; eblur/dust 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/>
+        <link rel="up" title="astrodust.halos" href="halos.html"/>
+        <link rel="next" title="halodict" href="halodict.html"/>
+        <link rel="prev" title="cosmhalo" href="cosmhalo.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> eblur/dust
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="distlib.html">astrodust.distlib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extinction.html">astrodust.extinction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="halos.html">astrodust.halos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="halos.html#halo-class">Halo class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halos.html#halo-types-htype">Halo types (<em>htype</em>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="halos.html#sub-modules">Sub-modules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="galhalo.html">galhalo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cosmhalo.html">cosmhalo</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">cosmology</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="halodict.html">halodict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="analytic.html">analytic</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">eblur/dust</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="halos.html">astrodust.halos</a> &raquo;</li>
+      
+    <li>cosmology</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/cosmology.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cosmology">
+<h1>cosmology<a class="headerlink" href="#cosmology" title="Permalink to this headline">¶</a></h1>
+<p>This module contains functions for calculating cosmological distances and
+other relevant values for the <a class="reference internal" href="cosmhalo.html"><em>cosmhalo</em></a> module.</p>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="astrodust.halos.cosmology.Cosmology">
+<em class="property">class </em><code class="descclassname">astrodust.halos.cosmology.</code><code class="descname">Cosmology</code><span class="sig-paren">(</span><em>h0=75.0</em>, <em>m=0.3</em>, <em>l=0.7</em>, <em>d=1e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmology.Cosmology" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Cosmology object stores relevant cosmological parameters</div>
+<div class="line"><br /></div>
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">h0 : [km/s/Mpc] : Hubble&#8217;s constant</div>
+<div class="line">m  : cosmic mass density in units of the critical density</div>
+<div class="line">l  : lambda mass density in units of the critical density</div>
+<div class="line">d  : cosmic dust density in units of the critical density</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="astrodust.halos.cosmology.cosmdens">
+<code class="descclassname">astrodust.halos.cosmology.</code><code class="descname">cosmdens</code><span class="sig-paren">(</span><em>cosm</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmology.cosmdens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the co-moving number density of dust grains
+for a given <strong>Cosmology</strong> object</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="astrodust.halos.cosmology.cosmdustspectrum">
+<code class="descclassname">astrodust.halos.cosmology.</code><code class="descname">cosmdustspectrum</code><span class="sig-paren">(</span><em>amin=0.1</em>, <em>amax=1.0</em>, <em>na=100.0</em>, <em>p=4.0</em>, <em>rho=3.0</em>, <em>cosm=&lt;astrodust.halos.cosmology.Cosmology object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmology.cosmdustspectrum" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">amin, amax : [microns]</div>
+<div class="line">na   : int (# of dust grain sizes to use)</div>
+<div class="line">p    : scalar for dust power law dn/da propto a^-p</div>
+<div class="line">rho  : grain density [g cm^-3]</div>
+<div class="line">cosm : Cosmology object</div>
+<div class="line"><br /></div>
+<div class="line">RETURNS : distlib.DustSpectrum</div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="astrodust.halos.cosmology.dchi_fun">
+<code class="descclassname">astrodust.halos.cosmology.</code><code class="descname">dchi_fun</code><span class="sig-paren">(</span><em>z</em>, <em>zp=0.0</em>, <em>cosm=&lt;astrodust.halos.cosmology.Cosmology object&gt;</em>, <em>nz=100</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmology.dchi_fun" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Calculates co-moving radial distance [Gpc] from zp to z using dx = cdt/a</div>
+<div class="line"><br /></div>
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">z    : float : redshift</div>
+<div class="line">zp   ; float (0) : starting redshift</div>
+<div class="line">cosm : Cosmology</div>
+<div class="line">nz   : int (100) : number of z-values to use in calculation</div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="astrodust.halos.cosmology.da_fun">
+<code class="descclassname">astrodust.halos.cosmology.</code><code class="descname">da_fun</code><span class="sig-paren">(</span><em>theta</em>, <em>z</em>, <em>cosm=&lt;astrodust.halos.cosmology.Cosmology object&gt;</em>, <em>nz=100</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmology.da_fun" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Calculates the diameter distance [Gpc] for an object of angular size</div>
+<div class="line">theta and redshift z using DA = theta(radians) * dchi / (1+z)</div>
+<div class="line"><br /></div>
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">theta : float : angular size [arcsec]</div>
+<div class="line">z     : float : redshift of object</div>
+<div class="line">cosm  : Cosmology</div>
+<div class="line">nz    : int (100) : number of z-values to use in dchi calculation</div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="astrodust.halos.cosmology.cosm_taux">
+<code class="descclassname">astrodust.halos.cosmology.</code><code class="descname">cosm_taux</code><span class="sig-paren">(</span><em>z</em>, <em>E=1.0</em>, <em>dist=&lt;astrodust.distlib.sizedist.DustSpectrum object&gt;</em>, <em>scatm=&lt;astrodust.extinction.sigma_scat.ScatModel object&gt;</em>, <em>cosm=&lt;astrodust.halos.cosmology.Cosmology object&gt;</em>, <em>nz=100</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmology.cosm_taux" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Calculates the optical depth from dust distributed uniformly in the IGM</div>
+<div class="line"><br /></div>
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">z : redshift of source</div>
+<div class="line">E : scalar or np.array [keV]</div>
+<div class="line">dist  : distlib.DustSpectrum</div>
+<div class="line">scatm : ss.ScatModel</div>
+<div class="line">cosm  : cosm.Cosmology</div>
+<div class="line"><br /></div>
+<div class="line"><strong>RETURNS</strong></div>
+<div class="line">tauX : scalar or np.array [optical depth to X-ray scattering]</div>
+<div class="line-block">
+<div class="line">= kappa( dn/da da ) cosmdens (1+z)^2 cdz/hfac</div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="astrodust.halos.cosmology.cosm_taux_screen">
+<code class="descclassname">astrodust.halos.cosmology.</code><code class="descname">cosm_taux_screen</code><span class="sig-paren">(</span><em>zg</em>, <em>E=1.0</em>, <em>dist=&lt;astrodust.distlib.sizedist.DustSpectrum object&gt;</em>, <em>scatm=&lt;astrodust.extinction.sigma_scat.ScatModel object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmology.cosm_taux_screen" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Calculates the optical depth from a screen of dust in the IGM</div>
+<div class="line"><br /></div>
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">zg : redshift of screen</div>
+<div class="line">E  : scalar or np.array [keV]</div>
+<div class="line">dist  : distlib.Powerlaw or distlib.Grain</div>
+<div class="line">scatm : ss.ScatModel</div>
+<div class="line"><br /></div>
+<div class="line"><strong>RETURNS</strong></div>
+<div class="line">tauX : np.array [optical depth to X-ray scattering] for the screen</div>
+<div class="line-block">
+<div class="line">: = kappa(Eg) * M_d</div>
+</div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="halodict.html" class="btn btn-neutral float-right" title="halodict" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cosmhalo.html" class="btn btn-neutral" title="cosmhalo" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Lia Corrales.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

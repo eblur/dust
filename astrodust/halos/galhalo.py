@@ -14,8 +14,8 @@ ANGLES = np.logspace(0.0, 3.5, np.int(3.5/0.05))
 
 class GalHalo(object):
     """
-    *An htype class for storing halo properties (see halo.py)*
-
+    | *An htype class for storing halo properties (see halo.py)*
+    |
     | **ATTRIBUTES**
     | NH  : float : hydrogen column density [cm^-2]
     | d2g : float : dust-to-gas mass ratio
@@ -30,15 +30,15 @@ class GalHalo(object):
 
 class Ihalo(object):
     """
-    A self-similar halo object [i(theta)], azimuthally symmetric, interpolatable
-
+    | A self-similar halo object [i(theta)], azimuthally symmetric, interpolatable
+    |
     | **ATTRIBUTES**
     | theta : np.array : theta values used to derive the object [arcsec]
     | itemp : np.array : values with respective theta [cm^2 arcsec^-2]
     | rad   : float : Grain size used to derive the object [um]
     | ener  : float : Photon energy used to derive the object [keV]
     | scatm : ss.ScatModel : Scattering model used to derive the object
-
+    |
     | **CALL**
     | ihalo( theta ) : [cm^2 arcsec^-2]
     """
@@ -137,7 +137,7 @@ def path_diff( alpha, x ):
     | **INPUTS**
     | alpha  : scalar : observation angle [arcsec]
     | x      : scalar or np.array : position of dust patch (source is at x=0, observer at x=1)
-
+    |
     | **RETURNS**
     | path difference associated with a particular alpha and x : alpha^2*(1-x)/(2x)
     """
@@ -156,12 +156,12 @@ def path_diff( alpha, x ):
 ## May 16, 2012: Added e^-kappa_x \delta x to the integral
 def uniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
     """
-    Calculate the X-ray scattering intensity for dust distributed
-    uniformly along the line of sight
-
+    | Calculate the X-ray scattering intensity for dust distributed
+    | uniformly along the line of sight
+    |
     | **MODIFIES**
     | halo.htype, halo.dist, halo.taux, halo.intensity
-
+    |
     | **INPUTS**
     | halo : Halo object
     | NH   : float : column density [cm^-2]
@@ -224,12 +224,12 @@ def uniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
 
 def screenISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
     """
-    Calculate the X-ray scattering intensity for dust in an
-    infinitesimally thin wall somewhere on the line of sight.
-
+    | Calculate the X-ray scattering intensity for dust in an
+    | infinitesimally thin wall somewhere on the line of sight.
+    |
     | **MODIFIES**
     | halo.htype, halo.dist, halo.taux, halo.intensity
-
+    |
     | **INPUTS**
     | halo : Halo object
     | xg   : float : distance FROM source / distance between source and observer

@@ -45,11 +45,11 @@ ALPHA  = np.logspace(0.0, 3.0, 30)
 
 def screen( halodict, xg=0.5, NH=NH, d2g=0.009, verbose=False ):
     """
-    Performs numerical integration dust screen calculation with each halo in halodict
-
+    | Performs numerical integration dust screen calculation with each halo in halodict
+    |
     | **MODIFIES**
     | halodict.intensity, halodict.htype
-
+    |
     | **INPUTS**
     | halodict : halodict.HaloDict object
     | xg       : float [0-1] : position of screen where 0 = point source, 1 = observer
@@ -69,12 +69,11 @@ def screen( halodict, xg=0.5, NH=NH, d2g=0.009, verbose=False ):
 
 def uniform( halodict, NH=NH, d2g=0.009, verbose=False ):
     """
-    Performs numerical integration with uniform dust distribution
-        calculation with each halo in halodict
-
+    | Performs numerical integration with uniform dust distribution calculation with each halo in halodict
+    |
     | **MODIFIES**
     | halodict.intensity, halodict.htype
-
+    |
     | **INPUTS**
     | halodict : halodict.HaloDict object
     | NH       : float [cm^-2] : Hydrogen column
@@ -97,15 +96,15 @@ def uniform( halodict, NH=NH, d2g=0.009, verbose=False ):
 
 def totalhalo( halodict, spectrum ):
     """
-    Alters halodict by running halodict.HaloDict.total_halo( corrflux )
-
+    | Alters halodict by running halodict.HaloDict.total_halo( corrflux )
+    |
     | **MODIFIES**
     | halodict.total
-
+    |
     | **INPUTS**
     | halodict : halodict.HaloDict object
     | spectrum : flux for the energy values associated with halodict
-
+    |
     | **RETURNS**
     | np.array : Corrected flux before scattering (F_a)
     |     assuming F_PS = F_a exp(-tau)
@@ -118,14 +117,13 @@ def totalhalo( halodict, spectrum ):
 
 def simulate_intensity( halodict, spectrum ):
     '''
-    Take a halo dictionary with an evaluated profile,
-    and simulate a surface brightness profile with it.
-    The arcsec to pixel conversion is based on Chandra.
-
+    | Take a halo dictionary with an evaluated profile, and simulate a surface brightness profile with it.
+    | The arcsec to pixel conversion is based on Chandra.
+    |
     | **INPUTS**
     | halodict : halodict.HaloDict object
     | spectrum : corrected flux for each energy value in halodict
-
+    |
     | **RETURNS**
     | scipy.interpolate.interp1d object : x = arcsec, y = flux/arcsec^2
     '''
@@ -145,9 +143,8 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, xg=0.5, rho=3.0, return_dict=False, \
     alpha=ALPHA, scatm=SCATM, elim=None, na=50, v=False ):
     '''
-    Simulate a surface brightness profile from spectrum file
-    for a screen of dust at xg, using 3-5 free parameters
-
+    | Simulate a surface brightness profile from spectrum file for a screen of dust at xg, using 3-5 free parameters
+    |
     | **INPUTS**
     | specfile : string : Name of spectrum file
     | a0       : float [um] : Minimum (or single) grain size to use (0.05)
@@ -162,7 +159,7 @@ def simulate_screen( specfile, a0=0.05, a1=None, p=3.5, \
     | scatm    : ss.ScatModel()
     | elim     : tuple containing energy limits [keV]
     | na       : number of bins to use for grain size distribution
-
+    |
     | **RETURNS**
     | if dict == False :
     |     scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2
@@ -191,9 +188,8 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     NH=1.0e22, d2g=0.009, rho=3.0, return_dict=False, \
     alpha=ALPHA, scatm=SCATM, elim=None, na=50, v=False ):
     '''
-    Simulate a surface brightness profile from spectrum file
-    for a uniform distribution of dust, using 2-4 free parameters
-
+    | Simulate a surface brightness profile from spectrum file for a uniform distribution of dust, using 2-4 free parameters
+    |
     | **INPUTS**
     | specfile : string : Name of spectrum file
     | a0       : float [um] : Minimum (or single) grain size to use
@@ -209,7 +205,7 @@ def simulate_uniform( specfile, a0=0.1, a1=None, p=3.5, \
     | scatm    : ss.ScatModel()
     | elim     : tuple containing energy limits [keV]
     | na       : number of bins to use for grain size distribution
-
+    |
     | **RETURNS**
     | if dict == False :
     |     scipy.interpolate.interp1d object : x = pixels, y = counts/pix^2

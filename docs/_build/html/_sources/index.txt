@@ -56,36 +56,29 @@ github repo into a directory in your python path.::
     cd /path/to/python/libraries/
     git clone https://github.com/eblur/dust.git dust
 
-Then be sure to add to your python path:
+Then be sure to add to your python path::
 
-    export PYTHONPATH=$PYTHONPATH:/path/to/eblur/dust/
+    export PYTHONPATH=$PYTHONPATH:/path/to/python/libraries/dust/
 
 
 Dependencies
 ------------
 
 I recommend using `Anaconda <https://www.continuum.io/downloads>`_ to manage python distributions and packages
-* `Python 2.7 <https://www.python.org/download/releases/2.7/>`_: *eblur/dust* is not yet fully Python 3 compatible
+
+* `Python 2.7 <https://www.python.org/download/releases/2.7/>`_ ()*eblur/dust* is not yet fully Python 3 compatible)
 * `numpy <http://www.numpy.org/>`_ and `scipy <https://www.scipy.org/>`_
 * `Astropy <http://www.astropy.org/>`_
 
 Modules
 -------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
 
    distlib
-       sizedist
-       composition
    extinction
-       sigma_scat
-       scatmodels
    halos
-       halo
-       galhalo
-       cosmology
-       analytic
 
 ..
   License

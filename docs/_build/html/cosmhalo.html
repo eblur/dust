@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>galhalo &mdash; eblur/dust 1.0 documentation</title>
+  <title>cosmhalo &mdash; eblur/dust 1.0 documentation</title>
   
 
   
@@ -32,8 +32,8 @@
   
     <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/>
         <link rel="up" title="astrodust.halos" href="halos.html"/>
-        <link rel="next" title="cosmhalo" href="cosmhalo.html"/>
-        <link rel="prev" title="astrodust.halos" href="halos.html"/> 
+        <link rel="next" title="cosmology" href="cosmology.html"/>
+        <link rel="prev" title="galhalo" href="galhalo.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -89,11 +89,12 @@
 <li class="toctree-l2"><a class="reference internal" href="halos.html#halo-class">Halo class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="halos.html#halo-types-htype">Halo types (<em>htype</em>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="halos.html#sub-modules">Sub-modules</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="">galhalo</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="galhalo.html">galhalo</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">cosmhalo</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cosmhalo.html">cosmhalo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cosmology.html">cosmology</a></li>
 <li class="toctree-l3"><a class="reference internal" href="halodict.html">halodict</a></li>
 <li class="toctree-l3"><a class="reference internal" href="model_halo.html">model_halo</a></li>
 </ul>
@@ -132,11 +133,11 @@
       
           <li><a href="halos.html">astrodust.halos</a> &raquo;</li>
       
-    <li>galhalo</li>
+    <li>cosmhalo</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/galhalo.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/cosmhalo.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -146,8 +147,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="galhalo">
-<h1>galhalo<a class="headerlink" href="#galhalo" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="cosmhalo">
+<h1>cosmhalo<a class="headerlink" href="#cosmhalo" title="Permalink to this headline">¶</a></h1>
 <p>This module is for calculating X-ray scattering halos from
 Galactic (z=0) point sources.</p>
 <p>One must import the <strong>Halo</strong> object from <a class="reference internal" href="halos.html"><em>astrodust.halos</em></a>.
@@ -160,55 +161,41 @@ description of these halo types.</p>
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <p>Functions within this module take a <strong>Halo</strong> object as input and modifies it by updating
 the <em>htype</em>, <em>intensity</em>, and any other related attributes.</p>
-<p>Intensities are calculated using numerical integration (trapezoidal
-method).  For the semi-analytic solutions, see <a class="reference internal" href="analytic.html"><em>analytic</em></a>.</p>
 <dl class="function">
-<dt id="astrodust.halos.galhalo.uniformISM">
-<code class="descclassname">astrodust.halos.galhalo.</code><code class="descname">uniformISM</code><span class="sig-paren">(</span><em>halo</em>, <em>NH=1e+20</em>, <em>d2g=0.009</em>, <em>nx=1000</em>, <em>usepathdiff=False</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.galhalo.uniformISM" title="Permalink to this definition">¶</a></dt>
+<dt id="astrodust.halos.cosmhalo.uniformIGM">
+<code class="descclassname">astrodust.halos.cosmhalo.</code><code class="descname">uniformIGM</code><span class="sig-paren">(</span><em>halo</em>, <em>zs=4.0</em>, <em>cosm=&lt;astrodust.halos.cosmology.Cosmology object&gt;</em>, <em>nz=500</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmhalo.uniformIGM" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
-<div class="line">Calculate the X-ray scattering intensity for dust distributed</div>
-<div class="line">uniformly along the line of sight</div>
+<div class="line">Calculates the intensity of a scattering halo from intergalactic</div>
+<div class="line">dust that is uniformly distributed along the line of sight.</div>
 <div class="line"><br /></div>
 <div class="line"><strong>MODIFIES</strong></div>
-<div class="line">halo.htype, halo.dist, halo.taux, halo.intensity</div>
+<div class="line">halo.htype, halo.dist, halo.intensity, halo.taux</div>
 <div class="line"><br /></div>
-<div class="line"><strong>INPUTS</strong></div>
+<div class="line"><strong>INPUT</strong></div>
 <div class="line">halo : Halo object</div>
-<div class="line">NH   : float : column density [cm^-2]</div>
-<div class="line">d2g  : float : dust-to-gass mass ratio</div>
-<div class="line">nx   : int : number of values to use in integration</div>
-<div class="line">usepathdiff : boolean : True = use extinction due to path difference e^(-tau*path_diff)</div>
+<div class="line">zs   : float : redshift of source</div>
+<div class="line">cosm : cosmo.Cosmology</div>
+<div class="line">nz   : int : number of z-values to use in integration</div>
 </div>
 </dd></dl>
 
 <dl class="function">
-<dt id="astrodust.halos.galhalo.screenISM">
-<code class="descclassname">astrodust.halos.galhalo.</code><code class="descname">screenISM</code><span class="sig-paren">(</span><em>halo</em>, <em>xg=0.5</em>, <em>NH=1e+20</em>, <em>d2g=0.009</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.galhalo.screenISM" title="Permalink to this definition">¶</a></dt>
+<dt id="astrodust.halos.cosmhalo.screenIGM">
+<code class="descclassname">astrodust.halos.cosmhalo.</code><code class="descname">screenIGM</code><span class="sig-paren">(</span><em>halo</em>, <em>zs=2.0</em>, <em>zg=1.0</em>, <em>md=1.5e-05</em>, <em>cosm=&lt;astrodust.halos.cosmology.Cosmology object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.cosmhalo.screenIGM" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
-<div class="line">Calculate the X-ray scattering intensity for dust in an</div>
-<div class="line">infinitesimally thin wall somewhere on the line of sight.</div>
+<div class="line">Calculates the intensity of a scattering halo from intergalactic</div>
+<div class="line">dust that is situated in an infinitesimally thin screen somewhere</div>
+<div class="line">along the line of sight.</div>
 <div class="line"><br /></div>
 <div class="line"><strong>MODIFIES</strong></div>
-<div class="line">halo.htype, halo.dist, halo.taux, halo.intensity</div>
+<div class="line">halo.htype, halo.dist, halo.intensity, halo.taux</div>
 <div class="line"><br /></div>
 <div class="line"><strong>INPUTS</strong></div>
 <div class="line">halo : Halo object</div>
-<div class="line">xg   : float : distance FROM source / distance between source and observer</div>
-<div class="line">NH   : float : column density [cm^-2]</div>
-<div class="line">d2g  : float : dust-to-gass mass ratio</div>
-</div>
-</dd></dl>
-
-<dl class="function">
-<dt id="astrodust.halos.galhalo.path_diff">
-<code class="descclassname">astrodust.halos.galhalo.</code><code class="descname">path_diff</code><span class="sig-paren">(</span><em>alpha</em>, <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.galhalo.path_diff" title="Permalink to this definition">¶</a></dt>
-<dd><div class="line-block">
-<div class="line"><strong>INPUTS</strong></div>
-<div class="line">alpha  : scalar : observation angle [arcsec]</div>
-<div class="line">x      : scalar or np.array : position of dust patch (source is at x=0, observer at x=1)</div>
-<div class="line"><br /></div>
-<div class="line"><strong>RETURNS</strong></div>
-<div class="line">path difference associated with a particular alpha and x : alpha^2*(1-x)/(2x)</div>
+<div class="line">zs   : float : redshift of source</div>
+<div class="line">zg   : float : redshift of screen</div>
+<div class="line">md   : float : mass density of dust to use in screen [g cm^-2]</div>
+<div class="line">cosm : cosmo.Cosmology</div>
 </div>
 </dd></dl>
 
@@ -222,10 +209,10 @@ method).  For the semi-analytic solutions, see <a class="reference internal" hre
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="cosmhalo.html" class="btn btn-neutral float-right" title="cosmhalo" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="cosmology.html" class="btn btn-neutral float-right" title="cosmology" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="halos.html" class="btn btn-neutral" title="astrodust.halos" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="galhalo.html" class="btn btn-neutral" title="galhalo" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -17,7 +17,7 @@ class Halo(object):
     | dist  : distlib.DustSpectrum
     | scatm : ss.ScatModel : scattering model used
     | intensity : np.array : fractional intensity [arcsec^-2]
-
+    |
     | **FUNCTIONS**
     | ecf(theta, nth=500)
     |     theta : float : Value for which to compute enclosed fraction (arcseconds)

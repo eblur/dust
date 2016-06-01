@@ -20,10 +20,5 @@ Functions
 Functions within this module modify the **Halo** object by updating
 the *htype* and *intensity*.
 
-.. autofunction:: analytic.screen_eq
-.. autofunction:: analytic.uniform_eq
-
-
-
-
-
+.. autofunction:: astrodust.halos.analytic.screen_eq
+.. autofunction:: astrodust.halos.analytic.uniform_eq

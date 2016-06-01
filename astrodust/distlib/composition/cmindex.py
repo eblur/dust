@@ -31,7 +31,7 @@ class CmDrude(object):
     | **ATTRIBUTES**
     | cmtype : 'Drude'
     | rho    : grain density [g cm^-3]
-
+    |
     | ** FUNCTIONS**
     | rp(E)  : real part of complex index of refraction [E in keV]
     | ip(E)  : imaginary part of complex index of refraction [always 0.0]
@@ -129,7 +129,7 @@ def getCM( E, model=CmDrude() ):
     | **INPUTS**
     | E     : scalar or np.array [keV]
     | model : any Cm-type object
-
+    |
     | **RETURNS**
     | Complex index of refraction : scalar or np.array of dtype='complex'
     """

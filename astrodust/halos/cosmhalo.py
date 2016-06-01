@@ -11,8 +11,8 @@ from .halo import Halo
 
 class CosmHalo(object):
     """
-    *An htype class for storing halo properties*
-
+    | *An htype class for storing halo properties*
+    |
     | **ATTRIBUTES**
     | zs      : float : redshift of X-ray source
     | zg      : float : redshift of an IGM screen
@@ -29,12 +29,12 @@ class CosmHalo(object):
 
 def uniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
     """
-    Calculates the intensity of a scattering halo from intergalactic
-    dust that is uniformly distributed along the line of sight.
-
+    | Calculates the intensity of a scattering halo from intergalactic
+    | dust that is uniformly distributed along the line of sight.
+    |
     | **MODIFIES**
     | halo.htype, halo.dist, halo.intensity, halo.taux
-
+    |
     | **INPUT**
     | halo : Halo object
     | zs   : float : redshift of source
@@ -94,13 +94,13 @@ def uniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
 
 def screenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
     """
-    Calculates the intensity of a scattering halo from intergalactic
-    dust that is situated in an infinitesimally thin screen somewhere
-    along the line of sight.
-
+    | Calculates the intensity of a scattering halo from intergalactic
+    | dust that is situated in an infinitesimally thin screen somewhere
+    | along the line of sight.
+    |
     | **MODIFIES**
     | halo.htype, halo.dist, halo.intensity, halo.taux
-
+    |
     | **INPUTS**
     | halo : Halo object
     | zs   : float : redshift of source

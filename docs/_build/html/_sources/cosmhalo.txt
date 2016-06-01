@@ -1,6 +1,5 @@
-
-galhalo
-=======
+cosmhalo
+========
 
 This module is for calculating X-ray scattering halos from
 Galactic (z=0) point sources.
@@ -18,9 +17,5 @@ Functions
 Functions within this module take a **Halo** object as input and modifies it by updating
 the *htype*, *intensity*, and any other related attributes.
 
-Intensities are calculated using numerical integration (trapezoidal
-method).  For the semi-analytic solutions, see :doc:`analytic`.
-
-.. autofunction:: astrodust.halos.galhalo.uniformISM
-.. autofunction:: astrodust.halos.galhalo.screenISM
-.. autofunction:: astrodust.halos.galhalo.path_diff
+.. autofunction:: astrodust.halos.cosmhalo.uniformIGM
+.. autofunction:: astrodust.halos.cosmhalo.screenIGM

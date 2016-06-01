@@ -30,7 +30,10 @@
   
 
   
-    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/> 
+    <link rel="top" title="eblur/dust 1.0 documentation" href="index.html"/>
+        <link rel="up" title="astrodust.halos" href="halos.html"/>
+        <link rel="next" title="analytic" href="analytic.html"/>
+        <link rel="prev" title="cosmology" href="cosmology.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -79,9 +82,26 @@
           
             
             
-                <ul>
+                <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="distlib.html">astrodust.distlib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extinction.html">astrodust.extinction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="halos.html">astrodust.halos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="halos.html#halo-class">Halo class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halos.html#halo-types-htype">Halo types (<em>htype</em>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="halos.html#sub-modules">Sub-modules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="galhalo.html">galhalo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cosmhalo.html">cosmhalo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cosmology.html">cosmology</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">halodict</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="analytic.html">analytic</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
             
@@ -112,6 +132,8 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
+          <li><a href="halos.html">astrodust.halos</a> &raquo;</li>
+      
     <li>halodict</li>
       <li class="wy-breadcrumbs-aside">
         
@@ -128,15 +150,87 @@
             
   <div class="section" id="halodict">
 <h1>halodict<a class="headerlink" href="#halodict" title="Permalink to this headline">¶</a></h1>
+<p>This module is for creating and manipulating <strong>HaloDict</strong> objects (a
+dictionary of <strong>Halo</strong> objects, see <a class="reference internal" href="halos.html"><em>astrodust.halos</em></a>).  The keys of the
+<strong>HaloDict</strong> objects are energy values.</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<p>This module is for creating and manipulating <strong>HaloDict</strong> objects (a
-dictionary of <strong>Halo</strong> objects, see <a class="reference internal" href="halo.html"><em>halo</em></a>).  The keys of the
-<strong>HaloDict</strong> objects are energy values.</p>
+<dl class="class">
+<dt id="astrodust.halos.halodict.HaloDict">
+<em class="property">class </em><code class="descclassname">astrodust.halos.halodict.</code><code class="descname">HaloDict</code><span class="sig-paren">(</span><em>energy</em>, <em>alpha=array([    1.</em>, <em>1.12201845</em>, <em>1.25892541</em>, <em>1.41253754</em>, <em>1.58489319</em>, <em>1.77827941</em>, <em>1.99526231</em>, <em>2.23872114</em>, <em>2.51188643</em>, <em>2.81838293</em>, <em>3.16227766</em>, <em>3.54813389</em>, <em>3.98107171</em>, <em>4.46683592</em>, <em>5.01187234</em>, <em>5.62341325</em>, <em>6.30957344</em>, <em>7.07945784</em>, <em>7.94328235</em>, <em>8.91250938</em>, <em>10.</em>, <em>11.22018454</em>, <em>12.58925412</em>, <em>14.12537545</em>, <em>15.84893192</em>, <em>17.7827941</em>, <em>19.95262315</em>, <em>22.38721139</em>, <em>25.11886432</em>, <em>28.18382931</em>, <em>31.6227766</em>, <em>35.48133892</em>, <em>39.81071706</em>, <em>44.66835922</em>, <em>50.11872336</em>, <em>56.23413252</em>, <em>63.09573445</em>, <em>70.79457844</em>, <em>79.43282347</em>, <em>89.12509381</em>, <em>100.</em>, <em>112.20184543</em>, <em>125.89254118</em>, <em>141.25375446</em>, <em>158.48931925</em>, <em>177.827941</em>, <em>199.5262315</em>, <em>223.87211386</em>, <em>251.18864315</em>, <em>281.83829313</em>, <em>316.22776602</em>, <em>354.81338923</em>, <em>398.10717055</em>, <em>446.68359215</em>, <em>501.18723363</em>, <em>562.34132519</em>, <em>630.95734448</em>, <em>707.94578438</em>, <em>794.32823472</em>, <em>891.25093813</em>, <em>1000.        ])</em>, <em>rad=&lt;astrodust.distlib.sizedist.Grain object&gt;</em>, <em>scatm=&lt;astrodust.extinction.sigma_scat.ScatModel object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.halodict.HaloDict" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">A dictionary of halos where each property can be looked up with energy as a key.</div>
+<div class="line"><br /></div>
+<div class="line"><strong>ATTRIBUTES</strong></div>
+<div class="line">alpha  : np.array : Observation angles [arcsec]</div>
+<div class="line">energy : np.array : Energy values [keV]</div>
+<div class="line">index  : dict : maps energy value to integer index</div>
+<div class="line">rad    : distlib.Grain or distlib.Powerlaw object</div>
+<div class="line">scatm  : sigma_scat.Scatmodel object</div>
+<div class="line">intensity : np.array : 2-D array with intensity values as a function of alpha and energy</div>
+<div class="line">htype  : halo type object (halo.CosmHalo or galhalo.GalHalo)</div>
+<div class="line">dist   : distlib.Dustspectrum object</div>
+<div class="line">taux   : np.array : Scattering cross-section as a function of energy</div>
+<div class="line">total  : np.array : Total halo flux as a function of osbervation angle [e.g. phot cm^-2 s^-1 arcsec^-2]</div>
+<div class="line"><br /></div>
+<div class="line"><strong>PROPERTIES</strong></div>
+<div class="line">len    : length in E dimension</div>
+<div class="line">hsize  : length in alpha dimension</div>
+<div class="line">superE : a 2-D array with the energy values duplicated along axis 1</div>
+<div class="line">superA : a 2-D array with the observation angles duplicated along axis 0</div>
+<div class="line"><br /></div>
+<div class="line"><strong>CALL</strong></div>
+<div class="line">halodict[E] : halo intensity I_h/F_a at E (keV) [arcsec^-2]</div>
+<div class="line">halodict[emin:emax] : sum of halo intensities betwen emin (keV) and emax (keV)</div>
+<div class="line"><br /></div>
+<div class="line"><strong>FUNCTIONS</strong></div>
+<div class="line">total_halo(fluxes)</div>
+<div class="line-block">
+<div class="line">fluxes : np.array : Source apparent flux as a function of energy [e.g. phot cm^-2 s^-1]</div>
+<div class="line"><em>Creates / updates the self.total parameter with the sum of the halo flux from each energy bin</em></div>
+</div>
+<div class="line">ecf(theta, nth=500)</div>
+<div class="line-block">
+<div class="line">theta : float : Value for which to compute enclosed fraction (arcseconds)</div>
+<div class="line">nth   : int (500) : Number of angles to use in calculation</div>
+<div class="line"><em>returns</em> the enclosed fraction for the halo surface brightness</div>
+<div class="line">profile, as a function of energy via</div>
+<div class="line">integral(theta,2pi*theta*halo)/total_halo_counts</div>
+</div>
+</div>
+</dd></dl>
+
 </div>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <p>Some somewhat useful functions for reading and writing <strong>HaloDict</strong> objects</p>
+<dl class="function">
+<dt id="astrodust.halos.halodict.fitsify_halodict">
+<code class="descclassname">astrodust.halos.halodict.</code><code class="descname">fitsify_halodict</code><span class="sig-paren">(</span><em>hd</em>, <em>outfile</em>, <em>clobber=False</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.halodict.fitsify_halodict" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Save a halo dictionary to a fits file, with some useful information in the header</div>
+<div class="line"><br /></div>
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">hd      : HaloDict object</div>
+<div class="line">outfile : string : output file name</div>
+<div class="line">clobber : boolean (False) : set to True to overwrite outfile if it already exists</div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="astrodust.halos.halodict.read_halodict_fits">
+<code class="descclassname">astrodust.halos.halodict.</code><code class="descname">read_halodict_fits</code><span class="sig-paren">(</span><em>infile</em><span class="sig-paren">)</span><a class="headerlink" href="#astrodust.halos.halodict.read_halodict_fits" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Read in a fits file and pass on as much information as possible to a halo dict object</div>
+<div class="line"><br /></div>
+<div class="line"><strong>INPUTS</strong></div>
+<div class="line">infile : string : fits file name to read</div>
+<div class="line"><br /></div>
+<div class="line"><strong>RETURNS</strong></div>
+<div class="line">intensity values from the fits file</div>
+</div>
+</dd></dl>
+
 </div>
 </div>
 
@@ -144,6 +238,15 @@ dictionary of <strong>Halo</strong> objects, see <a class="reference internal" h
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="analytic.html" class="btn btn-neutral float-right" title="analytic" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cosmology.html" class="btn btn-neutral" title="cosmology" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

@@ -18,8 +18,8 @@ from ..extinction import sigma_scat as ss
 
 class HaloDict( object ):
     """
-    A dictionary of halos where each property can be looked up with energy as a key.
-
+    | A dictionary of halos where each property can be looked up with energy as a key.
+    |
     | **ATTRIBUTES**
     | alpha  : np.array : Observation angles [arcsec]
     | energy : np.array : Energy values [keV]
@@ -31,17 +31,17 @@ class HaloDict( object ):
     | dist   : distlib.Dustspectrum object
     | taux   : np.array : Scattering cross-section as a function of energy
     | total  : np.array : Total halo flux as a function of osbervation angle [e.g. phot cm^-2 s^-1 arcsec^-2]
-
+    |
     | **PROPERTIES**
     | len    : length in E dimension
     | hsize  : length in alpha dimension
     | superE : a 2-D array with the energy values duplicated along axis 1
     | superA : a 2-D array with the observation angles duplicated along axis 0
-
+    |
     | **CALL**
     | halodict[E] : halo intensity I_h/F_a at E (keV) [arcsec^-2]
     | halodict[emin:emax] : sum of halo intensities betwen emin (keV) and emax (keV)
-
+    |
     | **FUNCTIONS**
     | total_halo(fluxes)
     |     fluxes : np.array : Source apparent flux as a function of energy [e.g. phot cm^-2 s^-1]
@@ -155,8 +155,8 @@ def aeff( filename ):
 
 def fitsify_halodict( hd, outfile, clobber=False ):
     """
-    Save a halo dictionary to a fits file, with some useful information in the header
-
+    | Save a halo dictionary to a fits file, with some useful information in the header
+    |
     | **INPUTS**
     | hd      : HaloDict object
     | outfile : string : output file name
@@ -193,11 +193,11 @@ def fitsify_halodict( hd, outfile, clobber=False ):
 
 def read_halodict_fits( infile ):
     """
-    Read in a fits file and pass on as much information as possible to a halo dict object
-
+    | Read in a fits file and pass on as much information as possible to a halo dict object
+    |
     | **INPUTS**
     | infile : string : fits file name to read
-
+    |
     | **RETURNS**
     | intensity values from the fits file
     """

@@ -104,22 +104,20 @@ def G_s( halo ):
     return -0.5 * np.power( const, -pfrac ) * ( gamma1 - gamma0 )
 
 def screen_eq( halo, xg=0.5, verbose=False, **kwargs ):
-    '''
-    Analytic function for a screen of dust particles
-        from parameters set in halo (taux, a0, a1, p, xg)
-
+    """
+    | Analytic function for a screen of dust particles
+    | from parameters set in halo (taux, a0, a1, p, xg)
+    |
     | **MODIFIES**
-    | halo.htype, halo.intensity
-
+    | halo.intensity : np.array [arcsec^-2] : I_h/F_a
+    | halo.htype
+    |
     | **INPUTS**
-    | halo : halo.Halo object
+    | halo : halos.Halo object
     | xg   : float (0.5) : parameterized location of dust screen
     |     [unitless, 0 = location of observer, 1 = location of source]
     | verbose : boolean (False) : prints some information
-
-    | **RETURNS**
-    | np.array [arcsec^-2] : I_h/F_a
-    '''
+    """
 
     set_htype( halo, xg=xg, **kwargs )
     hfrac, energy, alpha = np.array([]), np.array([]), np.array([])
@@ -178,20 +176,17 @@ def G_u( halo ):
     return ( (A1-B1) - (A0-B0) ) / power
 
 def uniform_eq( halo, verbose=False, **kwargs ):
-    '''
-    Analytic function for a uniform distribution of dust particles
-        from parameters set in halo (taux, a0, a1, p)
-
+    """
+    | Analytic function for a uniform distribution of dust particles from parameters set in halo (taux, a0, a1, p)
+    |
     | **MODIFIES**
-    | halo.htype, halo.intensity
-
+    | halo.intensity : np.array [arcsec^-2] : I_h/F_a
+    | halo.htype
+    |
     | **INPUTS**
-    | halo : halo.Halo object
+    | halo : halos.Halo object
     | verbose : boolean (False) : boolean (False) : prints some information
-
-    | **RETURNS**
-    | np.array [arcsec^-2] : I_h/F_a
-    '''
+    """
 
     set_htype( halo, xg=None, **kwargs )
 

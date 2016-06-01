@@ -15,7 +15,7 @@ API for CmIndex classes
     |          e.g. rp(E) where E is in [keV]
     | ip     : same as above, ip(E) where E is in [keV]
 
-.. automodule:: cmindex
+.. automodule:: astrodust.distlib.composition.cmindex
 
 Class Library
 -------------
