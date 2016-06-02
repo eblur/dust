@@ -8,7 +8,7 @@ grain sizes (see Appendix of `Corrales & Paerels, 2015
 <http://adsabs.harvard.edu/abs/2015MNRAS.453.1121C>`_).
 
 
-When creating a **Halo** object, one must import from :doc:`halo`.
+When creating a **Halo** object, one must import from :doc:`halos`.
 The functions in this module are for Galactic sources only.  (Note
 that :doc:`galhalo` contains functions for numerically integrated
 solutions).

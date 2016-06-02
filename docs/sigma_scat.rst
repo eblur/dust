@@ -1,10 +1,10 @@
 sigma_scat
 ==========
 
-This module combines the complex index of refraction (:doc:`cmindex`)
+This module combines the complex index of refraction (:doc:`composition`)
 and scattering algorithm (:doc:`scatmodels`) to calculate the total or
 differential cross-sections for a particular dust grain size
-distribution (:doc:`dust`).
+distribution (:doc:`distlib`).
 
 Classes
 -------

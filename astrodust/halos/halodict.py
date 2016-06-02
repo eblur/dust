@@ -120,22 +120,52 @@ class HaloDict( object ):
         self.total = result
         return
 
-        # Update -- Feb 10, 2015 to match halo.ecf
-    def ecf( self, theta, nth=500 ):
-        NE, NA = len(self.energy), len(self.alpha)
-        result = np.zeros( NE ) # NE x NA
+    # Update -- Feb 10, 2015 to match halo.ecf
+    def ecf(self, theta, nth=500):
+        NE     = len(self.energy)
+        result = np.zeros(NE)
         taux   = self.taux
-        tharray = np.linspace( min(self.alpha), theta, nth )
-
-        if self.taux == None:
+        tharray = np.linspace(min(self.alpha), theta, nth)
+        if self.taux is None:
             print('ERROR: No taux is specified. Need to run halo calculation')
             return result
-
         for i in range(NE):
-            interpH = interp1d( self.alpha, self.intensity[i,:] )
-            result[i] = c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / taux[i]
-
+            interpH = interp1d(self.alpha, self.intensity[i,:])
+            result[i] = c.intz(tharray, interpH(tharray) * 2.0*np.pi*tharray) / taux[i]
         return result
+
+    def fitsify_halodict(self, outfile, clobber=False):
+        """
+        | Save a halo dictionary to a fits file, with some useful information in the header
+        |
+        | **INPUTS**
+        | outfile : string : output file name
+        | clobber : boolean (False) : set to True to overwrite outfile if it already exists
+        """
+        # Set up the header
+        prihdr = fits.Header()
+        prihdr['COMMENT'] = "This is a fits file containing halo dictionary information"
+        prihdr['SCATM']   = self.scatm.stype
+        prihdr['HTYPE']   = self.htype.ismtype
+        prihdr['DUSTMASS'] = self.dist.md
+        prihdr['DUSTDENS'] = self.rad.rho
+        prihdr['DUSTPOWR'] = self.rad.p
+        prihdu = fits.PrimaryHDU(header=prihdr)
+        # Create a block that contains the energy and taux info
+        tbhdu = fits.BinTableHDU.from_columns(
+            [fits.Column(name='energy', format='1E', array=self.energy),
+             fits.Column(name='taux', format='1E', array=self.taux)])
+        dust_hdu = fits.BinTableHDU.from_columns(
+            [fits.Column(name='rad', format='1E', array=self.rad.a)])
+        thdulist = fits.HDUList([prihdu, tbhdu, dust_hdu])
+        # Write a table for each energy
+        for EE in self.energy:
+            tbhdu = fits.BinTableHDU.from_columns(
+                [fits.Column(name='alpha', format='1E', array=self.alpha),
+                 fits.Column(name='intensity', format='1E', array=self[EE])])
+            thdulist.append(tbhdu)
+        thdulist.writeto(outfile, clobber=clobber)
+        return
 
 #---------------------------------------------------------------
 # Supporting functions
@@ -151,47 +181,8 @@ def aeff( filename ):
     aeff   = np.array( data[1] )
     return interp1d( energy, aeff )   # keV vs cm^2
 
-## 2015.01.29 - Add a function that will save and load halo dicts into/from fits files
-
-def fitsify_halodict( hd, outfile, clobber=False ):
-    """
-    | Save a halo dictionary to a fits file, with some useful information in the header
-    |
-    | **INPUTS**
-    | hd      : HaloDict object
-    | outfile : string : output file name
-    | clobber : boolean (False) : set to True to overwrite outfile if it already exists
-    """
-    # Set up the header
-    prihdr = fits.Header()
-    prihdr['COMMENT'] = "This is a fits file containing halo dictionary information"
-    prihdr['SCATM']   = hd.scatm.stype
-    prihdr['HTYPE']   = hd.htype.ismtype
-    prihdr['DUSTMASS'] = hd.dist.md
-    prihdr['DUSTDENS'] = hd.rad.rho
-    prihdr['DUSTPOWR'] = hd.rad.p
-    prihdu = fits.PrimaryHDU(header=prihdr)
-
-    # Create a block that contains the energy and taux info
-    tbhdu = fits.BinTableHDU.from_columns( \
-        [fits.Column(name='energy', format='1E', array=hd.energy), \
-         fits.Column(name='taux', format='1E', array=hd.taux)] )
-
-    dust_hdu = fits.BinTableHDU.from_columns( \
-        [fits.Column(name='rad', format='1E', array=hd.rad.a)] )
-
-    thdulist = fits.HDUList([prihdu, tbhdu, dust_hdu])
-
-    for EE in hd.energy:
-        tbhdu = fits.BinTableHDU.from_columns( \
-            [fits.Column(name='alpha', format='1E', array=hd.alpha), \
-             fits.Column(name='intensity', format='1E', array=hd[EE])] )
-        thdulist.append(tbhdu)
-
-    thdulist.writeto(outfile, clobber=clobber)
-    return
-
-def read_halodict_fits( infile ):
+# 2015.01.29 - Add a function that will save and load halo dicts into/from fits files
+def read_halodict_fits(infile):
     """
     | Read in a fits file and pass on as much information as possible to a halo dict object
     |
@@ -212,11 +203,11 @@ def read_halodict_fits( infile ):
     powr    = header['DUSTPOWR']
     alpha   = hdulist[3].data['alpha']
 
-    result  = HaloDict( energy, alpha=alpha, rad=rad )
+    result  = HaloDict(energy, alpha=alpha, rad=rad)
     result.taux = taux
     result.dist = distlib.Dustspectrum(a=rad, p=powr, rho=rho, md=md)
 
-    for i in np.arange(len(energy))+3:
-        result.intensity[i-3,:] = hdulist[i].data['intensity']
+    for i in np.arange(len(energy)):
+        result.intensity[i,:] = hdulist[i+3].data['intensity']
 
     return result
