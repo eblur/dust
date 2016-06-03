@@ -98,41 +98,9 @@ class Ihalo(object):
 
         return result
 
-## As of May 20, 2012 -- it compiles!
-
-##------------------------------------------------------------------------------
-'''
-# Deprecated
-def make_Ihalo_dict( rad=distlib.MRN_RAD, ener=1.0, \
-                         theta=ANGLES,
-                         scatm=ss.ScatModel(), nx=1000 ):
-    """
-    | **RETURNS**
-    | A dictionary of Ihalo objects, with grain sizes as keys.
-    """
-
-    if np.size(ener) > 1:
-        print('Error: Can only choose one value for energy')
-        return
-    if np.size(theta) < 2:
-        print('Error: Must give more than one theta value')
-        return
-    if np.size(rad) == 1:
-        print('Error: Input "rad" must be an iterable object.')
-        return
-
-    keys = []
-    halo_objs = []
-    for aval in rad:
-        keys.append( aval )
-        halo_objs.append( Ihalo( theta=theta, rad=aval, ener=ener, scatm=scatm, nx=nx ) )
-
-    return dict( zip(keys,halo_objs) )
-'''
-
 #--------------- Galactic Halos --------------------
 
-def path_diff( alpha, x ):
+def path_diff(alpha, x):
     """
     | **INPUTS**
     | alpha  : scalar : observation angle [arcsec]
@@ -142,19 +110,17 @@ def path_diff( alpha, x ):
     | path difference associated with a particular alpha and x : alpha^2*(1-x)/(2x)
     """
 
-    if np.size( alpha ) > 1:
+    if np.size(alpha) > 1:
         print('Error: np.size(alpha) cannot be greater than one.')
         return
-    if np.max( x ) > 1.0 or np.min( x ) < 0:
+    if np.max(x) > 1.0 or np.min(x) < 0:
         print('Error: x must be between 0 and 1')
         return
-
     alpha_rad = alpha * c.arcs2rad
-
     return alpha_rad**2 * (1-x) / (2*x)
 
-## May 16, 2012: Added e^-kappa_x \delta x to the integral
-def uniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
+# May 16, 2012: Added e^-kappa_x \delta x to the integral
+def uniformISM(halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False):
     """
     | Calculate the X-ray scattering intensity for dust distributed
     | uniformly along the line of sight
@@ -174,12 +140,12 @@ def uniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
     scatm = halo.scatm
     md    = NH * c.m_p * d2g
 
-    halo.htype = GalHalo( NH=NH, d2g=d2g, ismtype='Uniform' )
+    halo.htype = GalHalo(NH=NH, d2g=d2g, ismtype='Uniform')
     halo.dist  = distlib.MRN_dist(md=md)
-    halo.taux  = ss.KappaScat( E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * md
+    halo.taux  = ss.KappaScat(E=halo.energy, scatm=halo.scatm, dist=halo.dist).kappa * md
 
     dx    = 1.0 / nx
-    xvals = np.arange( 0.0, 1.0, dx ) + dx
+    xvals = np.arange(0.0, 1.0, dx) + dx
 
     #--- Single grain case ---
 
@@ -188,17 +154,17 @@ def uniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
         intensity = np.array([])
         for al in alpha:
             thscat = al / xvals  # np.size(thscat) = nx
-            dsig   = ss.DiffScat( theta=thscat, a=halo.dist.a, E=E0, scatm=scatm ).dsig
+            dsig   = ss.DiffScat(theta=thscat, a=halo.dist.a, E=E0, scatm=scatm).dsig
 
             delta_tau = 0.0
             if usepathdiff:
                 print('Using path difference')
-                delta_x   = path_diff( al, xvals )
+                delta_x   = path_diff(al, xvals)
                 delta_tau = halo.taux * delta_x
-                print(np.max( delta_x ))
+                print(np.max(delta_x))
 
-            itemp  = np.power( xvals, -2.0 ) * dsig * halo.dist.nd * np.exp( -delta_tau )
-            intensity = np.append( intensity, c.intz( xvals, itemp ) )
+            itemp  = np.power(xvals, -2.0) * dsig * halo.dist.nd * np.exp(-delta_tau)
+            intensity = np.append(intensity, c.intz(xvals, itemp))
 
     #--- Dust distribution case ---
     else:
@@ -208,21 +174,22 @@ def uniformISM( halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False ):
             thscat = al / xvals  # np.size(thscat) = nx
             iatemp    = np.array([])
             for aa in avals:
-                dsig  = ss.DiffScat( theta=thscat, a=aa, E=E0, scatm=scatm ).dsig
+                dsig  = ss.DiffScat(theta=thscat, a=aa, E=E0, scatm=scatm).dsig
                 delta_tau = 0.0
                 if usepathdiff:
                     print('Using path difference')
-                    delta_x   = path_diff( al, xvals )
+                    delta_x   = path_diff(al, xvals)
                     delta_tau = halo.taux * delta_x
-                    print max( delta_x )
-                dtemp  = np.power( xvals, -2.0 ) * dsig * np.exp( -delta_tau )
-                iatemp = np.append( iatemp, c.intz( xvals, dtemp ) )
-            intensity = np.append( intensity, c.intz( avals, halo.dist.nd * iatemp ) )
+                    print max(delta_x)
+                dtemp  = np.power(xvals, -2.0) * dsig * np.exp(-delta_tau)
+                iatemp = np.append(iatemp, c.intz(xvals, dtemp))
+            intensity = np.append(intensity, c.intz(avals, halo.dist.nd * iatemp))
     # Set the halo intensity
-    halo.intensity  = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
+    halo.intensity  = intensity * np.power(c.arcs2rad, 2)  # arcsec^-2
     # halo.taux set at beginning of function so it could be called for later use
+    return
 
-def screenISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
+def screenISM(halo, xg=0.5, NH=1.0e20, d2g=0.009):
     """
     | Calculate the X-ray scattering intensity for dust in an
     | infinitesimally thin wall somewhere on the line of sight.
@@ -241,24 +208,26 @@ def screenISM( halo, xg=0.5, NH=1.0e20, d2g=0.009 ):
     scatm = halo.scatm
     md    = NH * c.m_p * d2g
 
-    halo.htype = GalHalo( xg=xg, NH=NH, d2g=d2g, ismtype='Screen' )
+    halo.htype = GalHalo(xg=xg, NH=NH, d2g=d2g, ismtype='Screen')
     halo.dist  = distlib.MRN_dist(md=md)
 
     thscat = alpha / xg
 
     if np.size(halo.dist.a) == 1:
-        dsig = ss.DiffScat( theta=thscat, a=halo.dist.a, E=E0, scatm=scatm ).dsig
-        intensity = np.power( xg, -2.0 ) * dsig * halo.dist.nd
+        dsig = ss.DiffScat(theta=thscat, a=halo.dist.a, E=E0, scatm=scatm).dsig
+        intensity = np.power(xg, -2.0) * dsig * halo.dist.nd
 
     else:
         avals  = halo.dist.a
         intensity = []
-        for i in range( len(alpha) ):
-            iatemp = np.zeros( shape=( len(avals),len(alpha) ) )
-            for j in range( len(avals) ):
-                dsig    = ss.DiffScat( theta=thscat, a=avals[j], E=E0, scatm=scatm ).dsig
+        for i in range(len(alpha)):
+            iatemp = np.zeros(shape=(len(avals),len(alpha)))
+            for j in range(len(avals)):
+                dsig    = ss.DiffScat(theta=thscat, a=avals[j], E=E0, scatm=scatm).dsig
                 iatemp[j,:] = np.power(xg,-2.0) * dsig
-            intensity.append( c.intz( avals, iatemp[:,i] * halo.dist.nd ) )
-        intensity = np.array( intensity )
-    halo.intensity = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
-    halo.taux      = ss.KappaScat( E=halo.energy, scatm=halo.scatm, dist=halo.dist ).kappa * md
+            intensity.append(c.intz(avals, iatemp[:,i] * halo.dist.nd))
+        intensity = np.array(intensity)
+
+    halo.intensity = intensity * np.power(c.arcs2rad, 2)  # arcsec^-2
+    halo.taux      = ss.KappaScat(E=halo.energy, scatm=halo.scatm, dist=halo.dist).kappa * md
+    return

@@ -82,7 +82,7 @@ def da_fun( theta, z, cosm=Cosmology(), nz=100 ):
     dchi = dchi_fun( z, cosm=cosm, nz=nz )
     return theta * c.arcs2rad * dchi / (1+z)
 
-
+# This needs to be rewritten to avoid energy for loop
 def cosm_taux(z, E=1.0, dist=distlib.MRN_dist(md=cosmdens(Cosmology())),
               scatm=ss.ScatModel(), cosm=Cosmology(), nz=100):
     """

@@ -44,25 +44,25 @@ def uniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
     E0    = halo.energy
     alpha = halo.alpha
     scatm = halo.scatm
+    print(scatm.cmodel.citation)
 
-    halo.htype = CosmHalo( zs=zs, cosm=cosm, igmtype='Uniform' ) # Stores information about this halo calc
+    halo.htype = CosmHalo(zs=zs, cosm=cosm, igmtype='Uniform')  # Stores information about this halo calc
 
-    Dtot   = cosmo.dchi_fun( zs, cosm=cosm, nz=nz )
-    zpvals = cosmo.zvalues( zs=zs-zs/nz, z0=0, nz=nz )
+    Dtot   = cosmo.dchi_fun(zs, cosm=cosm, nz=nz)
+    zpvals = cosmo.zvalues(zs=zs-zs/nz, z0=0, nz=nz)
 
     DP    = np.array([])
     for zp in zpvals:
-        DP = np.append( DP, cosmo.dchi_fun( zs, zp=zp, cosm=cosm ) )
+        DP = np.append(DP, cosmo.dchi_fun(zs, zp=zp, cosm=cosm))
 
     X     = DP/Dtot
 
-    c_H0_cm = c.cperh0 * (c.h0 / cosm.h0)  #cm
-    hfac    = np.sqrt( cosm.m * np.power( 1+zpvals, 3) + cosm.l )
+    c_H0_cm = c.cperh0 * (c.h0 / cosm.h0)  # cm
+    hfac    = np.sqrt(cosm.m * np.power(1+zpvals, 3) + cosm.l)
 
     Evals  = E0 * (1+zpvals)
 
-    ## Single grain case
-
+    # Single grain case
     if np.size(halo.dist.a) == 1:
         intensity = np.array([])
         f    = 0.0
@@ -88,7 +88,7 @@ def uniformIGM( halo, zs=4.0, cosm=cosmo.Cosmology(), nz=500 ):
             intensity = np.append( intensity, c.intz( avals, halo.dist.nd * iatemp ) )
     #----- Finally, set the halo intensity --------
     halo.intensity  = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
-    halo.taux       = cosmo.cosm_taux( zs, E=halo.energy, dist=halo.dist, scatm=halo.scatm, cosm=halo.htype.cosm )
+    halo.taux       = cosmo.cosm_taux(zs, E=halo.energy, dist=halo.dist, scatm=halo.scatm, cosm=halo.htype.cosm)
 
 #----------------- Infinite Screen Case --------------------------
 
@@ -115,27 +115,28 @@ def screenIGM( halo, zs=2.0, zg=1.0, md=1.5e-5, cosm=cosmo.Cosmology() ):
     E0    = halo.energy
     alpha = halo.alpha
     scatm = halo.scatm
+    print(scatm.cmodel.citation)
 
     # Store information about this halo calculation
-    halo.htype = CosmHalo( zs=zs, zg=zg, cosm=cosm, igmtype='Screen' )
+    halo.htype = CosmHalo(zs=zs, zg=zg, cosm=cosm, igmtype='Screen')
 
-    X      = cosmo.dchi_fun( zs, zp=zg, cosm=cosm ) / cosmo.dchi_fun( zs, cosm=cosm )  # Single value
+    X      = cosmo.dchi_fun(zs, zp=zg, cosm=cosm) / cosmo.dchi_fun(zs, cosm=cosm)  # Single value
     thscat = alpha / X                          # Scattering angle required
     Eg     = E0 * (1+zg)                        # Photon energy at the screen
 
-    ## Single grain size case
+    # Single grain size case
     if np.size(halo.dist.a) == 1:
-        dsig = ss.DiffScat( theta=thscat, a=halo.dist.a, E=Eg, scatm=scatm ).dsig
-        intensity = halo.dist.nd / np.power( X, 2 ) * dsig
-    ## Distribution of grain sizes
+        dsig = ss.DiffScat(theta=thscat, a=halo.dist.a, E=Eg, scatm=scatm).dsig
+        intensity = halo.dist.nd / np.power(X, 2) * dsig
+    # Distribution of grain sizes
     else:
         avals = halo.dist.a
-        dsig  = np.zeros( shape=(np.size(avals), np.size(thscat)) )
-        for i in range( np.size(avals) ):
-            dsig[i,:] = ss.DiffScat( theta=thscat, a=avals[i], E=Eg, scatm=scatm ).dsig
+        dsig  = np.zeros(shape=(np.size(avals), np.size(thscat)))
+        for i in range(np.size(avals)):
+            dsig[i,:] = ss.DiffScat(theta=thscat, a=avals[i], E=Eg, scatm=scatm).dsig
         intensity = np.array([])
-        for j in range( np.size(thscat) ):
+        for j in range(np.size(thscat)):
             itemp = halo.dist.nd * dsig[:,j] / np.power(X,2)
-            intensity = np.append( intensity, c.intz( avals, itemp ) )
-    halo.intensity = intensity * np.power( c.arcs2rad, 2 )  # arcsec^-2
-    halo.taux      = cosmo.cosm_taux_screen( zg, E=halo.energy, dist=halo.dist, scatm=halo.scatm )
+            intensity = np.append(intensity, c.intz(avals, itemp))
+    halo.intensity = intensity * np.power(c.arcs2rad, 2)  # arcsec^-2
+    halo.taux      = cosmo.cosm_taux_screen(zg, E=halo.energy, dist=halo.dist, scatm=halo.scatm)

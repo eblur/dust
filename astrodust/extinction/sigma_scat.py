@@ -82,7 +82,7 @@ def makeScatModel( model_name, material_name ):
         print('Error: CM name not recognized')
         return
 
-    return ScatModel( sm, cm )
+    return ScatModel(sm, cm)
 
 
 #-------------- Various Types of Scattering Cross-sections -----------------------
@@ -99,7 +99,7 @@ class DiffScat(object):
     | a     : scalar : um
     | dsig  : np.array : cm^2 ster^-1
     """
-    def __init__( self, scatm=ScatModel(), theta=angles(), E=1.0, a=1.0 ):
+    def __init__(self, scatm=ScatModel(), theta=angles(), E=1.0, a=1.0):
         self.scatm  = scatm
         self.theta  = theta
         self.E      = E
@@ -107,13 +107,14 @@ class DiffScat(object):
 
         cm   = scatm.cmodel
         scat = scatm.smodel
+        # Do not print citation here, because this function is called multiple times by other modules
 
         if cm.cmtype == 'Graphite':
-            dsig_pe = scat.Diff( theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-            dsig_pa = scat.Diff( theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
-            self.dsig = ( dsig_pa + 2.0 * dsig_pe ) / 3.0
+            dsig_pe = scat.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
+            dsig_pa = scat.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
+            self.dsig = (dsig_pa + 2.0 * dsig_pe) / 3.0
         else:
-            self.dsig   = scat.Diff( theta=theta, a=a, E=E, cm=cm )
+            self.dsig   = scat.Diff(theta=theta, a=a, E=E, cm=cm)
 
 class SigmaScat(object):
     """
@@ -127,22 +128,23 @@ class SigmaScat(object):
     | qsca  : scalar or np.array : unitless scattering efficiency
     | sigma : scalar or np.array : cm^2
     """
-    def __init__( self, scatm=ScatModel(), E=1.0, a=1.0 ):
+    def __init__(self, scatm=ScatModel(), E=1.0, a=1.0):
         self.scatm  = scatm
         self.E      = E
         self.a      = a
 
         cm   = scatm.cmodel
         scat = scatm.smodel
+        print(cm.citation)
 
-        cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
+        cgeo  = np.pi * np.power(a*c.micron2cm, 2)
 
         if cm.cmtype == 'Graphite':
-            qsca_pe = scat.Qsca( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-            qsca_pa = scat.Qsca( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
-            self.qsca = ( qsca_pa + 2.0*qsca_pe ) / 3.0
+            qsca_pe = scat.Qsca(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
+            qsca_pa = scat.Qsca(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
+            self.qsca = (qsca_pa + 2.0*qsca_pe) / 3.0
         else:
-            self.qsca = scat.Qsca( a=a, E=E, cm=cm )
+            self.qsca = scat.Qsca(a=a, E=E, cm=cm)
 
         self.sigma = self.qsca * cgeo
 
@@ -158,7 +160,7 @@ class SigmaExt(object):
     | qext  : scalar or np.array : unitless extinction efficiency
     | sigma : scalar or np.array : cm^2
     """
-    def __init__( self, scatm=ScatModel(), E=1.0, a=1.0 ):
+    def __init__(self, scatm=ScatModel(), E=1.0, a=1.0):
         self.scatm  = scatm
         self.E      = E
         self.a      = a
@@ -171,13 +173,15 @@ class SigmaExt(object):
 
         cm   = scatm.cmodel
         scat = scatm.smodel
-        cgeo  = np.pi * np.power( a*c.micron2cm, 2 )
+        print(cm.citation)
+
+        cgeo  = np.pi * np.power(a*c.micron2cm, 2)
         if cm.cmtype == 'Graphite':
-            qext_pe = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp') )
-            qext_pa = scat.Qext( a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para') )
-            self.qext = ( qext_pa + 2.0*qext_pe ) / 3.0
+            qext_pe = scat.Qext(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
+            qext_pa = scat.Qext(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
+            self.qext = (qext_pa + 2.0*qext_pe) / 3.0
         else:
-            self.qext = scat.Qext( a=a, E=E, cm=cm )
+            self.qext = scat.Qext(a=a, E=E, cm=cm)
         self.sigma = self.qext * cgeo
 
 class KappaScat(object):
@@ -190,19 +194,20 @@ class KappaScat(object):
     | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    def __init__( self, E=1.0, scatm=ScatModel(), dist=distlib.MRN_dist() ):
+    def __init__(self, E=1.0, scatm=ScatModel(), dist=distlib.MRN_dist()):
         self.scatm  = scatm
         self.E      = E
         self.dist   = dist
 
         cm   = scatm.cmodel
         scat = scatm.smodel
+        print(cm.citation)
 
-        cgeo = np.pi * np.power( dist.a * c.micron2cm, 2 )
+        cgeo = np.pi * np.power(dist.a * c.micron2cm, 2)
 
-        qsca    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-        qsca_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-        qsca_pa = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
+        qsca    = np.zeros(shape=(np.size(E),np.size(dist.a)))
+        qsca_pe = np.zeros(shape=(np.size(E),np.size(dist.a)))
+        qsca_pa = np.zeros(shape=(np.size(E),np.size(dist.a)))
 
         # Test for graphite case
         if cm.cmtype == 'Graphite':
@@ -210,29 +215,29 @@ class KappaScat(object):
             cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
 
             if np.size(dist.a) > 1:
-                for i in range( np.size(dist.a) ):
-                    qsca_pe[:,i] = scat.Qsca( E, a=dist.a[i], cm=cmGraphitePerp )
-                    qsca_pa[:,i] = scat.Qsca( E, a=dist.a[i], cm=cmGraphitePara )
+                for i in range(np.size(dist.a)):
+                    qsca_pe[:,i] = scat.Qsca(E, a=dist.a[i], cm=cmGraphitePerp)
+                    qsca_pa[:,i] = scat.Qsca(E, a=dist.a[i], cm=cmGraphitePara)
             else:
-                qsca_pe = scat.Qsca( E, a=dist.a, cm=cmGraphitePerp )
-                qsca_pa = scat.Qsca( E, a=dist.a, cm=cmGraphitePara )
+                qsca_pe = scat.Qsca(E, a=dist.a, cm=cmGraphitePerp)
+                qsca_pa = scat.Qsca(E, a=dist.a, cm=cmGraphitePara)
 
-            qsca    = ( qsca_pa + 2.0 * qsca_pe ) / 3.0
+            qsca    = (qsca_pa + 2.0 * qsca_pe) / 3.0
 
         else:
             if np.size(dist.a) > 1:
-                for i in range( np.size(dist.a) ):
-                    qsca[:,i] = scat.Qsca( E, a=dist.a[i], cm=cm )
+                for i in range(np.size(dist.a)):
+                    qsca[:,i] = scat.Qsca(E, a=dist.a[i], cm=cm)
             else:
-                qsca = scat.Qsca( E, a=dist.a, cm=cm )
+                qsca = scat.Qsca(E, a=dist.a, cm=cm)
 
         if np.size(dist.a) == 1:
             kappa = dist.nd * qsca * cgeo / dist.md
         else:
             kappa = np.array([])
-            for j in range( np.size(E) ):
-                kappa = np.append( kappa, \
-                                   c.intz( dist.a, dist.nd * qsca[j,:] * cgeo ) / dist.md )
+            for j in range(np.size(E)):
+                kappa = np.append(kappa,
+                                  c.intz(dist.a, dist.nd * qsca[j,:] * cgeo) / dist.md)
 
         self.kappa = kappa
 
@@ -248,7 +253,7 @@ class KappaExt(object):
     | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    def __init__( self, E=1.0, scatm=ScatModel(), dist=distlib.MRN_dist() ):
+    def __init__(self, E=1.0, scatm=ScatModel(), dist=distlib.MRN_dist()):
         self.scatm  = scatm
         self.E      = E
         self.dist   = dist
@@ -260,12 +265,13 @@ class KappaExt(object):
 
         cm   = scatm.cmodel
         scat = scatm.smodel
+        print(cm.citation)
 
-        cgeo = np.pi * np.power( dist.a * c.micron2cm, 2 )
+        cgeo = np.pi * np.power(dist.a * c.micron2cm, 2)
 
-        qext    = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-        qext_pe = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
-        qext_pa = np.zeros( shape=( np.size(E),np.size(dist.a) )  )
+        qext    = np.zeros(shape=(np.size(E),np.size(dist.a)))
+        qext_pe = np.zeros(shape=(np.size(E),np.size(dist.a)))
+        qext_pa = np.zeros(shape=(np.size(E),np.size(dist.a)))
 
         # Test for graphite case
         if cm.cmtype == 'Graphite':
@@ -273,61 +279,28 @@ class KappaExt(object):
             cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
 
             if np.size(dist.a) > 1:
-                for i in range( np.size(dist.a) ):
-                    qext_pe[:,i] = scat.Qext( E, a=dist.a[i], cm=cmGraphitePerp )
-                    qext_pa[:,i] = scat.Qext( E, a=dist.a[i], cm=cmGraphitePara )
+                for i in range(np.size(dist.a)):
+                    qext_pe[:,i] = scat.Qext(E, a=dist.a[i], cm=cmGraphitePerp)
+                    qext_pa[:,i] = scat.Qext(E, a=dist.a[i], cm=cmGraphitePara)
             else:
-                qext_pe = scat.Qext( E, a=dist.a, cm=cmGraphitePerp )
-                qext_pa = scat.Qext( E, a=dist.a, cm=cmGraphitePara )
+                qext_pe = scat.Qext(E, a=dist.a, cm=cmGraphitePerp)
+                qext_pa = scat.Qext(E, a=dist.a, cm=cmGraphitePara)
 
-            qext    = ( qext_pa + 2.0 * qext_pe ) / 3.0
+            qext    = (qext_pa + 2.0 * qext_pe) / 3.0
 
         else:
             if np.size(dist.a) > 1:
-                for i in range( np.size(dist.a) ):
-                    qext[:,i] = scat.Qext( E, a=dist.a[i], cm=cm )
+                for i in range(np.size(dist.a)):
+                    qext[:,i] = scat.Qext(E, a=dist.a[i], cm=cm)
             else:
-                qext = scat.Qext( E, a=dist.a, cm=cm )
+                qext = scat.Qext(E, a=dist.a, cm=cm)
 
         if np.size(dist.a) == 1:
             kappa = dist.nd * qext * cgeo / dist.md
         else:
             kappa = np.array([])
-            for j in range( np.size(E) ):
-                kappa = np.append( kappa, \
-                                   c.intz( dist.a, dist.nd * qext[j,:] * cgeo ) / dist.md )
+            for j in range(np.size(E)):
+                kappa = np.append(kappa,
+                                  c.intz(dist.a, dist.nd * qext[j,:] * cgeo) / dist.md)
 
         self.kappa = kappa
-
-
-
-
-#-------------- Objects that can be used for interpolation later -----------------
-'''
-# Deprecated
-class KappaSpec( object ):
-    """
-    OBJECT Kappaspec( E=None, kappa=None, scatm=None, dspec=None )
-    E     : np.array : keV
-    scatm : ScatModel
-    dspec : distlib.DustSpectrum
-    kappa : scipy.interpolate.interp1d object with (E, kappa) as arguments
-    """
-    def __init__(self, E=None, kappa=None, scatm=None, dspec=None ):
-        self.E = E
-        self.kappa = interp1d( E, kappa )
-        self.scatm = scatm
-        self.dspec = dspec
-
-class SigmaSpec( object ):
-    """
-    OBJECT Sigmaspec( E=None, sigma=None, scatm=None )
-    E     : np.array : keV
-    scatm : ScatModel
-    sigma : scipy.interpolate.interp1d object with (E, sigma) as arguments
-    """
-    def __init__(self, E=None, sigma=None, scatm=None):
-        self.E = E
-        self.sigma = interp1d( E, sigma )
-        self.scatm = scatm
-'''
