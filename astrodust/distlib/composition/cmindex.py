@@ -31,6 +31,7 @@ class CmDrude(object):
     | **ATTRIBUTES**
     | cmtype : 'Drude'
     | rho    : grain density [g cm^-3]
+    | citation : A string containing citation to original work
     |
     | ** FUNCTIONS**
     | rp(E)  : real part of complex index of refraction [E in keV]
@@ -39,14 +40,15 @@ class CmDrude(object):
     def __init__(self, rho=3.0):  # Returns a CM using the Drude approximation
         self.cmtype = 'Drude'
         self.rho    = rho
+        self.citation = "Using the Drude approximation.\nBohren, C. F. & Huffman, D. R., 1983, Absorption and Scattering of Light by Small Particles (New York: Wiley)"
 
-    def rp( self, E ):
-        mm1 = self.rho / ( 2.0*c.m_p ) * c.r_e/(2.0*np.pi) * np.power( c.hc/E , 2 )
+    def rp(self, E):
+        mm1 = self.rho / (2.0*c.m_p) * c.r_e/(2.0*np.pi) * np.power(c.hc/E, 2)
         return mm1+1
 
-    def ip( self, E ):
+    def ip(self, E):
         if np.size(E) > 1:
-            return np.zeros( np.size(E) )
+            return np.zeros(np.size(E))
         else:
             return 0.0
 
@@ -56,10 +58,11 @@ class CmGraphite(object):
     | cmtype : 'Graphite'
     | size   : 'big' or 'small'
     | orient : 'perp' or 'para'
+    | citation : A string containing citation to original work
     | rp(E)  : scipy.interp1d object
     | ip(E)  : scipy.interp1d object [E in keV]
     """
-    def __init__( self, size='big', orient='perp' ):
+    def __init__(self, size='big', orient='perp'):
         # size : string ('big' or 'small')
         #      : 'big' gives results for 0.1 um sized graphite grains at 20 K [Draine (2003)]
         #      : 'small' gives results for 0.01 um sized grains at 20 K
@@ -70,6 +73,7 @@ class CmGraphite(object):
         self.cmtype = 'Graphite'
         self.size   = size
         self.orient = orient
+        self.citation = "Using optical constants for graphite,\nDraine, B. T. 2003, ApJ, 598, 1026\nhttp://adsabs.harvard.edu/abs/2003ApJ...598.1026D"
 
         D03file = find_cmfile('CM_D03.pysav') # look up file
         D03vals = c.restore(D03file) # read in index values
@@ -105,11 +109,14 @@ class CmSilicate(object):
     """
     | **ATTRIBUTES**
     | cmtype : 'Silicate'
+    | citation : A string containing citation to the original work
     | rp(E)  : scipy.interp1d object
     | ip(E)  : scipy.interp1d object [E in keV]
     """
     def __init__( self ):
         self.cmtype = 'Silicate'
+        self.citation = "Using optical constants for astrosilicate,\nDraine, B. T. 2003, ApJ, 598, 1026\nhttp://adsabs.harvard.edu/abs/2003ApJ...598.1026D"
+
 
         D03file = find_cmfile('CM_D03.pysav')
         D03vals = c.restore(D03file)      # look up file
