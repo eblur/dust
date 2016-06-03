@@ -11,6 +11,7 @@ API for CmIndex classes
 
     | **ATTRIBUTES**
     | cmtype : string ('Drude', 'Graphite', or 'Silicate')
+    | citation : A string containing citation to original source of optical constants
     | rp     : either a function or scipy.interp1d object that can called,
     |          e.g. rp(E) where E is in [keV]
     | ip     : same as above, ip(E) where E is in [keV]

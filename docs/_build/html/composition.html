@@ -153,6 +153,7 @@ used for astrophysical dust.</p>
 <div><div class="line-block">
 <div class="line"><strong>ATTRIBUTES</strong></div>
 <div class="line">cmtype : string (&#8216;Drude&#8217;, &#8216;Graphite&#8217;, or &#8216;Silicate&#8217;)</div>
+<div class="line">citation : A string containing citation to original source of optical constants</div>
 <div class="line">rp     : either a function or scipy.interp1d object that can called,</div>
 <div class="line-block">
 <div class="line">e.g. rp(E) where E is in [keV]</div>
@@ -170,6 +171,7 @@ used for astrophysical dust.</p>
 <div class="line"><strong>ATTRIBUTES</strong></div>
 <div class="line">cmtype : &#8216;Drude&#8217;</div>
 <div class="line">rho    : grain density [g cm^-3]</div>
+<div class="line">citation : A string containing citation to original work</div>
 <div class="line"><br /></div>
 <div class="line">** FUNCTIONS**</div>
 <div class="line">rp(E)  : real part of complex index of refraction [E in keV]</div>
@@ -185,6 +187,7 @@ used for astrophysical dust.</p>
 <div class="line">cmtype : &#8216;Graphite&#8217;</div>
 <div class="line">size   : &#8216;big&#8217; or &#8216;small&#8217;</div>
 <div class="line">orient : &#8216;perp&#8217; or &#8216;para&#8217;</div>
+<div class="line">citation : A string containing citation to original work</div>
 <div class="line">rp(E)  : scipy.interp1d object</div>
 <div class="line">ip(E)  : scipy.interp1d object [E in keV]</div>
 </div>
@@ -196,6 +199,7 @@ used for astrophysical dust.</p>
 <dd><div class="line-block">
 <div class="line"><strong>ATTRIBUTES</strong></div>
 <div class="line">cmtype : &#8216;Silicate&#8217;</div>
+<div class="line">citation : A string containing citation to the original work</div>
 <div class="line">rp(E)  : scipy.interp1d object</div>
 <div class="line">ip(E)  : scipy.interp1d object [E in keV]</div>
 </div>
