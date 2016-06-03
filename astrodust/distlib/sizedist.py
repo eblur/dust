@@ -57,7 +57,8 @@ class Grain(object):
     >>> Grain(rho=0.0).ndens() == np.inf
     """
     def __init__(self, rad=AMICRON, rho=RHO):
-        self.a   = rad
+        assert np.size(rad) == 1
+        self.a   = np.array([rad])
         self.rho = rho
 
     def ndens(self, md=MDUST):
