@@ -10,6 +10,8 @@ from .sizedist import *
     |
     | **ATTRIBUTES**
     | sizedist : distlib.Grain(), distlib.Powerlaw(), distlib.WD01()
+    | composition : a string describing the grain composition
+    | scatmodel : a string describing the extinction model to use
 """
 
 class GrainPop(object):
