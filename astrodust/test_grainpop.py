@@ -25,3 +25,13 @@ def test_GrainPop_composition(compositions, rhos):
     gp = GrainPop(sizedist=WD01(), composition=compositions, scatmodel='Mie')
     assert gp.rho == rhos
     return
+
+wavel = np.logspace(0.0, 1.5, 2)  # Angstroms
+
+# Extinction cross section can only be calculated for Mie
+def test_GrainPop_tauext():
+    gp = GrainPop(sizedist=Grain(), composition='Graphite', scatmodel='Mie')
+    assert isinstance(gp.tau_ext(wavel), np.ndarray)
+    #assert isinstance(gp.tau_sca(wavel), np.ndarray)
+    #assert isinstance(gp.tau_abs(wavel), np.ndarray)
+    return

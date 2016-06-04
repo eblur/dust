@@ -9,6 +9,8 @@ from .. import distlib
 
 __all__ = ['ScatModel','DiffScat','SigmaExt','SigmaScat','KappaExt','KappaScat']
 
+DEFAULT_MD = 1.e-4  # g cm^-2
+
 #----------------------------------------------------------
 # evals( emin=1.0, emax=2.0, de=0.1 ) : np.array [keV]
 # angles( thmin=5.0, thmax=100.0, dth=5.0 ) : np.array [arcsec]
@@ -118,8 +120,7 @@ class DiffScat(object):
 
 class SigmaScat(object):
     """
-    | Total scattering cross-section [cm^2] integrated over a dust grain
-    | size distribution
+    | Scattering cross-section [cm^2] for a single grain size
     |
     | **ATTRIBUTES**
     | scatm : ScatModel
@@ -150,8 +151,7 @@ class SigmaScat(object):
 
 class SigmaExt(object):
     """
-    | Total EXTINCTION cross-section [cm^2] integrated over a dust grain
-    | size distribution
+    | EXTINCTION cross-section [cm^2] for a single grain size
     |
     | **ATTRIBUTES**
     | scatm : ScatModel
@@ -242,7 +242,7 @@ class KappaScat(object):
         self.kappa = kappa
 
 
-class KappaExt(object):
+def kappa_ext(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
     """
     | Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size
     | distribution
@@ -253,54 +253,51 @@ class KappaExt(object):
     | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    def __init__(self, E=1.0, scatm=ScatModel(), dist=distlib.MRN_dist()):
-        self.scatm  = scatm
-        self.E      = E
-        self.dist   = dist
 
-        if scatm.stype == 'RGscat':
-            print 'Rayleigh-Gans cross-section not currently supported for KappaExt'
-            self.kappa = None
-            return
+    if scatm.stype == 'RGscat':
+        print 'Rayleigh-Gans cross-section not currently supported for KappaExt'
+        kappa = None
+        return kappa
 
-        cm   = scatm.cmodel
-        scat = scatm.smodel
-        print(cm.citation)
+    cm   = scatm.cmodel
+    scat = scatm.smodel
+    print(cm.citation)
+    ndens = dist.ndens(md)
 
-        cgeo = np.pi * np.power(dist.a * c.micron2cm, 2)
+    cgeo = np.pi * np.power(dist.a * c.micron2cm, 2)
 
-        qext    = np.zeros(shape=(np.size(E),np.size(dist.a)))
-        qext_pe = np.zeros(shape=(np.size(E),np.size(dist.a)))
-        qext_pa = np.zeros(shape=(np.size(E),np.size(dist.a)))
+    qext    = np.zeros(shape=(np.size(E),np.size(dist.a)))
+    qext_pe = np.zeros(shape=(np.size(E),np.size(dist.a)))
+    qext_pa = np.zeros(shape=(np.size(E),np.size(dist.a)))
 
-        # Test for graphite case
-        if cm.cmtype == 'Graphite':
-            cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
-            cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
+    # Test for graphite case
+    if cm.cmtype == 'Graphite':
+        cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
+        cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
 
-            if np.size(dist.a) > 1:
-                for i in range(np.size(dist.a)):
-                    qext_pe[:,i] = scat.Qext(E, a=dist.a[i], cm=cmGraphitePerp)
-                    qext_pa[:,i] = scat.Qext(E, a=dist.a[i], cm=cmGraphitePara)
-            else:
-                qext_pe = scat.Qext(E, a=dist.a, cm=cmGraphitePerp)
-                qext_pa = scat.Qext(E, a=dist.a, cm=cmGraphitePara)
-
-            qext    = (qext_pa + 2.0 * qext_pe) / 3.0
-
+        if np.size(dist.a) > 1:
+            for i in range(np.size(dist.a)):
+                qext_pe[:,i] = scat.Qext(E, a=dist.a[i], cm=cmGraphitePerp)
+                qext_pa[:,i] = scat.Qext(E, a=dist.a[i], cm=cmGraphitePara)
         else:
-            if np.size(dist.a) > 1:
-                for i in range(np.size(dist.a)):
-                    qext[:,i] = scat.Qext(E, a=dist.a[i], cm=cm)
-            else:
-                qext = scat.Qext(E, a=dist.a, cm=cm)
+            qext_pe = scat.Qext(E, a=dist.a, cm=cmGraphitePerp)
+            qext_pa = scat.Qext(E, a=dist.a, cm=cmGraphitePara)
 
-        if np.size(dist.a) == 1:
-            kappa = dist.nd * qext * cgeo / dist.md
+        qext    = (qext_pa + 2.0 * qext_pe) / 3.0
+
+    else:
+        if np.size(dist.a) > 1:
+            for i in range(np.size(dist.a)):
+                qext[:,i] = scat.Qext(E, a=dist.a[i], cm=cm)
         else:
-            kappa = np.array([])
-            for j in range(np.size(E)):
-                kappa = np.append(kappa,
-                                  c.intz(dist.a, dist.nd * qext[j,:] * cgeo) / dist.md)
+            qext = scat.Qext(E, a=dist.a, cm=cm)
 
-        self.kappa = kappa
+    if np.size(dist.a) == 1:
+        kappa = ndens * qext * cgeo / md
+    else:
+        kappa = np.array([])
+        for j in range(np.size(E)):
+            kappa = np.append(kappa,
+                              c.intz(dist.a, ndens * qext[j,:] * cgeo) / md)
+
+    return kappa

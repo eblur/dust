@@ -40,5 +40,3 @@ def test_sigmascat_classes():
     assert type(sigma_scat.DiffScat()) == sigma_scat.DiffScat
     assert type(sigma_scat.SigmaScat()) == sigma_scat.SigmaScat
     assert type(sigma_scat.SigmaExt()) == sigma_scat.SigmaExt
-    assert type(sigma_scat.KappaScat()) == sigma_scat.KappaScat
-    assert type(sigma_scat.KappaExt()) == sigma_scat.KappaExt

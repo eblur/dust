@@ -2,6 +2,11 @@ import numpy as np
 
 from .sizedist import *
 from .composition import *
+from ..extinction import sigma_scat as ss
+from .. import constants as c
+
+# Default dust mass column density
+DEFAULT_MD = 1.e-4  # g cm^-2
 
 """
     API for GrainPop class
@@ -25,9 +30,9 @@ class GrainPop(object):
         | scatmodel
     """
     def __init__(self, sizedist, composition, scatmodel):
-        self.sizedist = sizedist
+        self.sizedist    = sizedist
         self.composition = Composition(composition)
-        self.scatmodel = scatmodel
+        self.scatmodel   = ss.makeScatModel(scatmodel, composition)
 
     @property
     def a(self):
@@ -39,3 +44,20 @@ class GrainPop(object):
 
     def ndens(self, md):
         return self.sizedist.ndens(md)
+
+    def tau_ext(self, wavel, md=DEFAULT_MD):
+        """
+        Calculate total extinction cross section for dust population
+            | **INPUTS**
+            | wavel : Wavelength to use [Angstroms]
+            |
+            | **KEYORDS**
+            | md : dust mass column [Default: 1.e-4 g cm^-2]
+            |
+            | **RETURNS**
+            | \tau_{ext} = \int \sigma_ext(a) dn/da da
+        """
+        E_keV = c.hc_angs / wavel  # keV
+        kappa = ss.kappa_ext(E_keV, scatm=self.scatmodel,
+                             dist=self.sizedist, md=md)
+        return kappa * md
