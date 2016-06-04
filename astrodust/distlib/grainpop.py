@@ -1,6 +1,7 @@
 import numpy as np
 
 from .sizedist import *
+from .composition import *
 
 """
     API for GrainPop class
@@ -25,12 +26,16 @@ class GrainPop(object):
     """
     def __init__(self, sizedist, composition, scatmodel):
         self.sizedist = sizedist
-        self.composition = composition
+        self.composition = Composition(composition)
         self.scatmodel = scatmodel
 
     @property
     def a(self):
         return self.sizedist.a
+
+    @property
+    def rho(self):
+        return self.composition.rho
 
     def ndens(self, md):
         return self.sizedist.ndens(md)
