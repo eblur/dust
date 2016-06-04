@@ -47,14 +47,11 @@ class GrainPop(object):
     def ndens(self):
         return self.sizedist.ndens(self.md)
 
-    def tau_ext(self, wavel):
+    def calc_tau_ext(self, wavel):
         """
         Calculate total extinction cross section for dust population
             | **INPUTS**
-            | wavel : Wavelength to use [Angstroms]
-            |
-            | **KEYORDS**
-            | md : dust mass column [Default: 1.e-4 g cm^-2]
+            | wavel : ndarray : Wavelengths to use [Angstroms]
             |
             | **RETURNS**
             | \tau_{ext} = \int \sigma_ext(a) dn/da da
@@ -64,4 +61,16 @@ class GrainPop(object):
                              dist=self.sizedist, md=self.md)
         return kappa * self.md
 
-#    def tau_sca(self, wavel):
+    def calc_tau_sca(self, wavel):
+        """
+        Calculate total scattering cross section for dust population
+            | **INPUTS**
+            | wavel : Wavelengths to use [Angstroms]
+            |
+            | **RETURNS**
+            | \tau_{sca} = \int \sigma_sca(a) dn/da da
+        """
+        E_keV = c.hc_angs / wavel  # keV
+        kappa = ss.kappa_scat(E_keV, scatm=self.scatmodel,
+                              dist=self.sizedist, md=self.md)
+        return kappa * self.md

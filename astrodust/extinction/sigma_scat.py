@@ -184,7 +184,7 @@ class SigmaExt(object):
             self.qext = scat.Qext(a=a, E=E, cm=cm)
         self.sigma = self.qext * cgeo
 
-class KappaScat(object):
+def kappa_scat(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
     """
     | Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
     |
@@ -194,52 +194,48 @@ class KappaScat(object):
     | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    def __init__(self, E=1.0, scatm=ScatModel(), dist=distlib.MRN_dist()):
-        self.scatm  = scatm
-        self.E      = E
-        self.dist   = dist
+    cm   = scatm.cmodel
+    scat = scatm.smodel
+    print(cm.citation)
+    ndens = dist.ndens(md)
 
-        cm   = scatm.cmodel
-        scat = scatm.smodel
-        print(cm.citation)
+    cgeo = np.pi * np.power(dist.a * c.micron2cm, 2)
 
-        cgeo = np.pi * np.power(dist.a * c.micron2cm, 2)
+    qsca    = np.zeros(shape=(np.size(E),np.size(dist.a)))
+    qsca_pe = np.zeros(shape=(np.size(E),np.size(dist.a)))
+    qsca_pa = np.zeros(shape=(np.size(E),np.size(dist.a)))
 
-        qsca    = np.zeros(shape=(np.size(E),np.size(dist.a)))
-        qsca_pe = np.zeros(shape=(np.size(E),np.size(dist.a)))
-        qsca_pa = np.zeros(shape=(np.size(E),np.size(dist.a)))
+    # Test for graphite case
+    if cm.cmtype == 'Graphite':
+        cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
+        cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
 
-        # Test for graphite case
-        if cm.cmtype == 'Graphite':
-            cmGraphitePerp = cmi.CmGraphite(size=cm.size, orient='perp')
-            cmGraphitePara = cmi.CmGraphite(size=cm.size, orient='para')
-
-            if np.size(dist.a) > 1:
-                for i in range(np.size(dist.a)):
-                    qsca_pe[:,i] = scat.Qsca(E, a=dist.a[i], cm=cmGraphitePerp)
-                    qsca_pa[:,i] = scat.Qsca(E, a=dist.a[i], cm=cmGraphitePara)
-            else:
-                qsca_pe = scat.Qsca(E, a=dist.a, cm=cmGraphitePerp)
-                qsca_pa = scat.Qsca(E, a=dist.a, cm=cmGraphitePara)
-
-            qsca    = (qsca_pa + 2.0 * qsca_pe) / 3.0
-
+        if np.size(dist.a) > 1:
+            for i in range(np.size(dist.a)):
+                qsca_pe[:,i] = scat.Qsca(E, a=dist.a[i], cm=cmGraphitePerp)
+                qsca_pa[:,i] = scat.Qsca(E, a=dist.a[i], cm=cmGraphitePara)
         else:
-            if np.size(dist.a) > 1:
-                for i in range(np.size(dist.a)):
-                    qsca[:,i] = scat.Qsca(E, a=dist.a[i], cm=cm)
-            else:
-                qsca = scat.Qsca(E, a=dist.a, cm=cm)
+            qsca_pe = scat.Qsca(E, a=dist.a, cm=cmGraphitePerp)
+            qsca_pa = scat.Qsca(E, a=dist.a, cm=cmGraphitePara)
 
-        if np.size(dist.a) == 1:
-            kappa = dist.nd * qsca * cgeo / dist.md
+        qsca    = (qsca_pa + 2.0 * qsca_pe) / 3.0
+
+    else:
+        if np.size(dist.a) > 1:
+            for i in range(np.size(dist.a)):
+                qsca[:,i] = scat.Qsca(E, a=dist.a[i], cm=cm)
         else:
-            kappa = np.array([])
-            for j in range(np.size(E)):
-                kappa = np.append(kappa,
-                                  c.intz(dist.a, dist.nd * qsca[j,:] * cgeo) / dist.md)
+            qsca = scat.Qsca(E, a=dist.a, cm=cm)
 
-        self.kappa = kappa
+    if np.size(dist.a) == 1:
+        kappa = ndens * qsca * cgeo / md
+    else:
+        kappa = np.array([])
+        for j in range(np.size(E)):
+            kappa = np.append(kappa,
+                              c.intz(dist.a, ndens * qsca[j,:] * cgeo) / md)
+
+    return kappa
 
 
 def kappa_ext(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
