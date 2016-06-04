@@ -29,10 +29,11 @@ class GrainPop(object):
         | composition
         | scatmodel
     """
-    def __init__(self, sizedist, composition, scatmodel):
+    def __init__(self, sizedist, composition, scatmodel, md=DEFAULT_MD):
         self.sizedist    = sizedist
         self.composition = Composition(composition)
         self.scatmodel   = ss.makeScatModel(scatmodel, composition)
+        self.md          = md
 
     @property
     def a(self):
@@ -42,10 +43,11 @@ class GrainPop(object):
     def rho(self):
         return self.composition.rho
 
-    def ndens(self, md):
-        return self.sizedist.ndens(md)
+    @property
+    def ndens(self):
+        return self.sizedist.ndens(self.md)
 
-    def tau_ext(self, wavel, md=DEFAULT_MD):
+    def tau_ext(self, wavel):
         """
         Calculate total extinction cross section for dust population
             | **INPUTS**
@@ -59,5 +61,7 @@ class GrainPop(object):
         """
         E_keV = c.hc_angs / wavel  # keV
         kappa = ss.kappa_ext(E_keV, scatm=self.scatmodel,
-                             dist=self.sizedist, md=md)
-        return kappa * md
+                             dist=self.sizedist, md=self.md)
+        return kappa * self.md
+
+#    def tau_sca(self, wavel):

@@ -8,9 +8,9 @@ TEST_MD = 1.e-4  # g cm^-2
 
 @pytest.mark.parametrize('sizedists',[Grain(), Powerlaw(), WD01()])
 def test_GrainPop_sizedist(sizedists):
-    gp = GrainPop(sizedist=sizedists, composition='Graphite', scatmodel='Mie')
+    gp = GrainPop(sizedist=sizedists, composition='Graphite', scatmodel='Mie', md=TEST_MD)
     assert isinstance(gp.a, np.ndarray)  # has a size
-    assert isinstance(gp.ndens(TEST_MD), np.ndarray)  # has a number density
+    assert isinstance(gp.ndens, np.ndarray)  # has a number density
     return
 
 @pytest.mark.parametrize(('compositions','rhos'),
