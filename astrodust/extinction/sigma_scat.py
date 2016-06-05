@@ -7,7 +7,7 @@ from . import scatmodels as sms
 from ..distlib.composition import cmindex as cmi
 from .. import distlib
 
-__all__ = ['ScatModel','DiffScat','SigmaExt','SigmaScat','KappaExt','KappaScat']
+__all__ = ['ScatModel','DiffScat','SigmaExt','SigmaScat','kappa_ext','kappa_sca']
 
 DEFAULT_MD = 1.e-4  # g cm^-2
 
@@ -184,7 +184,7 @@ class SigmaExt(object):
             self.qext = scat.Qext(a=a, E=E, cm=cm)
         self.sigma = self.qext * cgeo
 
-def kappa_scat(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
+def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
     """
     | Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
     |
@@ -194,8 +194,6 @@ def kappa_scat(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD)
     | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-    cm   = scatm.cmodel
-    scat = scatm.smodel
     print(cm.citation)
     ndens = dist.ndens(md)
 
@@ -212,20 +210,20 @@ def kappa_scat(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD)
 
         if np.size(dist.a) > 1:
             for i in range(np.size(dist.a)):
-                qsca_pe[:,i] = scat.Qsca(E, a=dist.a[i], cm=cmGraphitePerp)
-                qsca_pa[:,i] = scat.Qsca(E, a=dist.a[i], cm=cmGraphitePara)
+                qsca_pe[:,i] = scatm.Qsca(E, a=dist.a[i], cm=cmGraphitePerp)
+                qsca_pa[:,i] = scatm.Qsca(E, a=dist.a[i], cm=cmGraphitePara)
         else:
-            qsca_pe = scat.Qsca(E, a=dist.a, cm=cmGraphitePerp)
-            qsca_pa = scat.Qsca(E, a=dist.a, cm=cmGraphitePara)
+            qsca_pe = scatm.Qsca(E, a=dist.a, cm=cmGraphitePerp)
+            qsca_pa = scatm.Qsca(E, a=dist.a, cm=cmGraphitePara)
 
         qsca    = (qsca_pa + 2.0 * qsca_pe) / 3.0
 
     else:
         if np.size(dist.a) > 1:
             for i in range(np.size(dist.a)):
-                qsca[:,i] = scat.Qsca(E, a=dist.a[i], cm=cm)
+                qsca[:,i] = scatm.Qsca(E, a=dist.a[i], cm=cm)
         else:
-            qsca = scat.Qsca(E, a=dist.a, cm=cm)
+            qsca = scatm.Qsca(E, a=dist.a, cm=cm)
 
     if np.size(dist.a) == 1:
         kappa = ndens * qsca * cgeo / md
@@ -238,7 +236,7 @@ def kappa_scat(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD)
     return kappa
 
 
-def kappa_ext(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
+def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
     """
     | Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size
     | distribution
@@ -249,14 +247,12 @@ def kappa_ext(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
     | dist  : distlib.DustSpectrum
     | kappa : scalar or np.array : cm^2 g^-1, typically
     """
-
+    # Check if using the RGscat model, which does not do absorption
     if scatm.stype == 'RGscat':
         print 'Rayleigh-Gans cross-section not currently supported for KappaExt'
         kappa = None
         return kappa
 
-    cm   = scatm.cmodel
-    scat = scatm.smodel
     print(cm.citation)
     ndens = dist.ndens(md)
 
@@ -273,20 +269,20 @@ def kappa_ext(E=1.0, scatm=ScatModel(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
 
         if np.size(dist.a) > 1:
             for i in range(np.size(dist.a)):
-                qext_pe[:,i] = scat.Qext(E, a=dist.a[i], cm=cmGraphitePerp)
-                qext_pa[:,i] = scat.Qext(E, a=dist.a[i], cm=cmGraphitePara)
+                qext_pe[:,i] = scatm.Qext(E, a=dist.a[i], cm=cmGraphitePerp)
+                qext_pa[:,i] = scatm.Qext(E, a=dist.a[i], cm=cmGraphitePara)
         else:
-            qext_pe = scat.Qext(E, a=dist.a, cm=cmGraphitePerp)
-            qext_pa = scat.Qext(E, a=dist.a, cm=cmGraphitePara)
+            qext_pe = scatm.Qext(E, a=dist.a, cm=cmGraphitePerp)
+            qext_pa = scatm.Qext(E, a=dist.a, cm=cmGraphitePara)
 
         qext    = (qext_pa + 2.0 * qext_pe) / 3.0
 
     else:
         if np.size(dist.a) > 1:
             for i in range(np.size(dist.a)):
-                qext[:,i] = scat.Qext(E, a=dist.a[i], cm=cm)
+                qext[:,i] = scatm.Qext(E, a=dist.a[i], cm=cm)
         else:
-            qext = scat.Qext(E, a=dist.a, cm=cm)
+            qext = scatm.Qext(E, a=dist.a, cm=cm)
 
     if np.size(dist.a) == 1:
         kappa = ndens * qext * cgeo / md

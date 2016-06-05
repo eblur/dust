@@ -1,6 +1,6 @@
 
-from . import scatmodels
-from . import sigma_scat
+from .scatmodels import *
+from .sigma_scat import *
 
 from scipy.interpolate import interp1d
 

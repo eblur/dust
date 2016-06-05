@@ -2,9 +2,10 @@ import numpy as np
 
 from .sizedist import *
 from .composition import *
-from ..extinction import sigma_scat as ss
-from ..extinction import ExtinctionCurve
+from ..extinction import *
 from .. import constants as c
+
+__all__ = ['GrainPop']
 
 # Default dust mass column density
 DEFAULT_MD = 1.e-4  # g cm^-2
@@ -29,7 +30,7 @@ class GrainPop(object):
     def __init__(self, sizedist, composition, scatmodel, md=DEFAULT_MD):
         self.sizedist    = sizedist
         self.composition = Composition(composition)
-        self.scatmodel   = ss.makeScatModel(scatmodel, composition)
+        self.scatmodel   = _pick_scatmodel(scatmodel)
         self.md          = md
         self.ext         = ExtinctionCurve()
 
@@ -72,8 +73,8 @@ class GrainPop(object):
             _test_wavel_grid(wavel, self)
 
         E_keV = c.hc_angs / wavel  # keV
-        kappa = ss.kappa_ext(E_keV, scatm=self.scatmodel,
-                             dist=self.sizedist, md=self.md)
+        kappa = kappa_ext(E_keV, scatm=self.scatmodel, cm=self.composition.cmindex,
+                          dist=self.sizedist, md=self.md)
         self.ext.wavel   = wavel
         self.ext.energy  = E_keV
         self.ext.tau_ext = kappa * self.md
@@ -94,8 +95,8 @@ class GrainPop(object):
             _test_wavel_grid(wavel, self)
 
         E_keV = c.hc_angs / wavel  # keV
-        kappa = ss.kappa_scat(E_keV, scatm=self.scatmodel,
-                              dist=self.sizedist, md=self.md)
+        kappa = kappa_sca(E_keV, scatm=self.scatmodel, cm=self.composition.cmindex,
+                          dist=self.sizedist, md=self.md)
         self.ext.wavel   = wavel
         self.ext.energy  = E_keV
         self.ext.tau_sca = kappa * self.md
@@ -131,3 +132,11 @@ def _test_wavel_grid(wavel, gpop):
     if np.sum(gpop.ext.wavel - wavel) != 0.0:
         print("WARNING: Using wavelength grid from previous extinction calculation")
     return
+
+def _pick_scatmodel(sname):
+    result = dict(zip(['RG','Mie'], [RGscat(), Mie()]))
+    try:
+        return result[sname]
+    except:
+        print("Scattering model not found in library")
+        return
