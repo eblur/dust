@@ -2,7 +2,7 @@
 import numpy as np
 from .. import constants as c
 
-__all__ = ['Grain', 'Powerlaw', 'DustSpectrum', 'MRN_dist']
+__all__ = ['Grain', 'Powerlaw']
 
 # Some default values
 MDUST    = 1.5e-5  # g cm^-2 (dust mass column)
@@ -47,23 +47,18 @@ class Grain(object):
     """
     | **ATTRIBUTES**
     | a   : scalar [micron]
-    | rho : scalar grain density [g cm^-3]
     |
     | **FUNCTIONS**
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* scalar number density [cm^-3]
-
-    >>> Grain().ndens(0.0) == 0.0
-    >>> Grain(rho=0.0).ndens() == np.inf
     """
     def __init__(self, rad=AMICRON, rho=RHO):
         assert np.size(rad) == 1
         self.a   = np.array([rad])
-        self.rho = rho
 
-    def ndens(self, md=MDUST):
+    def ndens(self, md, rho=RHO):
         gvol = 4. / 3. * np.pi * np.power(self.a*c.micron2cm, 3)
-        return md / (gvol * self.rho)
+        return md / (gvol * rho)
 
 class Powerlaw(object):
     """
@@ -79,17 +74,16 @@ class Powerlaw(object):
     >>> np.sum(Powerlaw().ndens(0.0)) == 0.0
     >>> np.all(np.isinf(Powerlaw(rho=0.0).ndens()))
     """
-    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO,
+    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST,
                  na=NA, log=False):
         self.amin = amin
         self.amax = amax
         self.a    = make_rad(amin, amax, na, log=log)
         self.p    = p
-        self.rho  = rho
 
-    def ndens(self, md=MDUST):
+    def ndens(self, md, rho=RHO):
         adep  = np.power(self.a, -self.p)   # um^-p
-        gdens = (4. / 3.) * np.pi * self.rho
+        gdens = (4. / 3.) * np.pi * rho
         dmda  = adep * gdens * np.power(self.a * c.micron2cm, 3)  # g um^-p
         const = md / c.intz(self.a, dmda)  # cm^-? um^p-1
         return const * adep  # cm^-? um^-1
@@ -99,6 +93,8 @@ def Dustdist(amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, rho=RHO, na=NA, log=Fal
     print("WARNING: dust.Dustdist is deprecated. Use Powerlaw")
     return Powerlaw(amin=amin, amax=amax, p=p, rho=rho, na=na, log=log)
 
+'''
+# 2016.06.05 - deprecated
 class DustSpectrum(object):  # radius (a), number density (nd), and mass density (md)
     """
     | **ATTRIBUTES**
@@ -136,10 +132,13 @@ class DustSpectrum(object):  # radius (a), number density (nd), and mass density
             return mass * self.nd
         else:
             return trapz(mass * self.nd, self.a)
+'''
 
 #-----------------------------------------------------------------
 
-def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, rho=RHO, md=MDUST, **kwargs):
+'''
+# 2016.06.05 - deprecated
+def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, md=MDUST, **kwargs):
     """
     | Returns a dust spectrum for a power law distribution of dust grains
     |
@@ -158,7 +157,7 @@ def MRN_dist(amin=AMIN, amax=AMAX, p=PDIST, rho=RHO, md=MDUST, **kwargs):
     result = DustSpectrum()
     result.calc_from_dist(ddist, md=md)
     return result
-
+'''
 # Depreceated
 #def make_dust_spectrum(amin=0.1, amax=1.0, na=100, p=4.0, rho=3.0, md=1.5e-5):
 #    print("WARNING: make_dust_spectrum is deprecated. Use MRN_dist")

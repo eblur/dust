@@ -128,6 +128,9 @@ class GrainPop(object):
         self.ext.tau_abs = self.ext.tau_ext - self.ext.tau_sca
         return
 
+#---------------------------------------------------------
+# Supporting internal functions
+
 def _test_wavel_grid(wavel, gpop):
     if np.sum(gpop.ext.wavel - wavel) != 0.0:
         print("WARNING: Using wavelength grid from previous extinction calculation")
@@ -140,3 +143,23 @@ def _pick_scatmodel(sname):
     except:
         print("Scattering model not found in library")
         return
+
+#---------------------------------------------------------
+# Supporting external functions for creating a GrainPop quickly
+
+def make_MRN_grainpop(amin, amax, p=3.5,
+                      compname='Drude', scatname='RG', md=DEFAULT_MD):
+    """
+    Quick start for making a GrainPop that follows a power law dust grain size distribution
+        |
+        | **INPUTS**
+        | amin : minimum grain size cut off [microns]
+        | amax : maximum grain size cut off [microns]
+        |
+        | **KEWORDS**
+        | p : powerlaw index, 3.5 (default)
+        | compname : a string describing the composition name : 'Drude' (default), 'Graphite', 'Silicate'
+        | scatname : a string describing the scattering model : 'RG' (default), 'Mie'
+        | md : dust mass column [g cm^-2], 1.e-4 (default)
+    """
+    gdist = Powerlaw(amin=amin, amax=amax, p=p, rho=)

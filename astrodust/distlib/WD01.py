@@ -6,27 +6,167 @@ Weingartner & Draine (2001) dust grain size distributions.
 import numpy as np
 from astropy.io import ascii
 import os
-import scipy.special as special # Needed for WD01 equations
+
+import scipy.special as special  # Needed for WD01 equations
+from scipy.integrate import trapz  # Needed for ndens renormalizations
 
 from .. import constants as c
-from . import sizedist
 
 MW_caseA_file = 'Table1.WD.dat'
 LMC_avg_file  = 'Table3_LMCavg.WD.dat'
 LMC_2_file    = 'Table3_LMC2.WD.dat'
 SMC_file      = 'Table3_SMC.WD.dat'
 
-def find_wdfile(name):
+DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(1.0), 50)
+
+class WD01(object):
+    """
+    Grain size distributions from Weingartner & Draine (2001)
+    """
+    def __init__(self, rad=DEFAULT_RAD, composition='Graphite', gal='MW',
+                 R_V=3.1, bc=0.0):
+        self.a = rad
+        self.composition = composition
+        self.gal  = gal
+        self.bc   = bc
+        self.R_V  = R_V
+        self.citation = "Using %s model for %s from\nWeingartner, C. & Draine, B. T. 2001, ApJ, 548, 296\nhttp://adsabs.harvard.edu/abs/2001ApJ...548..296W" \
+                        % (self.gal, self.composition)
+
+        nd, md, rho = _make_WD01_DustSpectrum(R_V=self.R_V, bc=self.bc, rad=self.a,
+                                              dtype=self.composition, gal=self.gal, verbose=True)
+        self.nd     = nd
+        self.md_nom = md
+        self.rho    = rho
+        print(self.citation)
+
+    def ndens(self, md=None, rho=None):
+        # If no arguments given, return the already calculated density
+        if (md is None) and (rho is None):
+            renorm_mass = 1.0
+        # If a new rho value is given, need to renormalized based on the new grain densities
+        elif (md is None) and (rho is not None):
+            mg_new = (4.0/3.0) * np.pi * np.power(self.a * c.micron2cm, 3) * rho
+            md_new = trapz(self.nd * mg_new, self.a)
+            renorm_mass = md_new / self.md_nom
+        # If new md value is given, it doesn't matter what rho value is used, just renormalize
+        else:
+            renorm_mass = md / self.md_nom
+        return self.nd * renorm_mass
+
+#----------------------------------------------------------------------
+# Helper functions that call up the necessary parameters and populate the WD01 sizedist
+
+def _find_wdfile(name):
     data_path = os.path.join(os.path.dirname(__file__), 'tables/')
     return os.path.join(data_path, name)
 
-
-def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
+def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
+                            dtype='Graphite', gal='MW', verbose=True):
     """
-    get_dist_params(
+    make_WD01_DustSpectrum(
+    R_V [float],
+    bc [float],
+    rad [np.array : grain sizes (um)],
+    dtype [string : 'Graphite' or 'Silicate'] )
+    gal [string : 'MW', 'LMC', or 'SMC'],
+    -------------------------------------------
+    Returns a sizedist.DustSpectrum object containing a
+    (grain sizes), nd (dn/da), and md (total mass density of dust)
+
+    >>> wd01_sil = make_WD01_DustSpectrum(type='Silicate')
+    >>> (wd01_sil.integrate_dust_mass(wd01_sil)/wd01_sil.md) - 1.0 < 0.01
+
+    >>> wd01_gra = make_WD01_DustSpectrum(type='Graphite')
+    >>> (wd01_gra.integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
+    """
+
+    if dtype == 'Graphite':
+        rho = 2.24  # g cm^-3
+    elif dtype == 'Silicate':
+        rho = 3.8
+    else:
+        print('Error: Dust type not recognized')
+        return
+
+    ANGS2MICRON = 1.e-10 * 1.e6
+    a    = rad  # Easier than changing variable names further down
+    a_cm = rad * c.micron2cm
+    NA   = np.size(a)
+
+
+    (alpha, beta, a_t, a_c, C) = _get_dist_params(R_V=R_V, bc=bc, dtype=dtype, gal=gal, verbose=verbose)
+
+    if dtype == 'Graphite':
+
+        mc      = 12. * 1.67e-24   # Mass of carbon atom in grams (12 m_p)
+        sig     = 0.4
+        a_01    = 3.5*ANGS2MICRON      # 3.5 angstroms in units of microns
+        a_01_cm = a_01 * c.micron2cm
+        bc1     = 0.75 * bc * 1.e-5
+        B_1     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_01_cm**3 * 0.4) \
+            * bc1 * mc / (1 + special.erf(3*0.4/np.sqrt(2) + np.log(a_01/3.5e-4)/(0.4*np.sqrt(2))))
+
+        a_02    = 30.0*ANGS2MICRON       # 30 angtroms in units of microns
+        a_02_cm = a_02 * c.micron2cm
+        bc2     = 0.25 * bc * 1.e-5
+        B_2     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_02_cm**3 * 0.4) \
+            * bc2 * mc / (1 + special.erf(3*0.4/np.sqrt(2) + np.log(a_02/3.5e-4)/(0.4*np.sqrt(2))))
+
+        D       = (B_1/a_cm) * np.exp(-0.5*(np.log(a/a_01)/sig)**2) + \
+            (B_2/a_cm) * np.exp(-0.5*(np.log(a/a_02)/sig)**2)
+
+        Case_vsg = np.where(a < 3.5*ANGS2MICRON)
+        if np.size(Case_vsg) != 0:
+            D[Case_vsg] = 0.0
+
+        Case_g = np.zeros(NA)
+        case1g = np.where(np.logical_and(a > 3.5*ANGS2MICRON, a < a_t))
+        case2g = np.where(a >= a_t)
+
+        if np.size(case1g) != 0:
+            Case_g[case1g] = 1.0
+        if np.size(case2g) != 0:
+            Case_g[case2g] = np.exp(-((a[case2g]-a_t) / a_c)**3)
+
+        if beta >= 0:
+            F_g  = 1 + beta * a / a_t
+        if beta < 0:
+            F_g  = 1.0 / (1 - beta * a / a_t)
+
+        Dist_WD01 = D + C/a_cm * (a/a_t)**alpha * F_g * Case_g  # cm^-4 per n_H
+
+    if dtype == 'Silicate':
+        Case_s = np.zeros(NA)
+        case1s = np.where(np.logical_and(a > 3.5*ANGS2MICRON, a < a_t))
+        case2s = np.where(a >= a_t)
+
+        if np.size(case1s) != 0:
+            Case_s[case1s] = 1.0
+        if np.size(case2s) != 0:
+            Case_s[case2s] = np.exp(-((a[case2s]-a_t)/a_c)**3)
+
+        F_s    = np.zeros(NA)
+        if beta >= 0:
+            F_s = 1 + beta * a / a_t
+        if beta < 0:
+            F_s = 1. / (1 - beta * a / a_t)
+
+        Dist_WD01 = C/a_cm * (a/a_t)**alpha * F_s * Case_s  # cm^-4 per n_H
+
+    mg = 4.0/3.0*np.pi*a_cm**3 * rho  # mass of each dust grain
+    Md = c.intz(a_cm, Dist_WD01 * mg)
+
+    ndens = Dist_WD01 * c.micron2cm  # cm^-3 per um per n_H
+
+    return (ndens, Md, rho)
+
+def _get_dist_params(R_V=3.1, bc=0.0, dtype='Graphite', gal='MW', verbose=True):
+    """
+    _get_dist_params(
     R_V [float : 3.1, 4.0, or 5.5]
     bc [float : 0,1,2,3...],
-    type [string : 'Graphite' or 'Silicate],
+    dtype [string : 'Graphite' or 'Silicate],
     gal [string : 'MW','LMC' or 'SMC'] )
     ------------------------------------------
     Returns (alpha, beta, a_t, a_c, C) : Parameters used in WD01 fits
@@ -34,12 +174,12 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
     is_MW = False
 
     if gal == 'MW':
-        table_filename = find_wdfile( MW_caseA_file )
+        table_filename = _find_wdfile( MW_caseA_file )
         is_MW = True
     elif gal == 'SMC':
-        table_filename = find_wdfile( SMC_file )
+        table_filename = _find_wdfile( SMC_file )
     elif gal == 'LMC':
-        table_filename = find_wdfile( LMC_avg_file )
+        table_filename = _find_wdfile( LMC_avg_file )
     else:
         print('Error: Galaxy type not recognized')
         return
@@ -91,14 +231,14 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
     ## Now choose the relevant columns based on grain type
     ## Remember: First index is column, second index is row
 
-    if type == 'Graphite':
+    if dtype == 'Graphite':
         alpha = table_info['col3'][i_bc]
         beta  = table_info['col4'][i_bc]
         a_t   = table_info['col5'][i_bc]
         a_c   = table_info['col6'][i_bc]
         C     = table_info['col7'][i_bc]
 
-    elif type == 'Silicate':
+    elif dtype == 'Silicate':
         alpha = table_info['col8'][i_bc]
         beta  = table_info['col9'][i_bc]
         a_t   = table_info['col10'][i_bc]
@@ -121,130 +261,3 @@ def get_dist_params( R_V=3.1, bc=0.0, type='Graphite', gal='MW', verbose=True ):
         print('C     = ', C)
 
     return result
-
-#----------------------------------------------------------------------
-
-DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(1.0), 50)
-
-class WD01(object):
-    """
-    Grain size distributions from Weingartner & Draine (2001)
-    """
-    def __init__(self, rad=DEFAULT_RAD, composition='Graphite', gal='MW',
-                 R_V=3.1, bc=0.0):
-        self.a = rad
-        self.composition = composition
-        self.gal  = gal
-        self.bc   = bc
-        self.R_V  = R_V
-
-    def ndens(self, md):
-        nd, mass = _make_WD01_DustSpectrum(R_V=self.R_V, bc=self.bc, rad=self.a,
-                                           type=self.composition, gal=self.gal, verbose=True)
-        return nd * (md / mass)
-
-
-#----------------------------------------------------------------------
-# Helper functions that call up the necessary parameters and populate the WD01 sizedist
-
-
-def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
-                            type='Graphite', gal='MW', verbose=True):
-    """
-    make_WD01_DustSpectrum(
-    R_V [float],
-    bc [float],
-    rad [np.array : grain sizes (um)],
-    type [string : 'Graphite' or 'Silicate'] )
-    gal [string : 'MW', 'LMC', or 'SMC'],
-    -------------------------------------------
-    Returns a sizedist.DustSpectrum object containing a
-    (grain sizes), nd (dn/da), and md (total mass density of dust)
-
-    >>> wd01_sil = make_WD01_DustSpectrum(type='Silicate')
-    >>> (wd01_sil.integrate_dust_mass(wd01_sil)/wd01_sil.md) - 1.0 < 0.01
-
-    >>> wd01_gra = make_WD01_DustSpectrum(type='Graphite')
-    >>> (wd01_gra.integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
-    """
-
-    if type == 'Graphite':
-        rho_d = 2.2  #g cm^-3
-    elif type == 'Silicate':
-        rho_d = 3.8
-    else:
-        print('Error: Dust type not recognized')
-        return
-
-    ANGS2MICRON = 1.e-10 * 1.e6
-    a    = rad  # Easier than changing variable names further down
-    a_cm = rad * c.micron2cm
-    NA   = np.size(a)
-
-
-    (alpha, beta, a_t, a_c, C) = get_dist_params(R_V=R_V, bc=bc, type=type, gal=gal, verbose=verbose)
-
-    if type == 'Graphite':
-
-        mc      = 12. * 1.67e-24   # Mass of carbon atom in grams (12 m_p)
-        rho     = 2.24             # g cm^-3
-        sig     = 0.4
-        a_01    = 3.5*ANGS2MICRON      # 3.5 angstroms in units of microns
-        a_01_cm = a_01 * c.micron2cm
-        bc1     = 0.75 * bc * 1.e-5
-        B_1     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_01_cm**3 * 0.4) \
-            * bc1 * mc / (1 + special.erf(3*0.4/np.sqrt(2) + np.log(a_01/3.5e-4)/(0.4*np.sqrt(2))))
-
-        a_02    = 30.0*ANGS2MICRON       # 30 angtroms in units of microns
-        a_02_cm = a_02 * c.micron2cm
-        bc2     = 0.25 * bc * 1.e-5
-        B_2     = (3.0/(2*np.pi)**1.5) * np.exp(-4.5 * 0.4**2) / (rho*a_02_cm**3 * 0.4) \
-            * bc2 * mc / (1 + special.erf(3*0.4/np.sqrt(2) + np.log(a_02/3.5e-4)/(0.4*np.sqrt(2))))
-
-        D       = (B_1/a_cm) * np.exp(-0.5*(np.log(a/a_01)/sig)**2) + \
-            (B_2/a_cm) * np.exp(-0.5*(np.log(a/a_02)/sig)**2)
-
-        Case_vsg = np.where(a < 3.5*ANGS2MICRON)
-        if np.size(Case_vsg) != 0:
-            D[Case_vsg] = 0.0
-
-        Case_g = np.zeros(NA)
-        case1g = np.where(np.logical_and(a > 3.5*ANGS2MICRON, a < a_t))
-        case2g = np.where(a >= a_t)
-
-        if np.size(case1g) != 0:
-            Case_g[case1g] = 1.0
-        if np.size(case2g) != 0:
-            Case_g[case2g] = np.exp(-((a[case2g]-a_t) / a_c)**3)
-
-        if beta >= 0:
-            F_g  = 1 + beta * a / a_t
-        if beta < 0:
-            F_g  = 1.0 / (1 - beta * a / a_t)
-
-        Dist_WD01 = D + C/a_cm * (a/a_t)**alpha * F_g * Case_g  # cm^-4 per n_H
-
-    if type == 'Silicate':
-        Case_s = np.zeros(NA)
-        case1s = np.where(np.logical_and(a > 3.5*ANGS2MICRON, a < a_t))
-        case2s = np.where(a >= a_t)
-
-        if np.size(case1s) != 0:
-            Case_s[case1s] = 1.0
-        if np.size(case2s) != 0:
-            Case_s[case2s] = np.exp(-((a[case2s]-a_t)/a_c)**3)
-
-        F_s    = np.zeros(NA)
-        if beta >= 0:
-            F_s = 1 + beta * a / a_t
-        if beta < 0:
-            F_s = 1. / (1 - beta * a / a_t)
-
-        Dist_WD01 = C/a_cm * (a/a_t)**alpha * F_s * Case_s  # cm^-4 per n_H
-
-    mg = 4.0/3.0*np.pi*a_cm**3 * rho_d  # mass of each dust grain
-    Md = c.intz(a_cm, Dist_WD01 * mg)
-
-    ndens = Dist_WD01 * c.micron2cm  # cm^-3 per um per n_H
-
-    return (ndens, Md)
