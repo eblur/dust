@@ -1,6 +1,5 @@
 
 import numpy as np
-from scipy.interpolate import interp1d
 
 from .. import constants as c
 from . import scatmodels as sms
@@ -11,64 +10,6 @@ __all__ = ['diff_scat','sigma_sca','sigma_ext','kappa_ext','kappa_sca']
 
 DEFAULT_MD = 1.e-4  # g cm^-2
 DEFAULT_ALPHA = np.linspace(5.0, 100.0, 20)
-
-#-------------- Tie scattering mechanism to an index of refraction ------------------
-'''
-# 2016.06.05 - deprecated
-class ScatModel(object):
-    """
-    | **ATTRIBUTES**
-    | smodel : scattering model object : RGscat(), Mie()
-    | cmodel : cmindex object : CmDrude(), CmGraphite(), CmSilicate()
-    | stype  : string : 'RGscat', 'Mie'
-    | cmtype : 'Drude', 'Silicate', 'Graphite'
-    """
-    def __init__( self, smodel=sms.RGscat(), cmodel=cmi.CmDrude() ):
-        self.smodel = smodel
-        self.cmodel = cmodel
-        self.stype  = smodel.stype
-        self.cmtype = cmodel.cmtype
-        # cmtype choices : 'Drude' (requires rho term only)
-        #                  'Graphite' (Carbonaceous grains)
-        #                  'Silicate' (Astrosilicate)
-        #                  --- Graphite and Silicate values come from Draine (2003)
-'''
-#-------------- Quickly make a common ScatModel object ---------------------------
-
-'''
-# 2016.06.05 -- deprecated
-def makeScatModel( model_name, material_name ):
-    """
-    | **INPUTS**
-    | model_name    : string : 'RG' or 'Mie'
-    | material_name : string : 'Drude', 'Silicate', 'Graphite', 'SmallGraphite'
-    |
-    | **RETURNS**
-    | ScatModel object
-    """
-
-    if model_name == 'RG':
-        sm = sms.RGscat()
-    elif model_name == 'Mie':
-        sm = sms.Mie()
-    else:
-        print('Error: Model name not recognized')
-        return
-
-    if material_name == 'Drude':
-        cm = cmi.CmDrude()
-    elif material_name == 'Silicate':
-        cm = cmi.CmSilicate()
-    elif material_name == 'Graphite':
-        cm = cmi.CmGraphite()
-    elif material_name == 'SmallGraphite': # Small Graphite ~ 0.01 um
-        cm = cmi.CmGraphite( size='small' )
-    else:
-        print('Error: CM name not recognized')
-        return
-
-    return ScatModel(sm, cm)
-'''
 
 #-------------- Various Types of Scattering Cross-sections -----------------------
 
