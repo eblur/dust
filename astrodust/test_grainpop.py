@@ -27,7 +27,7 @@ def test_GrainPop_composition(compositions, rhos):
     return
 
 wavel     = np.logspace(0.0, 1.5, 2)  # Angstroms
-one_wavel = 5.0  # Angstroms
+one_wavel = 4500.0  # Angstroms
 TEST_GP = GrainPop(sizedist=Grain(), composition='Graphite', scatmodel='Mie')
 
 # Extinction cross section can only be calculated for Mie

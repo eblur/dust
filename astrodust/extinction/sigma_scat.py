@@ -7,30 +7,10 @@ from . import scatmodels as sms
 from ..distlib.composition import cmindex as cmi
 from .. import distlib
 
-__all__ = ['ScatModel','DiffScat','SigmaExt','SigmaScat','kappa_ext','kappa_sca']
+__all__ = ['DiffScat','kappa_ext','kappa_sca']
 
 DEFAULT_MD = 1.e-4  # g cm^-2
-
-#----------------------------------------------------------
-# evals( emin=1.0, emax=2.0, de=0.1 ) : np.array [keV]
-# angles( thmin=5.0, thmax=100.0, dth=5.0 ) : np.array [arcsec]
-#
-
-def evals( emin=1.0, emax=2.0, de=0.1 ):
-    """
-    FUNCTION evals( emin=1.0, emax=2.0, de=0.1 )
-    RETURNS : np.array
-    Distribution of energies [keV]
-    """
-    return np.arange( emin, emax+de, de )
-
-def angles( thmin=5.0, thmax=100.0, dth=5.0 ):
-    """
-    FUNCTION angles( thmin=5.0, thmax=100.0, dth=5.0 )
-    RETURNS : np.array
-    Distribution of angles [arcsec]
-    """
-    return np.arange( thmin, thmax+dth, dth )
+DEFAULT_ALPHA = np.linspace(5.0, 100.0, 20)
 
 #-------------- Tie scattering mechanism to an index of refraction ------------------
 
@@ -54,6 +34,8 @@ class ScatModel(object):
 
 #-------------- Quickly make a common ScatModel object ---------------------------
 
+'''
+# 2016.06.05 -- deprecated
 def makeScatModel( model_name, material_name ):
     """
     | **INPUTS**
@@ -85,7 +67,7 @@ def makeScatModel( model_name, material_name ):
         return
 
     return ScatModel(sm, cm)
-
+'''
 
 #-------------- Various Types of Scattering Cross-sections -----------------------
 
@@ -95,29 +77,30 @@ class DiffScat(object):
     | over dust grain size distribution
     |
     | **ATTRIBUTES**
-    | scatm : ScatModel
+    | scatm : scatmodel object : scatmodels.RGscat (default)
+    | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
     | theta : np.array : arcsec
     | E     : scalar or np.array : Note, must match number of theta values if size > 1
     | a     : scalar : um
     | dsig  : np.array : cm^2 ster^-1
     """
-    def __init__(self, scatm=ScatModel(), theta=angles(), E=1.0, a=1.0):
+    def __init__(self, E, a=1.0, scatm=sms.RGscat(), cm=cmi.CmDrude(), theta=DEFAULT_ALPHA):
         self.scatm  = scatm
+        self.cm     = cm
         self.theta  = theta
         self.E      = E
         self.a      = a
 
-        cm   = scatm.cmodel
-        scat = scatm.smodel
         # Do not print citation here, because this function is called multiple times by other modules
-
         if cm.cmtype == 'Graphite':
-            dsig_pe = scat.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
-            dsig_pa = scat.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
+            dsig_pe = scatm.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
+            dsig_pa = scatm.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
             self.dsig = (dsig_pa + 2.0 * dsig_pe) / 3.0
         else:
-            self.dsig   = scat.Diff(theta=theta, a=a, E=E, cm=cm)
+            self.dsig   = scatm.Diff(theta=theta, a=a, E=E, cm=cm)
 
+'''
+# 2016.06.05 -- deprecated
 class SigmaScat(object):
     """
     | Scattering cross-section [cm^2] for a single grain size
@@ -183,16 +166,20 @@ class SigmaExt(object):
         else:
             self.qext = scat.Qext(a=a, E=E, cm=cm)
         self.sigma = self.qext * cgeo
+'''
 
 def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
     """
-    | Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
-    |
-    | **ATTRIBUTES**
-    | scatm : ScatModel
-    | E     : scalar or np.array : keV
-    | dist  : distlib.DustSpectrum
-    | kappa : scalar or np.array : cm^2 g^-1, typically
+    Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
+        |
+        | **INPUTS**
+        | E     : scalar or np.array : keV
+        |
+        | **KEYWORDS**
+        | scatm : scatmodel object : scatmodels.RGscat (default)
+        | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
+        | dist  : distlib sizedist object : distlib.Powerlaw (default)
+        | md    : dust mass column [g cm^-2] : 1.e-4 (default)
     """
     print(cm.citation)
     ndens = dist.ndens(md)
@@ -238,14 +225,16 @@ def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), 
 
 def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
     """
-    | Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size
-    | distribution
-    |
-    | **ATTRIBUTES**
-    | scatm : ScatModel
-    | E     : scalar or np.array : keV
-    | dist  : distlib.DustSpectrum
-    | kappa : scalar or np.array : cm^2 g^-1, typically
+    Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size distribution
+        |
+        | **INPUTS**
+        | E     : scalar or np.array : keV
+        |
+        | **KEYWORDS**
+        | scatm : scatmodel object : scatmodels.RGscat (default)
+        | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
+        | dist  : distlib sizedist object : distlib.Powerlaw (default)
+        | md    : dust mass column [g cm^-2] : 1.e-4 (default)
     """
     # Check if using the RGscat model, which does not do absorption
     if scatm.stype == 'RGscat':
