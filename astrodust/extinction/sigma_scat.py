@@ -7,13 +7,14 @@ from . import scatmodels as sms
 from ..distlib.composition import cmindex as cmi
 from .. import distlib
 
-__all__ = ['DiffScat','sigma_sca','sigma_ext','kappa_ext','kappa_sca']
+__all__ = ['diff_scat','sigma_sca','sigma_ext','kappa_ext','kappa_sca']
 
 DEFAULT_MD = 1.e-4  # g cm^-2
 DEFAULT_ALPHA = np.linspace(5.0, 100.0, 20)
 
 #-------------- Tie scattering mechanism to an index of refraction ------------------
-
+'''
+# 2016.06.05 - deprecated
 class ScatModel(object):
     """
     | **ATTRIBUTES**
@@ -31,7 +32,7 @@ class ScatModel(object):
         #                  'Graphite' (Carbonaceous grains)
         #                  'Silicate' (Astrosilicate)
         #                  --- Graphite and Silicate values come from Draine (2003)
-
+'''
 #-------------- Quickly make a common ScatModel object ---------------------------
 
 '''
@@ -71,33 +72,27 @@ def makeScatModel( model_name, material_name ):
 
 #-------------- Various Types of Scattering Cross-sections -----------------------
 
-class DiffScat(object):
+def diff_scat(a, E, scatm=sms.RGscat(), cm=cmi.CmDrude(), theta=DEFAULT_ALPHA):
     """
-    | A differential scattering cross-section [cm^2 ster^-1] integrated
-    | over dust grain size distribution
-    |
-    | **ATTRIBUTES**
-    | scatm : scatmodel object : scatmodels.RGscat (default)
-    | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
-    | theta : np.array : arcsec
-    | E     : scalar or np.array : Note, must match number of theta values if size > 1
-    | a     : scalar : um
-    | dsig  : np.array : cm^2 ster^-1
+    Calculate differential scattering cross-section [cm^2 ster^-1] for a single grain size
+        |
+        | **INPUTS**
+        | a     : scalar : um
+        | E     : scalar or np.array : Note, must match number of theta values if size > 1
+        |
+        | **KEYWORDS**
+        | scatm : scatmodel object : scatmodels.RGscat (default)
+        | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
+        | theta : np.array : scattering angle in arcsec, np.linspace(5, 100, 20) (default)
     """
-    def __init__(self, E, a=1.0, scatm=sms.RGscat(), cm=cmi.CmDrude(), theta=DEFAULT_ALPHA):
-        self.scatm  = scatm
-        self.cm     = cm
-        self.theta  = theta
-        self.E      = E
-        self.a      = a
-
-        # Do not print citation here, because this function is called multiple times by other modules
-        if cm.cmtype == 'Graphite':
-            dsig_pe = scatm.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
-            dsig_pa = scatm.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
-            self.dsig = (dsig_pa + 2.0 * dsig_pe) / 3.0
-        else:
-            self.dsig   = scatm.Diff(theta=theta, a=a, E=E, cm=cm)
+    # Do not print citation here, because this function is called multiple times by other modules
+    if cm.cmtype == 'Graphite':
+        dsig_pe = scatm.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
+        dsig_pa = scatm.Diff(theta=theta, a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
+        dsig = (dsig_pa + 2.0 * dsig_pe) / 3.0
+    else:
+        dsig   = scatm.Diff(theta=theta, a=a, E=E, cm=cm)
+    return dsig
 
 def sigma_sca(a, E, scatm=sms.RGscat(), cm=cmi.CmDrude(), qval=False):
     """

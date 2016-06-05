@@ -63,3 +63,14 @@ def test_kappa_sca(scatmods, cms):
 def test_kappa_ext(scatmods, cms):
     test = kappa_ext(ETEST, dist=Grain(), scatm=scatmods, cm=cms)
     assert isinstance(test, np.ndarray)
+
+@pytest.mark.parametrize(('scatmods','cms'),
+                         [(RGscat(),CmDrude()),
+                          (RGscat(),CmSilicate()),
+                          (RGscat(),CmGraphite()),
+                          (Mie(),CmSilicate()),
+                          (Mie(),CmGraphite())])
+def test_diff_scat(scatmods, cms):
+    AVAL, EVAL, THETA = 0.1, 0.3, np.linspace(5.0, 100.0, 3)
+    test = diff_scat(AVAL, EVAL, scatm=scatmods, cm=cms, theta=THETA)
+    assert len(test) == len(THETA)
