@@ -4,6 +4,8 @@ import numpy as np
 from astrodust.distlib.grainpop import GrainPop
 from astrodust.distlib import Grain, Powerlaw, WD01
 
+# Just test to see if everything runs
+
 @pytest.mark.parametrize('sizedists',[Grain(), Powerlaw(), WD01()])
 def test_GrainPop_sizedist(sizedists):
     gp = GrainPop(sizedist=sizedists, composition='Graphite', scatmodel='Mie', md=1.e-4)
@@ -25,13 +27,21 @@ def test_GrainPop_composition(compositions, rhos):
     return
 
 wavel = np.logspace(0.0, 1.5, 2)  # Angstroms
+TEST_GP = GrainPop(sizedist=Grain(), composition='Graphite', scatmodel='Mie')
 
 # Extinction cross section can only be calculated for Mie
 def test_GrainPop_tauext():
-    gp = GrainPop(sizedist=Grain(), composition='Graphite', scatmodel='Mie')
-    assert isinstance(gp.calc_tau_ext(wavel), np.ndarray)
+    TEST_GP.calc_tau_ext(wavel)
+    assert isinstance(TEST_GP.tau_ext, np.ndarray)
     return
 
 def test_GrainPop_tausca():
-    gp = GrainPop(sizedist=Grain(), composition='Graphite', scatmodel='Mie')
-    assert isinstance(gp.calc_tau_sca(wavel), np.ndarray)
+    TEST_GP.calc_tau_sca(wavel)
+    assert isinstance(TEST_GP.tau_sca, np.ndarray)
+
+def test_GrainPop_tauabs():
+    TEST_GP.calc_tau_abs(wavel)
+    assert isinstance(TEST_GP.tau_abs, np.ndarray)
+    new_gp = GrainPop(sizedist=Grain(), composition='Graphite', scatmodel='Mie')
+    new_gp.calc_tau_abs(wavel)
+    assert isinstance(new_gp.tau_abs, np.ndarray)
