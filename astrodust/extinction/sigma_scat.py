@@ -7,7 +7,7 @@ from . import scatmodels as sms
 from ..distlib.composition import cmindex as cmi
 from .. import distlib
 
-__all__ = ['DiffScat','kappa_ext','kappa_sca']
+__all__ = ['DiffScat','sigma_sca','sigma_ext','kappa_ext','kappa_sca']
 
 DEFAULT_MD = 1.e-4  # g cm^-2
 DEFAULT_ALPHA = np.linspace(5.0, 100.0, 20)
@@ -99,74 +99,65 @@ class DiffScat(object):
         else:
             self.dsig   = scatm.Diff(theta=theta, a=a, E=E, cm=cm)
 
-'''
-# 2016.06.05 -- deprecated
-class SigmaScat(object):
+def sigma_sca(a, E, scatm=sms.RGscat(), cm=cmi.CmDrude(), qval=False):
     """
-    | Scattering cross-section [cm^2] for a single grain size
-    |
-    | **ATTRIBUTES**
-    | scatm : ScatModel
-    | E     : scalar or np.array : keV
-    | a     : scalar : um
-    | qsca  : scalar or np.array : unitless scattering efficiency
-    | sigma : scalar or np.array : cm^2
+    Returns scattering cross-section [cm^2] for a single grain size
+        |
+        | **INPUTS**
+        | a     : scalar : um
+        | E     : np.ndarray : keV
+        |
+        | **KEYWORDS**
+        | scatm : scatmodel object : extinction.RGscat (default)
+        | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
+        | qval  : boolean : False (default), set True to return scattering efficiency, Qscat [unitless]
     """
-    def __init__(self, scatm=ScatModel(), E=1.0, a=1.0):
-        self.scatm  = scatm
-        self.E      = E
-        self.a      = a
+    print(cm.citation)
 
-        cm   = scatm.cmodel
-        scat = scatm.smodel
-        print(cm.citation)
+    if cm.cmtype == 'Graphite':
+        qsca_pe = scatm.Qsca(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
+        qsca_pa = scatm.Qsca(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
+        qsca = (qsca_pa + 2.0*qsca_pe) / 3.0
+    else:
+        qsca = scatm.Qsca(a=a, E=E, cm=cm)
 
+    if qval:
+        return qsca
+    else:
         cgeo  = np.pi * np.power(a*c.micron2cm, 2)
+        return qsca * cgeo
 
-        if cm.cmtype == 'Graphite':
-            qsca_pe = scat.Qsca(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
-            qsca_pa = scat.Qsca(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
-            self.qsca = (qsca_pa + 2.0*qsca_pe) / 3.0
-        else:
-            self.qsca = scat.Qsca(a=a, E=E, cm=cm)
-
-        self.sigma = self.qsca * cgeo
-
-class SigmaExt(object):
+def sigma_ext(a, E, scatm=sms.RGscat(), cm=cmi.CmDrude(), qval=False):
     """
-    | EXTINCTION cross-section [cm^2] for a single grain size
-    |
-    | **ATTRIBUTES**
-    | scatm : ScatModel
-    | E     : scalar or np.array : keV
-    | a     : scalar : um
-    | qext  : scalar or np.array : unitless extinction efficiency
-    | sigma : scalar or np.array : cm^2
+    Returns extinction cross-section [cm^2] for a single grain size
+        |
+        | **INPUTS**
+        | a     : scalar : um
+        | E     : np.ndarray : keV
+        |
+        | **KEYWORDS**
+        | scatm : scatmodel object : extinction.RGscat (default)
+        | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
+        | qval  : boolean : False (default), set True to return extinction efficiency, Qext [unitless]
     """
-    def __init__(self, scatm=ScatModel(), E=1.0, a=1.0):
-        self.scatm  = scatm
-        self.E      = E
-        self.a      = a
+    if scatm.stype == 'RGscat':
+        print('Rayleigh-Gans cross-section not currently supported for KappaExt')
+        return
 
-        if scatm.stype == 'RGscat':
-            print('Rayleigh-Gans cross-section not currently supported for KappaExt')
-            self.qext = None
-            self.sigma = None
-            return
+    print(cm.citation)
 
-        cm   = scatm.cmodel
-        scat = scatm.smodel
-        print(cm.citation)
+    if cm.cmtype == 'Graphite':
+        qext_pe = scatm.Qext(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
+        qext_pa = scatm.Qext(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
+        qext = (qext_pa + 2.0*qext_pe) / 3.0
+    else:
+        qext = scatm.Qext(a=a, E=E, cm=cm)
 
+    if qval:
+        return qext
+    else:
         cgeo  = np.pi * np.power(a*c.micron2cm, 2)
-        if cm.cmtype == 'Graphite':
-            qext_pe = scat.Qext(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='perp'))
-            qext_pa = scat.Qext(a=a, E=E, cm=cmi.CmGraphite(size=cm.size, orient='para'))
-            self.qext = (qext_pa + 2.0*qext_pe) / 3.0
-        else:
-            self.qext = scat.Qext(a=a, E=E, cm=cm)
-        self.sigma = self.qext * cgeo
-'''
+        return qext * cgeo
 
 def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
     """

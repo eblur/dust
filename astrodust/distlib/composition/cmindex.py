@@ -5,6 +5,8 @@ from scipy.interpolate import interp1d
 
 from ... import constants as c
 
+__all__ = ['CmDrude', 'CmGraphite', 'CmSilicate']
+
 #------------- Index of Refraction object comes in handy --
 
 #class CM(object):       # Complex index of refraction

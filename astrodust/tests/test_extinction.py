@@ -1,42 +1,65 @@
 """Test extinction library"""
-
+import pytest
 import numpy as np
 
 from astrodust.extinction import *
+from astrodust.distlib.composition.cmindex import *
+from astrodust.distlib import *
 
-## Test the scattering models
+# Test initialization of the scattering models
 
 def test_scatmodels_RGscat():
-    assert type(scatmodels.RGscat()) == scatmodels.RGscat
+    assert isinstance(scatmodels.RGscat(), scatmodels.RGscat)
 
 def test_scatmodels_Mie():
-    assert type(scatmodels.Mie()) == scatmodels.Mie
+    assert isinstance(scatmodels.Mie(), scatmodels.Mie)
 
 def test_scatmodels_PAH():
-    assert type(scatmodels.PAH('neu')) == scatmodels.PAH
-    assert type(scatmodels.PAH('ion')) == scatmodels.PAH
+    assert isinstance(scatmodels.PAH('neu'), scatmodels.PAH)
+    assert isinstance(scatmodels.PAH('ion'), scatmodels.PAH)
 
 def test_scatmodels_PAH_Qsca():
     PAH_neu = scatmodels.PAH('neu')
     PAH_ion = scatmodels.PAH('ion')
-    assert type(PAH_neu.Qsca(1.0, 0.01)) == np.ndarray
-    assert type(PAH_neu.Qsca(1.0, 0.01)) == np.ndarray
+    assert isinstance(PAH_neu.Qsca(1.0, 0.01), np.ndarray)
+    assert isinstance(PAH_neu.Qsca(1.0, 0.01), np.ndarray)
+    assert isinstance(PAH_ion.Qsca(1.0, 0.01), np.ndarray)
+    assert isinstance(PAH_ion.Qsca(1.0, 0.01), np.ndarray)
 
-## Test cross section models
+# Test that the sigma_scat module loades
+ATEST = 0.1
+ETEST = np.array([0.3,0.5])
 
-def test_sigmascat_makeScatModel():
-    assert type(sigma_scat.makeScatModel('RG','Drude')) == sigma_scat.ScatModel
-    assert type(sigma_scat.makeScatModel('RG','Silicate')) == sigma_scat.ScatModel
-    assert type(sigma_scat.makeScatModel('RG','Graphite')) == sigma_scat.ScatModel
-    assert type(sigma_scat.makeScatModel('Mie','Silicate')) == sigma_scat.ScatModel
-    assert type(sigma_scat.makeScatModel('Mie','Graphite')) == sigma_scat.ScatModel
+@pytest.mark.parametrize(('scatmods','cms'),
+                         [(RGscat(),CmDrude()),
+                          (RGscat(),CmSilicate()),
+                          (RGscat(),CmGraphite()),
+                          (Mie(),CmSilicate()),
+                          (Mie(),CmGraphite())])
+def test_sigma_sca(scatmods, cms):
+    test = sigma_sca(ATEST, ETEST, scatm=scatmods, cm=cms)
+    assert isinstance(test, np.ndarray)
 
-def test_sigmscat_rgdrude():
-    RGD = sigma_scat.makeScatModel('RG','Drude')
-    assert RGD.smodel.stype is 'RGscat'
-    assert RGD.cmodel.cmtype is 'Drude'
+@pytest.mark.parametrize(('scatmods','cms'),
+                         [(Mie(),CmSilicate()),
+                          (Mie(),CmGraphite())])
+def test_sigma_ext(scatmods, cms):
+    test = sigma_ext(ATEST, ETEST, scatm=scatmods, cm=cms)
+    assert isinstance(test, np.ndarray)
 
-def test_sigmascat_classes():
-    assert type(sigma_scat.DiffScat()) == sigma_scat.DiffScat
-    assert type(sigma_scat.SigmaScat()) == sigma_scat.SigmaScat
-    assert type(sigma_scat.SigmaExt()) == sigma_scat.SigmaExt
+@pytest.mark.parametrize(('scatmods','cms'),
+                         [(RGscat(),CmDrude()),
+                          (RGscat(),CmSilicate()),
+                          (RGscat(),CmGraphite()),
+                          (Mie(),CmSilicate()),
+                          (Mie(),CmGraphite())])
+def test_kappa_sca(scatmods, cms):
+    test = kappa_sca(ETEST, dist=Grain(), scatm=scatmods, cm=cms)
+    assert isinstance(test, np.ndarray)
+
+@pytest.mark.parametrize(('scatmods','cms'),
+                         [(Mie(),CmSilicate()),
+                          (Mie(),CmGraphite())])
+def test_kappa_ext(scatmods, cms):
+    test = kappa_ext(ETEST, dist=Grain(), scatm=scatmods, cm=cms)
+    assert isinstance(test, np.ndarray)
