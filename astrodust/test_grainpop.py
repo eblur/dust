@@ -26,21 +26,25 @@ def test_GrainPop_composition(compositions, rhos):
     assert gp.rho == rhos
     return
 
-wavel = np.logspace(0.0, 1.5, 2)  # Angstroms
+wavel     = np.logspace(0.0, 1.5, 2)  # Angstroms
+one_wavel = 5.0  # Angstroms
 TEST_GP = GrainPop(sizedist=Grain(), composition='Graphite', scatmodel='Mie')
 
 # Extinction cross section can only be calculated for Mie
-def test_GrainPop_tauext():
-    TEST_GP.calc_tau_ext(wavel)
+@pytest.mark.parametrize('wavels', [wavel, one_wavel])
+def test_GrainPop_tauext(wavels):
+    TEST_GP.calc_tau_ext(wavels)
     assert isinstance(TEST_GP.tau_ext, np.ndarray)
     return
 
-def test_GrainPop_tausca():
-    TEST_GP.calc_tau_sca(wavel)
+@pytest.mark.parametrize('wavels', [wavel, one_wavel])
+def test_GrainPop_tausca(wavels):
+    TEST_GP.calc_tau_sca(wavels)
     assert isinstance(TEST_GP.tau_sca, np.ndarray)
 
-def test_GrainPop_tauabs():
-    TEST_GP.calc_tau_abs(wavel)
+@pytest.mark.parametrize('wavels', [wavel, one_wavel])
+def test_GrainPop_tauabs(wavels):
+    TEST_GP.calc_tau_abs(wavels)
     assert isinstance(TEST_GP.tau_abs, np.ndarray)
     new_gp = GrainPop(sizedist=Grain(), composition='Graphite', scatmodel='Mie')
     new_gp.calc_tau_abs(wavel)

@@ -5,6 +5,23 @@ from . import sigma_scat
 from scipy.interpolate import interp1d
 
 class ExtinctionCurve(object):
+    """
+    ExtinctionCurve class for storing extinction curve information
+        |
+        | **ATTRIBUTES**
+        | wavel : wavelength [Angstroms]
+        | tau_ext : total extinction optical depth
+        | tau_sca : scattering optical depth
+        | tau_abs : absorption optical depth
+        |
+        | **FUNCTIONS**
+        | Several interpolation functions exist for interpolating from the current
+        | wavelength grid to a new one.  Uses the scipy.interpolate.interp1d class
+        |
+        | interp_ext(new_wavel)
+        | interp_sca(new_wavel)
+        | interp_abs(new_wavel)
+    """
     def __init__(self):
         self.wavel = None    # Angstroms
         self.tau_ext = None

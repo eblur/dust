@@ -9,26 +9,22 @@ from .. import constants as c
 # Default dust mass column density
 DEFAULT_MD = 1.e-4  # g cm^-2
 
-"""
-    API for GrainPop class
-    ----------------------
-
-    | **GrainPop** class contains the following
-    |
-    | **ATTRIBUTES**
-    | sizedist : distlib.Grain(), distlib.Powerlaw(), distlib.WD01()
-    | composition : a string describing the grain composition
-    | scatmodel : a string describing the extinction model to use
-"""
-
 class GrainPop(object):
     """
     A population of dust grains
         |
-        | **ATTRIBUTES***
-        | sizedist
-        | composition
-        | scatmodel
+        | **INITIALIZE**
+        | sizedist : grain size dist objects : distlib.Grain, distlib.Powerlaw, distlib.WD01
+        | composition : a string describing the composition type : 'Graphite', 'Silicate' or 'Drude'
+        | scatmodel : a string describing the scattering physics to use : 'RG' or 'Mie'
+        | md : dust mass column : 1.e-4 g cm^-2 (default)
+        |
+        | **ATTRIBUTES**
+        | sizedist : distlib.Grain(), distlib.Powerlaw(), distlib.WD01()
+        | composition : distlib.Composition class
+        | scatmodel : extinction.sigma_scat.ScatModel
+        | md : dust mass column [g cm^-2]
+        | ext : extinction.ExtinctionCurve object
     """
     def __init__(self, sizedist, composition, scatmodel, md=DEFAULT_MD):
         self.sizedist    = sizedist
