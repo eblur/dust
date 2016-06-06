@@ -1,27 +1,51 @@
 """Test the distlib."""
+import pytest
+import numpy as np
+from scipy.integrate import trapz
 
-from astrodust import distlib
+from astrodust.distlib import *
+from astrodust import constants as c
+
+TEST_MD, TEST_RHO = 1.e-4, 4.0
 
 def test_grain():
-    assert type(distlib.Grain()) == distlib.Grain
+    test = Grain()
+    assert len(test.ndens(TEST_MD, rho=TEST_RHO)) == len(test.a)
 
 def test_Powlaw():
-    assert type(distlib.Powerlaw()) == distlib.Powerlaw
+    test = Powerlaw()
+    assert len(test.ndens(TEST_MD, rho=TEST_RHO)) == len(test.a)
 
-def test_DustSpectrum():
-    assert type(distlib.DustSpectrum()) == distlib.DustSpectrum
+@pytest.mark.parametrize(('gals','compositions'),
+                         [('MW','Silicate'),
+                          ('MW','Graphite'),
+                          ('LMC','Silicate'),
+                          ('LMC','Graphite')])
+def test_WD01(gals, compositions):
+    test = WD01(composition=compositions, gal=gals)
+    assert len(test.ndens(TEST_MD, rho=TEST_RHO)) == len(test.a)
 
-def test_MRN_dist():
-    assert type(distlib.MRN_dist()) == distlib.DustSpectrum
+#------------------------------------------
+# UNIT TESTS
 
-def test_WD01_dist():
-    assert type(distlib.make_WD01_DustSpectrum()) == distlib.DustSpectrum
+def test_units():
+    assert Grain().ndens(0.0) == 0.0
+    assert np.sum(Powerlaw().ndens(0.0)) == 0.0
+    assert np.all(np.isinf(Powerlaw().ndens(md=1.0, rho=0.0)))
 
-# Test both powerlaw and grain thingies
-def test_calc_from_dist():
-    pl = distlib.Powerlaw()
-    DSp = distlib.DustSpectrum()
-    DSp.calc_from_dist(pl, md=1.e-4)
-    gr = distlib.Grain()
-    DSg = distlib.DustSpectrum()
-    DSg.calc_from_dist(gr, md=1.e-4)
+def test_WD01_ndens_units():
+    test = WD01(composition='Silicate')
+    # No input to ndens yields nominal dust mass column
+    mg   = (4./3.) * np.pi * test.rho * np.power(test.a * c.micron2cm, 3)
+    assert np.abs(1.0 - trapz(test.ndens()*mg, test.a) / test.md_nom) < 0.01
+    # Test that ndens changes appropriately with dust mass column
+    md_new = 1.e-3
+    assert np.abs(1.0 - trapz(test.ndens(md=md_new)*mg, test.a) / md_new) < 0.01
+    assert np.all(test.ndens(md=md_new) > test.nd_nom)
+    # Test that changing dust material density (rho) will still yield correct dust mass
+    rho_new = 4.0
+    mg_new  = (4./3.) * np.pi * rho_new * np.power(test.a * c.micron2cm, 3)
+    assert np.abs(1.0 - trapz(test.ndens(rho=rho_new)*mg_new, test.a) / test.md_nom) < 0.01
+    assert np.all(test.ndens(rho=rho_new) < test.nd_nom)
+    # Test that you get correct dust mass when changing both
+    assert np.abs(1.0 - trapz(test.ndens(md=md_new, rho=rho_new)*mg_new, test.a) / md_new) < 0.01

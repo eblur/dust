@@ -35,24 +35,21 @@ class WD01(object):
 
         nd, md, rho = _make_WD01_DustSpectrum(R_V=self.R_V, bc=self.bc, rad=self.a,
                                               dtype=self.composition, gal=self.gal, verbose=True)
-        self.nd     = nd
+        self.nd_nom = nd
         self.md_nom = md
         self.rho    = rho
         print(self.citation)
 
     def ndens(self, md=None, rho=None):
-        # If no arguments given, return the already calculated density
-        if (md is None) and (rho is None):
-            renorm_mass = 1.0
-        # If a new rho value is given, need to renormalized based on the new grain densities
-        elif (md is None) and (rho is not None):
+        # If no arguments given, return the density that came with WD01 table
+        renorm_mass = 1.0
+        if rho is not None:
             mg_new = (4.0/3.0) * np.pi * np.power(self.a * c.micron2cm, 3) * rho
-            md_new = trapz(self.nd * mg_new, self.a)
-            renorm_mass = md_new / self.md_nom
-        # If new md value is given, it doesn't matter what rho value is used, just renormalize
-        else:
-            renorm_mass = md / self.md_nom
-        return self.nd * renorm_mass
+            md_new = trapz(self.nd_nom * mg_new, self.a)
+            renorm_mass *= self.md_nom / md_new
+        if md is not None:
+            renorm_mass *= md / self.md_nom
+        return self.nd_nom * renorm_mass
 
 #----------------------------------------------------------------------
 # Helper functions that call up the necessary parameters and populate the WD01 sizedist

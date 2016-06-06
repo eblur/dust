@@ -30,8 +30,6 @@ def make_rad(amin, amax, na, log=False):
     |
     | **RETURNS**
     | A numpy array of length na
-
-    >>> len(make_rad(0.1,1.0,10)) == 10
     """
     if log:
         return np.logspace(np.log10(amin), np.log10(amax), na)
@@ -70,9 +68,6 @@ class Powerlaw(object):
     | **FUNCTIONS**
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
-
-    >>> np.sum(Powerlaw().ndens(0.0)) == 0.0
-    >>> np.all(np.isinf(Powerlaw(rho=0.0).ndens()))
     """
     def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST,
                  na=NA, log=False):
