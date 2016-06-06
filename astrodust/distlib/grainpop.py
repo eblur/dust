@@ -5,7 +5,7 @@ from .composition import *
 from ..extinction import *
 from .. import constants as c
 
-__all__ = ['GrainPop']
+__all__ = ['GrainPop', 'make_MRN_grainpop']
 
 # Default dust mass column density
 DEFAULT_MD = 1.e-4  # g cm^-2
@@ -145,7 +145,7 @@ def _pick_scatmodel(sname):
 #---------------------------------------------------------
 # Supporting external functions for creating a GrainPop quickly
 
-def make_MRN_grainpop(amin, amax, p=3.5,
+def make_MRN_grainpop(amin=0.005, amax=0.25, p=3.5,
                       compname='Drude', scatname='RG', md=DEFAULT_MD, **kwargs):
     """
     Quick start for making a GrainPop that follows a power law dust grain size distribution

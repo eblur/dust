@@ -16,7 +16,7 @@ class Halo(object):
     | scatm : ss.ScatModel : scattering model used
     | intensity : np.array : fractional intensity [arcsec^-2]
     """
-    def __init__(self, E0, alpha=DEFAULT_ALPHA, gpop=distlib.GrainPop()):
+    def __init__(self, E0, alpha=DEFAULT_ALPHA, gpop=distlib.make_MRN_grainpop()):
         self.htype  = None
         self.energy = E0
         self.alpha  = alpha
