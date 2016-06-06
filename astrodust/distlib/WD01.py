@@ -11,6 +11,7 @@ import scipy.special as special  # Needed for WD01 equations
 from scipy.integrate import trapz  # Needed for ndens renormalizations
 
 from .. import constants as c
+from .composition import *
 
 MW_caseA_file = 'Table1.WD.dat'
 LMC_avg_file  = 'Table3_LMCavg.WD.dat'
@@ -23,21 +24,20 @@ class WD01(object):
     """
     Grain size distributions from Weingartner & Draine (2001)
     """
-    def __init__(self, rad=DEFAULT_RAD, composition='Graphite', gal='MW',
+    def __init__(self, rad=DEFAULT_RAD, comp='Graphite', gal='MW',
                  R_V=3.1, bc=0.0):
         self.a = rad
-        self.composition = composition
+        self.comp = Composition(comp)
         self.gal  = gal
         self.bc   = bc
         self.R_V  = R_V
         self.citation = "Using %s model for %s from\nWeingartner, C. & Draine, B. T. 2001, ApJ, 548, 296\nhttp://adsabs.harvard.edu/abs/2001ApJ...548..296W" \
-                        % (self.gal, self.composition)
+                        % (self.gal, self.comp.cname)
 
         nd, md, rho = _make_WD01_DustSpectrum(R_V=self.R_V, bc=self.bc, rad=self.a,
-                                              dtype=self.composition, gal=self.gal, verbose=True)
+                                              dtype=self.comp, gal=self.gal, verbose=True)
         self.nd_nom = nd
         self.md_nom = md
-        self.rho    = rho
         print(self.citation)
 
     def ndens(self, md=None, rho=None):
@@ -59,13 +59,13 @@ def _find_wdfile(name):
     return os.path.join(data_path, name)
 
 def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
-                            dtype='Graphite', gal='MW', verbose=True):
+                            dtype=Composition('Graphite'), gal='MW', verbose=True):
     """
     make_WD01_DustSpectrum(
     R_V [float],
     bc [float],
     rad [np.array : grain sizes (um)],
-    dtype [string : 'Graphite' or 'Silicate'] )
+    dtype : Composition object: Composition('Graphite') or Composition('Silicate')] )
     gal [string : 'MW', 'LMC', or 'SMC'],
     -------------------------------------------
     Returns a sizedist.DustSpectrum object containing a
@@ -78,13 +78,14 @@ def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
     >>> (wd01_gra.integrate_dust_mass(wd01_gra)/wd01_gra.md) - 1.0 < 0.01
     """
 
-    if dtype == 'Graphite':
-        rho = 2.24  # g cm^-3
-    elif dtype == 'Silicate':
-        rho = 3.8
+    if dtype.cname == 'Graphite':
+        dtype.rho = 2.24  # g cm^-3
+    elif dtype.cname == 'Silicate':
+        dtype.rho = 3.8
     else:
         print('Error: Dust type not recognized')
         return
+    rho = dtype.rho
 
     ANGS2MICRON = 1.e-10 * 1.e6
     a    = rad  # Easier than changing variable names further down
@@ -92,9 +93,9 @@ def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
     NA   = np.size(a)
 
 
-    (alpha, beta, a_t, a_c, C) = _get_dist_params(R_V=R_V, bc=bc, dtype=dtype, gal=gal, verbose=verbose)
+    (alpha, beta, a_t, a_c, C) = _get_dist_params(R_V=R_V, bc=bc, cname=dtype.cname, gal=gal, verbose=verbose)
 
-    if dtype == 'Graphite':
+    if dtype.cname == 'Graphite':
 
         mc      = 12. * 1.67e-24   # Mass of carbon atom in grams (12 m_p)
         sig     = 0.4
@@ -133,7 +134,7 @@ def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
 
         Dist_WD01 = D + C/a_cm * (a/a_t)**alpha * F_g * Case_g  # cm^-4 per n_H
 
-    if dtype == 'Silicate':
+    if dtype.cname == 'Silicate':
         Case_s = np.zeros(NA)
         case1s = np.where(np.logical_and(a > 3.5*ANGS2MICRON, a < a_t))
         case2s = np.where(a >= a_t)
@@ -158,12 +159,12 @@ def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
 
     return (ndens, Md, rho)
 
-def _get_dist_params(R_V=3.1, bc=0.0, dtype='Graphite', gal='MW', verbose=True):
+def _get_dist_params(R_V=3.1, bc=0.0, cname='Graphite', gal='MW', verbose=True):
     """
     _get_dist_params(
     R_V [float : 3.1, 4.0, or 5.5]
     bc [float : 0,1,2,3...],
-    dtype [string : 'Graphite' or 'Silicate],
+    cname [string : 'Graphite' or 'Silicate],
     gal [string : 'MW','LMC' or 'SMC'] )
     ------------------------------------------
     Returns (alpha, beta, a_t, a_c, C) : Parameters used in WD01 fits
@@ -171,24 +172,24 @@ def _get_dist_params(R_V=3.1, bc=0.0, dtype='Graphite', gal='MW', verbose=True):
     is_MW = False
 
     if gal == 'MW':
-        table_filename = _find_wdfile( MW_caseA_file )
+        table_filename = _find_wdfile(MW_caseA_file)
         is_MW = True
     elif gal == 'SMC':
-        table_filename = _find_wdfile( SMC_file )
+        table_filename = _find_wdfile(SMC_file)
     elif gal == 'LMC':
-        table_filename = _find_wdfile( LMC_avg_file )
+        table_filename = _find_wdfile(LMC_avg_file)
     else:
         print('Error: Galaxy type not recognized')
         return
 
     table_info = 0.0
     try:
-        table_info = ascii.read( table_filename )
+        table_info = ascii.read(table_filename)
     except:
         print('Error: File %s not found' % (table_filename))
         return
 
-    RV_col = table_info['col1'] # either a float or '--' (LMC/SMC case)
+    RV_col = table_info['col1']  # either a float or '--' (LMC/SMC case)
     bc_col = table_info['col2']
 
     # Get index of rows associated with the input R_V value
@@ -206,7 +207,7 @@ def _get_dist_params(R_V=3.1, bc=0.0, dtype='Graphite', gal='MW', verbose=True):
             print('Error: R_V value not found')
             return
     else:
-        i_RV = range( len(RV_col) )
+        i_RV = range(len(RV_col))
 
     # Get the ultimate row index for this R_V, bc combination
 
@@ -221,21 +222,21 @@ def _get_dist_params(R_V=3.1, bc=0.0, dtype='Graphite', gal='MW', verbose=True):
             i_bc = count_bc
         count_bc += 1
 
-    if i_bc == None:
+    if i_bc is None:
         print('Error: bc value not found')
         return
 
-    ## Now choose the relevant columns based on grain type
-    ## Remember: First index is column, second index is row
+    # Now choose the relevant columns based on grain type
+    # Remember: First index is column, second index is row
 
-    if dtype == 'Graphite':
+    if cname == 'Graphite':
         alpha = table_info['col3'][i_bc]
         beta  = table_info['col4'][i_bc]
         a_t   = table_info['col5'][i_bc]
         a_c   = table_info['col6'][i_bc]
         C     = table_info['col7'][i_bc]
 
-    elif dtype == 'Silicate':
+    elif cname == 'Silicate':
         alpha = table_info['col8'][i_bc]
         beta  = table_info['col9'][i_bc]
         a_t   = table_info['col10'][i_bc]

@@ -22,7 +22,7 @@ def test_Powlaw():
                           ('LMC','Silicate'),
                           ('LMC','Graphite')])
 def test_WD01(gals, compositions):
-    test = WD01(composition=compositions, gal=gals)
+    test = WD01(comp=compositions, gal=gals)
     assert len(test.ndens(TEST_MD, rho=TEST_RHO)) == len(test.a)
 
 #------------------------------------------
@@ -34,9 +34,9 @@ def test_units():
     assert np.all(np.isinf(Powerlaw().ndens(md=1.0, rho=0.0)))
 
 def test_WD01_ndens_units():
-    test = WD01(composition='Silicate')
+    test = WD01(comp='Silicate')
     # No input to ndens yields nominal dust mass column
-    mg   = (4./3.) * np.pi * test.rho * np.power(test.a * c.micron2cm, 3)
+    mg   = (4./3.) * np.pi * test.comp.rho * np.power(test.a * c.micron2cm, 3)
     assert np.abs(1.0 - trapz(test.ndens()*mg, test.a) / test.md_nom) < 0.01
     # Test that ndens changes appropriately with dust mass column
     md_new = 1.e-3
