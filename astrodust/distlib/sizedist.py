@@ -50,7 +50,7 @@ class Grain(object):
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* scalar number density [cm^-3]
     """
-    def __init__(self, rad=AMICRON, rho=RHO):
+    def __init__(self, rad=AMICRON):
         assert np.size(rad) == 1
         self.a   = np.array([rad])
 
@@ -69,8 +69,7 @@ class Powerlaw(object):
     | ndens ( md : mass density [g cm^-2 or g cm^-3] )
     |    *returns* number density [cm^-3 um^-1]
     """
-    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST,
-                 na=NA, log=False):
+    def __init__(self, amin=MRN_RAD[0], amax=MRN_RAD[-1], p=PDIST, na=NA, log=False):
         self.amin = amin
         self.amax = amax
         self.a    = make_rad(amin, amax, na, log=log)

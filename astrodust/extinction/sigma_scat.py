@@ -4,7 +4,7 @@ import numpy as np
 from .. import constants as c
 from . import scatmodels as sms
 from ..distlib.composition import cmindex as cmi
-from .. import distlib
+from ..distlib import *
 
 __all__ = ['diff_scat','sigma_sca','sigma_ext','kappa_ext','kappa_sca']
 
@@ -95,7 +95,7 @@ def sigma_ext(a, E, scatm=sms.RGscat(), cm=cmi.CmDrude(), qval=False):
         cgeo  = np.pi * np.power(a*c.micron2cm, 2)
         return qext * cgeo
 
-def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
+def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAULT_MD):
     """
     Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
         |
@@ -150,7 +150,7 @@ def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), 
     return kappa
 
 
-def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=distlib.Powerlaw(), md=DEFAULT_MD):
+def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAULT_MD):
     """
     Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size distribution
         |

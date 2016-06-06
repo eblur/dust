@@ -16,23 +16,23 @@ class GrainPop(object):
         |
         | **INITIALIZE**
         | sizedist : grain size dist objects : distlib.Grain, distlib.Powerlaw, distlib.WD01
-        | composition : a string describing the composition type : 'Graphite', 'Silicate' or 'Drude'
-        | scatmodel : a string describing the scattering physics to use : 'RG' or 'Mie'
+        | composition : Composition object : Composition('Graphite', 'Silicate' or 'Drude')
+        | scatmodel : scatmodel object : extinction.RGscat or extinction.Mie
         | md : dust mass column : 1.e-4 g cm^-2 (default)
         |
         | **ATTRIBUTES**
         | sizedist : distlib.Grain(), distlib.Powerlaw(), distlib.WD01()
-        | composition : distlib.Composition class
-        | scatmodel : extinction.sigma_scat.ScatModel
+        | comp : distlib.Composition class
+        | scatm : scatmodel object
         | md : dust mass column [g cm^-2]
         | ext : extinction.ExtinctionCurve object
     """
     def __init__(self, sizedist, composition, scatmodel, md=DEFAULT_MD):
-        self.sizedist    = sizedist
-        self.composition = Composition(composition)
-        self.scatmodel   = _pick_scatmodel(scatmodel)
-        self.md          = md
-        self.ext         = ExtinctionCurve()
+        self.sizedist = sizedist
+        self.comp     = composition
+        self.scatm    = scatmodel
+        self.md       = md
+        self.ext      = ExtinctionCurve()
 
     @property
     def a(self):
@@ -40,7 +40,7 @@ class GrainPop(object):
 
     @property
     def rho(self):
-        return self.composition.rho
+        return self.comp.rho
 
     @property
     def ndens(self):
@@ -73,8 +73,7 @@ class GrainPop(object):
             _test_wavel_grid(wavel, self)
 
         E_keV = c.hc_angs / wavel  # keV
-        kappa = kappa_ext(E_keV, scatm=self.scatmodel, cm=self.composition.cmindex,
-                          dist=self.sizedist, md=self.md)
+        kappa = kappa_ext(E_keV, scatm=self.scatm, cm=self.comp.cmindex, dist=self.sizedist, md=self.md)
         self.ext.wavel   = wavel
         self.ext.energy  = E_keV
         self.ext.tau_ext = kappa * self.md
@@ -95,8 +94,7 @@ class GrainPop(object):
             _test_wavel_grid(wavel, self)
 
         E_keV = c.hc_angs / wavel  # keV
-        kappa = kappa_sca(E_keV, scatm=self.scatmodel, cm=self.composition.cmindex,
-                          dist=self.sizedist, md=self.md)
+        kappa = kappa_sca(E_keV, scatm=self.scatm, cm=self.comp.cmindex, dist=self.sizedist, md=self.md)
         self.ext.wavel   = wavel
         self.ext.energy  = E_keV
         self.ext.tau_sca = kappa * self.md
@@ -148,7 +146,7 @@ def _pick_scatmodel(sname):
 # Supporting external functions for creating a GrainPop quickly
 
 def make_MRN_grainpop(amin, amax, p=3.5,
-                      compname='Drude', scatname='RG', md=DEFAULT_MD):
+                      compname='Drude', scatname='RG', md=DEFAULT_MD, **kwargs):
     """
     Quick start for making a GrainPop that follows a power law dust grain size distribution
         |
@@ -162,4 +160,7 @@ def make_MRN_grainpop(amin, amax, p=3.5,
         | scatname : a string describing the scattering model : 'RG' (default), 'Mie'
         | md : dust mass column [g cm^-2], 1.e-4 (default)
     """
-    gdist = Powerlaw(amin=amin, amax=amax, p=p, rho=)
+    gdist = Powerlaw(amin=amin, amax=amax, p=p, **kwargs)
+    comp  = Composition(compname)
+    scatm = _pick_scatmodel(scatname)
+    return GrainPop(gdist, comp, scatm, md=md)
