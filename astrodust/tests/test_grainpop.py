@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from astrodust import GrainPop
+from astrodust.grainpop import *
 from astrodust.distlib import *
 from astrodust.extinction import *
 
