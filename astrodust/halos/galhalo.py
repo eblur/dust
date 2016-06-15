@@ -60,11 +60,11 @@ def uniformISM(halo, NH=1.0e20, d2g=0.009, nx=1000, usepathdiff=False):
     alpha = halo.alpha
     gpop  = halo.gpop
     scatm = gpop.scatm
-    cmind = gpop.comp.cmind
+    cmind = gpop.comp.cmindex
     md    = NH * c.m_p * d2g
     nd    = gpop.sizedist.ndens(md=md)
 
-    halo.htype = GalHalo(NH=NH, d2g=d2g, ismtype='Uniform')
+    halo.htype = GalHalo(ismtype='Uniform')
     halo.taux  = ss.kappa_sca(E=E0, dist=gpop.sizedist, scatm=scatm, cm=cmind) * md
 
     dx    = 1.0 / nx
@@ -134,15 +134,15 @@ def screenISM(halo, xg=0.5, NH=1.0e20, d2g=0.009):
     md    = NH * c.m_p * d2g
     nd    = gpop.sizedist.ndens(md=md)
 
-    halo.htype = GalHalo(xg=xg, NH=NH, d2g=d2g, ismtype='Screen')
+    halo.htype = GalHalo(xg=xg, ismtype='Screen')
     thscat = alpha / xg
 
     if np.size(gpop.a) == 1:
         dsig = ss.diff_scat(E=E0, theta=thscat, a=gpop.a, scatm=scatm, cm=cmind)
-        intensity = np.power(xg, -2.0) * dsig * halo.dist.nd
+        intensity = np.power(xg, -2.0) * dsig * nd
 
     else:
-        avals  = halo.dist.a
+        avals  = halo.gpop.a
         intensity = []
         for i in range(len(alpha)):
             iatemp = np.zeros(shape=(len(avals),len(alpha)))

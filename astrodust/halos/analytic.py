@@ -52,7 +52,7 @@ def set_htype(halo, xg=None):
     else:
         halo.htype = GH.GalHalo(xg=xg, ismtype='Screen')
 
-    halo.taux  = ss.kappa_sca(E=halo.energy, scatm=halo.gpop.scatm, dist=halo.gpop.sizeidst) * halo.gpop.md
+    halo.taux  = ss.kappa_sca(E=halo.energy, scatm=halo.gpop.scatm, dist=halo.gpop.sizedist) * halo.gpop.md
     return
 
 #--------------------------------------------
@@ -145,8 +145,8 @@ def G_u(halo):
     Function used for evaluating halo from power law distribution of grain sizes
     (Uniform case)
     """
-    a0 = halo.a[0]
-    a1 = halo.a[-1]
+    a0 = halo.gpop.a[0]
+    a1 = halo.gpop.a[-1]
     p  = halo.gpop.sizedist.p
 
     if type(halo) == Halo:
@@ -194,7 +194,7 @@ def uniform_eq(halo, verbose=False):
             hfrac = np.tile(halo.taux.reshape(NE,1), NA)  # NE x NA
             energy, alpha = halo.superE, halo.superA  # NE x NA
 
-        if np.size(halo.dist.a) == 1:
+        if np.size(halo.gpop.a) == 1:
             if verbose: print('Using a dust grain')
             charsig = 1.04 * 60. / halo.dist.a  / energy  # arcsec
             eterm  = 1 - erf(alpha / charsig / np.sqrt(2.))

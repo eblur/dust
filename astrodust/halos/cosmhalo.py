@@ -49,7 +49,7 @@ def uniformIGM(halo, zs=4.0, cosm=Cosmology(), nz=500):
     halo.htype = CosmHalo(zs=zs, cosm=cosm, igmtype='Uniform')  # Stores information about this halo calc
 
     Dtot   = dchi_fun(zs, cosm=cosm, nz=nz)
-    zpvals = zvalues(zs=zs-zs/nz, z0=0, nz=nz)
+    zpvals = np.linspace(0, zs, nz)
 
     DP    = np.array([])
     for zp in zpvals:
@@ -111,8 +111,9 @@ def screenIGM(halo, zs=2.0, zg=1.0, md=DEFAULT_SCREEN_MD, cosm=Cosmology()):
 
     E0    = halo.energy
     alpha = halo.alpha
-    scatm = halo.gpop.scatm
-    cmind = halo.gpop.comp.cmindex
+    gpop  = halo.gpop
+    scatm = gpop.scatm
+    cmind = gpop.comp.cmindex
     nd    = gpop.sizedist.ndens(md=md)
     print(cmind.citation)
 
