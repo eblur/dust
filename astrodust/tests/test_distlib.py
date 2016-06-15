@@ -33,6 +33,12 @@ def test_units():
     assert np.sum(Powerlaw().ndens(0.0)) == 0.0
     assert np.all(np.isinf(Powerlaw().ndens(md=1.0, rho=0.0)))
 
+@pytest.mark.parametrize('gmodels', [Grain(), Powerlaw(), WD01()])
+def test_ndens_units(gmodels):
+    test = gmodels
+    assert np.all(test.ndens(2.0*TEST_MD)/test.ndens(TEST_MD) == 2.0)
+    assert np.all(test.ndens(TEST_MD, rho=TEST_RHO/2.0)/test.ndens(TEST_MD, rho=TEST_RHO) == 2.0)
+
 def test_WD01_ndens_units():
     test = WD01(comp='Silicate')
     # No input to ndens yields nominal dust mass column
