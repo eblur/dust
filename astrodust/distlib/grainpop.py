@@ -44,7 +44,7 @@ class GrainPop(object):
 
     @property
     def ndens(self):
-        return self.sizedist.ndens(self.md)
+        return self.sizedist.ndens(md=self.md, rho=self.comp.rho)
 
     @property
     def tau_ext(self):

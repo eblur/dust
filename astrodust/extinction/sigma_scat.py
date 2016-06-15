@@ -95,7 +95,7 @@ def sigma_ext(a, E, scatm=sms.RGscat(), cm=cmi.CmDrude(), qval=False):
         cgeo  = np.pi * np.power(a*c.micron2cm, 2)
         return qext * cgeo
 
-def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAULT_MD):
+def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw()):
     """
     Opacity to scattering [g^-1 cm^2] integrated over dust grain size distribution.
         |
@@ -106,10 +106,10 @@ def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAU
         | scatm : scatmodel object : scatmodels.RGscat (default)
         | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
         | dist  : distlib sizedist object : distlib.Powerlaw (default)
-        | md    : dust mass column [g cm^-2] : 1.e-4 (default)
     """
     print(cm.citation)
-    ndens = dist.ndens(md)
+    MD    = 1.0
+    ndens = dist.ndens(MD)
 
     cgeo = np.pi * np.power(dist.a * c.micron2cm, 2)
 
@@ -140,17 +140,17 @@ def kappa_sca(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAU
             qsca = scatm.Qsca(E, a=dist.a, cm=cm)
 
     if np.size(dist.a) == 1:
-        kappa = ndens * qsca * cgeo / md
+        kappa = ndens * qsca * cgeo / MD
     else:
         kappa = np.array([])
         for j in range(np.size(E)):
             kappa = np.append(kappa,
-                              c.intz(dist.a, ndens * qsca[j,:] * cgeo) / md)
+                              c.intz(dist.a, ndens * qsca[j,:] * cgeo) / MD)
 
     return kappa
 
 
-def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAULT_MD):
+def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw()):
     """
     Opacity to EXTINCTION [g^-1 cm^2] integrated over dust grain size distribution
         |
@@ -161,7 +161,6 @@ def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAU
         | scatm : scatmodel object : scatmodels.RGscat (default)
         | cm    : complex index of refraction object : distlib.composition.cmindex.CmDrude (default)
         | dist  : distlib sizedist object : distlib.Powerlaw (default)
-        | md    : dust mass column [g cm^-2] : 1.e-4 (default)
     """
     # Check if using the RGscat model, which does not do absorption
     if scatm.stype == 'RGscat':
@@ -170,7 +169,8 @@ def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAU
         return kappa
 
     print(cm.citation)
-    ndens = dist.ndens(md)
+    MD    = 1.0
+    ndens = dist.ndens(MD)
 
     cgeo = np.pi * np.power(dist.a * c.micron2cm, 2)
 
@@ -201,11 +201,11 @@ def kappa_ext(E, scatm=sms.RGscat(), cm=cmi.CmDrude(), dist=Powerlaw(), md=DEFAU
             qext = scatm.Qext(E, a=dist.a, cm=cm)
 
     if np.size(dist.a) == 1:
-        kappa = ndens * qext * cgeo / md
+        kappa = ndens * qext * cgeo / MD
     else:
         kappa = np.array([])
         for j in range(np.size(E)):
             kappa = np.append(kappa,
-                              c.intz(dist.a, ndens * qext[j,:] * cgeo) / md)
+                              c.intz(dist.a, ndens * qext[j,:] * cgeo) / MD)
 
     return kappa

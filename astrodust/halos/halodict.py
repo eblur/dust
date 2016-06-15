@@ -5,30 +5,23 @@ from astropy.io import fits
 
 from .. import constants as c
 from .. import distlib
-from ..extinction import sigma_scat as ss
 
-## UPDATED July 10, 2013 : Rewrote ecf method in HaloDict object
-## UPDATED June 11, 2013 : Make this file independent of asciidata
-
-## July 17, 2012 : A library of objects and functions for simulating a
-## full halo given an object's spectrum.
-## See sim_cygx3.py for original code (and testing)
+ALPHA  = np.logspace(0.0, 3.0, 30)
+GPOP   = distlib.make_MRN_grainpop()
 
 #---------------------------------------------------------------
 
-class HaloDict( object ):
+class HaloDict(object):
     """
-    | A dictionary of halos where each property can be looked up with energy as a key.
+    A dictionary of halos where each property can be looked up with energy as a key.
     |
     | **ATTRIBUTES**
     | alpha  : np.array : Observation angles [arcsec]
     | energy : np.array : Energy values [keV]
     | index  : dict : maps energy value to integer index
-    | rad    : distlib.Grain or distlib.Powerlaw object
-    | scatm  : sigma_scat.Scatmodel object
+    | gpop   : distlib.GrainPop
     | intensity : np.array : 2-D array with intensity values as a function of alpha and energy
     | htype  : halo type object (halo.CosmHalo or galhalo.GalHalo)
-    | dist   : distlib.Dustspectrum object
     | taux   : np.array : Scattering cross-section as a function of energy
     | total  : np.array : Total halo flux as a function of osbervation angle [e.g. phot cm^-2 s^-1 arcsec^-2]
     |
@@ -54,20 +47,16 @@ class HaloDict( object ):
     |     integral(theta,2pi*theta*halo)/total_halo_counts
     """
 
-    def __init__( self, energy, alpha=np.power(10.0, np.arange(0.0,3.01,0.05)), \
-        rad=distlib.Grain(), scatm=ss.ScatModel() ):
-
+    def __init__(self, energy, alpha=ALPHA, gpop=GPOP):
         self.alpha  = alpha
         self.energy = energy
-        self.index  = dict( zip(energy,range(len(energy))) )
-        self.rad    = rad
-        self.scatm  = scatm
-        self.intensity = np.zeros( shape=( len(energy), len(alpha) ) )
+        self.index  = dict(zip(energy,range(len(energy))))
+        self.gpop   = gpop
+        self.intensity = np.zeros(shape=(len(energy), len(alpha)))
 
         # The following variables get defined when htype is set
         # See analytic.set_htype
         self.htype  = None
-        self.dist   = None
         self.taux   = None
 
     ## Issues with comparing flouts, try round
@@ -81,66 +70,68 @@ class HaloDict( object ):
             return self.intensity[i,:]
 
     ## http://stackoverflow.com/questions/19151/build-a-basic-python-iterator
-    def __iter__( self ):
+    def __iter__(self):
         self.count = 0
         return self
-    def next( self ):
-        if self.count >= len( self.energy ):
+    def next(self):
+        if self.count >= len(self.energy):
             raise StopIteration
         else:
             self.count += 1
             return self.intensity[count,:]
 
     @property
-    def len( self ):
-        return len( self.energy )
+    def len(self):
+        return len(self.energy)
 
     @property
-    def hsize( self ):
-        return len( self.alpha )
+    def hsize(self):
+        return len(self.alpha)
 
     @property
-    def superE( self ):
+    def superE(self):
         NE, NA = len(self.energy), len(self.alpha)
-        return np.tile( self.energy.reshape(NE,1), NA ) # NE x NA
+        return np.tile(self.energy.reshape(NE,1), NA)  # NE x NA
 
     @property
-    def superA( self ):
-        NE, NA = len(self.energy), len(self.alpha)
-        return np.tile( self.alpha, (NE,1) ) # NE x NA
+    def superA(self):
+        NE = len(self.energy)
+        return np.tile(self.alpha, (NE,1))  # NE x NA
 
-    def total_halo( self, fluxes ):
+    def total_halo(self, fluxes):
         NE, NA = len(self.energy), len(self.alpha)
         if len(fluxes) != NE:
             print('Error: Number of flux bins must equal the number of halo energy bins')
             return
 
-        superflux  = np.tile( fluxes.reshape(NE,1), NA )
-        result     = np.sum( superflux * self.intensity, 0 )
+        superflux  = np.tile(fluxes.reshape(NE,1), NA)
+        result     = np.sum(superflux * self.intensity, 0)
         self.total = result
         return
 
         # Update -- Feb 10, 2015 to match halo.ecf
-    def ecf( self, theta, nth=500 ):
-        NE, NA = len(self.energy), len(self.alpha)
-        result = np.zeros( NE ) # NE x NA
+    def ecf(self, theta, nth=500):
+        NE = len(self.energy)
+        result = np.zeros(NE)
         taux   = self.taux
-        tharray = np.linspace( min(self.alpha), theta, nth )
+        tharray = np.linspace(min(self.alpha), theta, nth)
 
-        if self.taux == None:
+        if self.taux is None:
             print('ERROR: No taux is specified. Need to run halo calculation')
             return result
 
         for i in range(NE):
-            interpH = interp1d( self.alpha, self.intensity[i,:] )
-            result[i] = c.intz( tharray, interpH(tharray) * 2.0*np.pi*tharray ) / taux[i]
+            interpH = interp1d(self.alpha, self.intensity[i,:])
+            result[i] = c.intz(tharray, interpH(tharray) * 2.0*np.pi*tharray) / taux[i]
 
         return result
 
 #---------------------------------------------------------------
 # Supporting functions
 
-def get_spectrum( filename ):
+"""
+# 2016.06.10 - deprecated
+def get_spectrum(filename):
     data = c.read_table( filename, 2 )
     energy, flux = np.array( data[0] ), np.array( data[1] )
     return energy, flux
@@ -150,9 +141,8 @@ def aeff( filename ):
     energy = np.array( data[0] )
     aeff   = np.array( data[1] )
     return interp1d( energy, aeff )   # keV vs cm^2
-
+"""
 ## 2015.01.29 - Add a function that will save and load halo dicts into/from fits files
-
 def fitsify_halodict( hd, outfile, clobber=False ):
     """
     | Save a halo dictionary to a fits file, with some useful information in the header
@@ -191,7 +181,7 @@ def fitsify_halodict( hd, outfile, clobber=False ):
     thdulist.writeto(outfile, clobber=clobber)
     return
 
-def read_halodict_fits( infile ):
+def read_halodict_fits(infile):
     """
     | Read in a fits file and pass on as much information as possible to a halo dict object
     |

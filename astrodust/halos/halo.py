@@ -9,12 +9,12 @@ DEFAULT_ALPHA = np.linspace(5.0, 100.0, 20)
 class Halo(object):
     """
     | **ATTRIBUTES**
-    | htype : abstract class containing information about the halo calculation
-    | E0    : float : observed energy [keV]
-    | alpha : np.array : observed angle [arcsec]
-    | dist  : distlib.DustSpectrum
-    | scatm : ss.ScatModel : scattering model used
-    | intensity : np.array : fractional intensity [arcsec^-2]
+    | htype  : abstract class containing information about the halo calculation
+    | energy : float : observed energy [keV]
+    | alpha  : np.ndarray : observed angle [arcsec]
+    | gpop   : distlib.GrainPop object
+    | intensity : np.ndarray : fractional intensity [arcsec^-2]
+    | taux   : np.ndarray : dust scattering optical depth vs energy, None (default) until calculated
     """
     def __init__(self, E0, alpha=DEFAULT_ALPHA, gpop=distlib.make_MRN_grainpop()):
         self.htype  = None

@@ -7,10 +7,9 @@ from astrodust import distlib
 def test_Halo():
     halo = Halo(1.0)
     assert type(halo) == Halo
-    halo.energy
-    assert type(halo.dist) == distlib.DustSpectrum
+    assert type(halo.dist) == distlib.GrainPop
 
-## Test the analytic halo module
+# Test the analytic halo module
 def test_gammainc():
     assert analytic.gammainc_fun(0,-1) is None
 
