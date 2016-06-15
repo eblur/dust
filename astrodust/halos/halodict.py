@@ -4,10 +4,10 @@ from scipy.interpolate import interp1d
 from astropy.io import fits
 
 from .. import constants as c
-from .. import distlib
+from .. import grainpop
 
 ALPHA  = np.logspace(0.0, 3.0, 30)
-GPOP   = distlib.make_MRN_grainpop()
+GPOP   = grainpop.make_MRN_grainpop()
 
 #---------------------------------------------------------------
 
@@ -19,7 +19,7 @@ class HaloDict(object):
     | alpha  : np.array : Observation angles [arcsec]
     | energy : np.array : Energy values [keV]
     | index  : dict : maps energy value to integer index
-    | gpop   : distlib.GrainPop
+    | gpop   : grainpop.GrainPop
     | intensity : np.array : 2-D array with intensity values as a function of alpha and energy
     | htype  : halo type object (halo.CosmHalo or galhalo.GalHalo)
     | taux   : np.array : Scattering cross-section as a function of energy
@@ -204,7 +204,7 @@ def read_halodict_fits(infile):
 
     result  = HaloDict( energy, alpha=alpha, rad=rad )
     result.taux = taux
-    result.dist = distlib.Dustspectrum(a=rad, p=powr, rho=rho, md=md)
+    #result.dist = distlib.Dustspectrum(a=rad, p=powr, rho=rho, md=md)
 
     for i in np.arange(len(energy))+3:
         result.intensity[i-3,:] = hdulist[i].data['intensity']

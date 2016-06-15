@@ -2,7 +2,7 @@
 import numpy as np
 
 from .. import constants as c
-from .. import distlib
+from .. import grainpop
 from ..extinction import sigma_scat as ss
 
 __all__ = ['Cosmology', 'cosmdens', 'dchi_fun', 'da_fun', 'cosm_taux', 'cosm_taux_screen']
@@ -50,9 +50,9 @@ def cosm_gpop(amin=0.1, amax=1.0, na=100., p=4.0, rho=3.0, cosm=Cosmology()):
     | rho  : grain density [g cm^-3]
     | cosm : Cosmology object
     |
-    | RETURNS : distlib.DustSpectrum
+    | RETURNS : grainpop.GrainPop
     """
-    return distlib.make_MRN_grainpop(amin, amax, p,
+    return grainpop.make_MRN_grainpop(amin, amax, p,
                                      compname='Drude', scatname='RG', md=cosmdens(cosm))
 
 def dchi_fun(z, zp=0.0, cosm=Cosmology(), nz=100):
@@ -84,14 +84,14 @@ def da_fun(theta, z, cosm=Cosmology(), nz=100):
     return theta * c.arcs2rad * dchi / (1+z)
 
 # This needs to be rewritten to avoid energy for loop
-def cosm_taux(z, E=1.0, gpop=distlib.make_MRN_grainpop(), cosm=Cosmology(), nz=100):
+def cosm_taux(z, E=1.0, gpop=grainpop.make_MRN_grainpop(), cosm=Cosmology(), nz=100):
     """
     | Calculates the optical depth from dust distributed uniformly in the IGM
     |
     | **INPUTS**
     | z : redshift of source
     | E : scalar or np.array [keV]
-    | gpop  : distlib.GrainPop
+    | gpop  : grainpop.GrainPop
     | cosm  : cosm.Cosmology
     | nz : number of z values to use
     |
@@ -123,14 +123,14 @@ def cosm_taux(z, E=1.0, gpop=distlib.make_MRN_grainpop(), cosm=Cosmology(), nz=1
     return result
 
 
-def cosm_taux_screen(zg, E=1.0, gpop=distlib.make_MRN_grainpop(), cosm=Cosmology()):
+def cosm_taux_screen(zg, E=1.0, gpop=grainpop.make_MRN_grainpop(), cosm=Cosmology()):
     """
     | Calculates the optical depth from a screen of dust in the IGM
     |
     | **INPUTS**
     | zg : redshift of screen
     | E  : scalar or np.array [keV]
-    | gpop  : distlib.GrainPop
+    | gpop  : grainpop.GrainPop
     | cosm : Cosmology object
     |
     | **RETURNS**

@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
+from .. import grainpop
 from .. import constants as c
-from .. import distlib
 
 DEFAULT_ALPHA = np.linspace(5.0, 100.0, 20)
 
@@ -12,11 +12,11 @@ class Halo(object):
     | htype  : abstract class containing information about the halo calculation
     | energy : float : observed energy [keV]
     | alpha  : np.ndarray : observed angle [arcsec]
-    | gpop   : distlib.GrainPop object
+    | gpop   : grainpop.GrainPop object
     | intensity : np.ndarray : fractional intensity [arcsec^-2]
     | taux   : np.ndarray : dust scattering optical depth vs energy, None (default) until calculated
     """
-    def __init__(self, E0, alpha=DEFAULT_ALPHA, gpop=distlib.make_MRN_grainpop()):
+    def __init__(self, E0, alpha=DEFAULT_ALPHA, gpop=grainpop.make_MRN_grainpop()):
         self.htype  = None
         self.energy = E0
         self.alpha  = alpha

@@ -1,9 +1,8 @@
 import pytest
 import numpy as np
 
-from astrodust.distlib.grainpop import GrainPop
-from astrodust.distlib import Grain, Powerlaw, WD01
-from astrodust.distlib.composition import *
+from astrodust import GrainPop
+from astrodust.distlib import *
 from astrodust.extinction import *
 
 DEFAULT_COMP = Composition('Silicate')

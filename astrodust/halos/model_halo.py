@@ -3,7 +3,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
-from .. import distlib
+from .. import grainpop
 from . import galhalo as GH
 from . import halodict as HD
 from . import analytic as AH
@@ -13,7 +13,7 @@ from astropy.io import ascii
 #---------------------------------------------------------------------
 # Set up the model
 ALPHA  = np.logspace(0.0, 3.0, 30)
-GPOP   = distlib.make_MRN_grainpop()
+GPOP   = grainpop.make_MRN_grainpop()
 
 #---------------------------------------------------------------------
 
@@ -116,7 +116,7 @@ def simulate_screen(specfile, xg=0.5, alpha=ALPHA, gpop=GPOP,
     | specfile : string : Name of spectrum file
     | xg       : float [0-1] : Position of screen where 0 = point source, 1 = observer
     | alpha    : np.array [arcsec] : Angles for halo intensity values
-    | gpop     : distlib.GrainPop object
+    | gpop     : grainpop.GrainPop object
     | elim     : tuple containing energy limits [keV]
     | return_dict : boolean (False) : if True, returns halodict instead of interp object
     | verbose  : boolean (False) : prints extra information if True
@@ -150,7 +150,7 @@ def simulate_uniform(specfile, alpha=ALPHA, gpop=GPOP,
     | **INPUTS**
     | specfile : string : Name of spectrum file
     | alpha    : np.array [arcsec] : Angles for halo intensity values
-    | gpop     : distlib.GrainPop object
+    | gpop     : grainpop.GrainPop object
     | elim     : tuple containing energy limits [keV]
     | return_dict : boolean (False) : if True, returns halodict instead of interp object
     | verbose  : boolean (False) : prints extra information if True

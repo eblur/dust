@@ -2,12 +2,12 @@
 
 import numpy as np
 from astrodust.halos import *
-from astrodust import distlib
+from astrodust import grainpop
 
 def test_Halo():
     halo = Halo(1.0)
     assert type(halo) == Halo
-    assert type(halo.dist) == distlib.GrainPop
+    assert type(halo.dist) == grainpop.GrainPop
 
 # Test the analytic halo module
 def test_gammainc():
@@ -49,7 +49,7 @@ def test_gh_screenISM():
 
 ## Test the cosmological halo module
 def test_cosmspec():
-    assert type(cosmology.cosmdustspectrum()) == distlib.DustSpectrum
+    assert type(cosmology.cosmdustspectrum()) == grainpop.DustSpectrum
 
 def test_ch_types():
     assert type(cosmhalo.CosmHalo()) == cosmhalo.CosmHalo
