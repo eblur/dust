@@ -1,6 +1,7 @@
 
 import numpy as np
 from .. import constants as c
+from scipy.integrate import trapz
 
 __all__ = ['Grain', 'Powerlaw']
 
@@ -30,7 +31,7 @@ class Grain(object):
         assert np.size(rad) == 1
         self.a   = np.array([rad])
 
-    def ndens(self, md, rho=RHO):
+    def ndens(self, md, rho):
         """
         Calculate number density of dust grains
             |
@@ -71,5 +72,5 @@ class Powerlaw(object):
         adep  = np.power(self.a, -self.p)   # um^-p
         gdens = (4. / 3.) * np.pi * rho
         dmda  = adep * gdens * np.power(self.a * c.micron2cm, 3)  # g um^-p
-        const = md / c.intz(self.a, dmda)  # cm^-? um^p-1
+        const = md / trapz(dmda, self.a)  # cm^-? um^p-1
         return const * adep  # cm^-? um^-1

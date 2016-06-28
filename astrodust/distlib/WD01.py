@@ -3,6 +3,8 @@ Contains helper functions for producing a DustSpectrum object for the
 Weingartner & Draine (2001) dust grain size distributions.
 """
 
+__all__ = ['WD01']
+
 import numpy as np
 from astropy.io import ascii
 import os
@@ -19,13 +21,33 @@ LMC_2_file    = 'Table3_LMC2.WD.dat'
 SMC_file      = 'Table3_SMC.WD.dat'
 
 DEFAULT_RAD = np.logspace(np.log10(0.005), np.log10(1.0), 50)
+NH_NOM      = 1.e22  # H cm^-2, normalization for dust mass column
 
 class WD01(object):
     """
     Grain size distributions from Weingartner & Draine (2001)
+        |
+        | **INPUTS**
+        | *rad* : an array of grain sizes [micron]
+        | *comp* : a string describing the composition ('Graphite' or 'Silicate')
+        | *gal* : Galaxy to use ('MW','LMC', or 'SMC')
+        | *R_V* : 3.1, 4.0, or 5.5
+        | *bc* : an integer value between 0 and 6
+        | *verbose* : if True, prints information about the distribution parameters used
+        |
+        | **ATTRIBUTES**
+        | *a* : grain sizes [micron]
+        | *comp* : distlib.Composition object
+        | *gal* : Galaxy string
+        | *bc* : an integer value between 0 and 6
+        | *citation* : Citation string
+        | *nd_nom* : Nominal grain size distribution from WD01 [cm^-2 um^-1 per 10^22 H]
+        | *md_nom* : Nominal dust mass from WD01 [g cm^-2 per 10^22 H]
+        |
+        | **FUNCTIONS**
+        | ndens(md=None, rho=None) : returns grain size distribution renormalized to a given dust mass and/or grain material density
     """
-    def __init__(self, rad=DEFAULT_RAD, comp='Graphite', gal='MW',
-                 R_V=3.1, bc=0.0):
+    def __init__(self, rad=DEFAULT_RAD, comp='Graphite', gal='MW', R_V=3.1, bc=0.0, verbose=True):
         self.a = rad
         self.comp = Composition(comp)
         self.gal  = gal
@@ -34,17 +56,19 @@ class WD01(object):
         self.citation = "Using %s model for %s from\nWeingartner, C. & Draine, B. T. 2001, ApJ, 548, 296\nhttp://adsabs.harvard.edu/abs/2001ApJ...548..296W" \
                         % (self.gal, self.comp.cname)
 
+        if verbose: print(self.citation)
         nd, md, rho = _make_WD01_DustSpectrum(R_V=self.R_V, bc=self.bc, rad=self.a,
-                                              dtype=self.comp, gal=self.gal, verbose=True)
+                                              dtype=self.comp, gal=self.gal, verbose=verbose)
         self.nd_nom = nd
         self.md_nom = md
-        print(self.citation)
+        #self.comp.rho = rho
 
     def ndens(self, md=None, rho=None):
         # If no arguments given, return the density that came with WD01 table
         renorm_mass = 1.0
         if rho is not None:
-            mg_new = (4.0/3.0) * np.pi * np.power(self.a * c.micron2cm, 3) * rho
+            a_cm   = self.a * c.micron2cm
+            mg_new = (4.0/3.0) * np.pi * a_cm**3 * rho
             md_new = trapz(self.nd_nom * mg_new, self.a)
             renorm_mass *= self.md_nom / md_new
         if md is not None:
@@ -87,11 +111,12 @@ def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
         return
     rho = dtype.rho
 
+    if verbose: print("rho = %f" % (rho))
+
     ANGS2MICRON = 1.e-10 * 1.e6
     a    = rad  # Easier than changing variable names further down
     a_cm = rad * c.micron2cm
     NA   = np.size(a)
-
 
     (alpha, beta, a_t, a_c, C) = _get_dist_params(R_V=R_V, bc=bc, cname=dtype.cname, gal=gal, verbose=verbose)
 
@@ -150,12 +175,12 @@ def _make_WD01_DustSpectrum(R_V=3.1, bc=0.0, rad=DEFAULT_RAD,
         if beta < 0:
             F_s = 1. / (1 - beta * a / a_t)
 
-        Dist_WD01 = C/a_cm * (a/a_t)**alpha * F_s * Case_s  # cm^-4 per n_H
+        Dist_WD01 = C/a_cm * (a/a_t)**alpha * F_s * Case_s  # cm^-4 per H
 
-    mg = 4.0/3.0*np.pi*a_cm**3 * rho  # mass of each dust grain
-    Md = c.intz(a_cm, Dist_WD01 * mg)
+    mg = (4.0/3.0) * np.pi * (a_cm**3) * rho  # mass of each dust grain
+    Md = trapz(Dist_WD01 * mg, a_cm) * NH_NOM
 
-    ndens = Dist_WD01 * c.micron2cm  # cm^-3 per um per n_H
+    ndens = Dist_WD01 * c.micron2cm * NH_NOM  # cm^-3 per um per 10^22 H
 
     return (ndens, Md, rho)
 
