@@ -129,7 +129,7 @@ class GrainPop(object):
 # Supporting internal functions
 
 def _test_wavel_grid(wavel, gpop):
-    if np.sum(gpop.ext.wavel - wavel) != 0.0:
+    if gpop.ext.wavel is not None:
         print("WARNING: Using wavelength grid from previous extinction calculation")
     return
 
@@ -144,7 +144,7 @@ def _pick_scatmodel(sname):
 #---------------------------------------------------------
 # Supporting external functions for creating a GrainPop quickly
 
-def make_MRN_grainpop(amin=0.005, amax=0.25, p=3.5,
+def make_MRN_GrainPop(amin=0.005, amax=0.25, p=3.5,
                       compname='Drude', scatname='RG', md=DEFAULT_MD, **kwargs):
     """
     Quick start for making a GrainPop that follows a power law dust grain size distribution
