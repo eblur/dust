@@ -16,5 +16,6 @@ from ._astropy_init import *
 if not _ASTROPY_SETUP_:
     from . import distlib
     from . import extinction
+    from . import halos
 
 # ----------------------------------------------------------------------------
