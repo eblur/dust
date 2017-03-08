@@ -16,6 +16,11 @@ def test_Powlaw():
     test = Powerlaw()
     assert len(test.ndens(TEST_MD, TEST_RHO)) == len(test.a)
 
+def test_MRN():
+    test = MRN()
+    assert test.amin == 0.005
+    assert test.p == 3.5
+
 @pytest.mark.parametrize(('gals','compositions'),
                          [('MW','Silicate'),
                           ('MW','Graphite'),

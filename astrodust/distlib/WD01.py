@@ -1,9 +1,6 @@
 """
-Contains helper functions for producing a DustSpectrum object for the
 Weingartner & Draine (2001) dust grain size distributions.
 """
-
-__all__ = ['WD01']
 
 import numpy as np
 from astropy.io import ascii
@@ -14,6 +11,8 @@ from scipy.integrate import trapz  # Needed for ndens renormalizations
 
 from .. import constants as c
 from .composition import *
+
+__all__ = ['WD01']
 
 MW_caseA_file = 'Table1.WD.dat'
 LMC_avg_file  = 'Table3_LMCavg.WD.dat'

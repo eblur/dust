@@ -3,7 +3,7 @@ import numpy as np
 from .. import constants as c
 from scipy.integrate import trapz
 
-__all__ = ['Grain', 'Powerlaw']
+__all__ = ['Grain', 'Powerlaw', 'MRN']
 
 # Some default values
 RHO      = 3.0     # g cm^-3 (average grain material density)
@@ -74,3 +74,9 @@ class Powerlaw(object):
         dmda  = adep * gdens * np.power(self.a * c.micron2cm, 3)  # g um^-p
         const = md / trapz(dmda, self.a)  # cm^-? um^p-1
         return const * adep  # cm^-? um^-1
+
+def MRN(amin=AMIN, amax=AMAX, p=PDIST, **kwargs):
+    """
+    MRN 1977 ApJ 217, 425 -- Power law with amin=0.005 um and amax~0.3 um
+    """
+    return Powerlaw(amin=amin, amax=amax, **kwargs)
